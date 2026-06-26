@@ -9,6 +9,9 @@
 <link rel="apple-touch-icon" href="./icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
 <meta name="theme-color" content="#fef9f3">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <link rel="manifest" href="./manifest.json">
 <title>五仁打卡</title>
 <style>
@@ -229,6 +232,7 @@ nav.tabs button.active { color: var(--accent); font-weight: 700; }
 
 <script>
 // ============ CONFIG ============
+const APP_VERSION = 3; // 改代码后+1，所有人自动提示刷新
 const PERSONS = ['石维婧','梅妍洁','单兰迪','王珂','师旌议'];
 const DAYS = ['一','二','三','四','五','六','日'];
 const AVATARS = { '石维婧':'🌸','梅妍洁':'🥜','单兰迪':'🌟','王珂':'🍃','师旌议':'🔥' };
@@ -537,11 +541,38 @@ function downloadFile(filename,content){const blob=new Blob([content],{type:'tex
 function switchTab(idx){document.querySelectorAll('.page').forEach((p,i)=>p.classList.toggle('active',i===idx));document.querySelectorAll('nav.tabs button').forEach((b,i)=>b.classList.toggle('active',i===idx));if(idx===0)renderCheckin();if(idx===1)renderWeekly();if(idx===2)renderPredict();if(idx===3)renderHistory();}
 
 // ============ INIT ============
+async function checkVersion(){
+  // Check remote version.json for updates
+  try{
+    const resp=await fetch(`https://raw.githubusercontent.com/${REPO}/main/version.json?t=${Date.now()}`,{cache:'no-cache'});
+    if(resp.ok){
+      const remote=await resp.json();
+      const localVer=parseInt(localStorage.getItem('wuren_app_ver')||'0');
+      if(remote.version>localVer){
+        // New version available!
+        const banner=document.createElement('div');
+        banner.style.cssText='position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:300;background:#f0883e;color:#fff;padding:10px 20px;border-radius:0 0 16px 16px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);animation:bounce 0.5s ease;';
+        banner.textContent='🆕 有新版本！点此刷新 →';
+        banner.onclick=()=>{
+          localStorage.setItem('wuren_app_ver',remote.version);
+          // Force clear service worker cache
+          if('serviceWorker'in navigator){navigator.serviceWorker.getRegistrations().then(regs=>regs.forEach(r=>r.unregister()));}
+          location.reload(true);
+        };
+        document.body.appendChild(banner);
+        setTimeout(()=>{if(banner.parentNode)banner.remove();},15000);
+      }
+    }
+  }catch(e){}
+}
+
 async function init(){
   const sel=document.getElementById('currentUser');sel.innerHTML='<option value="">选择自己</option>'+PERSONS.map(p=>`<option value="${p}">${AVATARS[p]||''} ${p}</option>`).join('');
   const saved=localStorage.getItem('wuren_me');if(saved&&PERSONS.includes(saved))sel.value=saved;
   document.getElementById('checkinDate').value=fmtDate(new Date());
+  localStorage.setItem('wuren_app_ver',APP_VERSION);
   await syncNow(true);renderAll();
+  checkVersion(); // Check for updates in background
   if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
 }
 init();
