@@ -1,1 +1,21 @@
-{"checkins":{},"predictions":{}}
+{
+  "checkins": {
+    "石维婧": {
+      "2026-06-27": {
+        "study": 0,
+        "sNote": "",
+        "exercise": 1.5,
+        "eNote": ""
+      }
+    },
+    "梅妍洁": {
+      "2026-06-27": {
+        "study": 1,
+        "sNote": "",
+        "exercise": 2,
+        "eNote": ""
+      }
+    }
+  },
+  "predictions": {}
+}
