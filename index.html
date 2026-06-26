@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="五仁打卡">
+<meta name="theme-color" content="#f5f0e8">
+<link rel="manifest" href="./manifest.json">
+<title>五仁打卡</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --bg: #faf7f2;
+  --card: #ffffff;
+  --text: #3d3929;
+  --sub: #8b856e;
+  --accent: #e8913a;
+  --accent2: #5b9e8c;
+  --study: #5b9e8c;
+  --exercise: #e8913a;
+  --border: #e8e3d5;
+  --shadow: 0 2px 12px rgba(60,50,30,0.06);
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: 80px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Header */
+header {
+  background: var(--card);
+  padding: 16px 20px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+header h1 { font-size: 20px; font-weight: 700; }
+header .date { font-size: 13px; color: var(--sub); margin-top: 2px; }
+
+/* Tabs */
+nav.tabs {
+  display: flex;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  z-index: 10;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+nav.tabs button {
+  flex: 1;
+  padding: 10px 4px 8px;
+  border: none;
+  background: none;
+  font-size: 12px;
+  color: var(--sub);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transition: color 0.2s;
+}
+nav.tabs button .ico { font-size: 22px; }
+nav.tabs button.active { color: var(--accent); font-weight: 600; }
+
+/* Page */
+.page { display: none; padding: 16px; }
+.page.active { display: block; }
+
+/* Cards */
+.card {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+.card h3 { font-size: 16px; margin-bottom: 10px; }
+.card .person-name { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+
+/* Score Row */
+.score-row { display: flex; gap: 10px; margin-bottom: 8px; }
+.score-block { flex: 1; }
+.score-block .label { font-size: 12px; color: var(--sub); margin-bottom: 4px; }
+.score-block .label .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+.score-block .label .dot.study { background: var(--study); }
+.score-block .label .dot.exercise { background: var(--exercise); }
+.score-btns { display: flex; gap: 4px; flex-wrap: wrap; }
+.score-btns button {
+  flex: 1; min-width: 36px;
+  padding: 8px 4px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.score-btns button:hover { background: #faf5ed; }
+.score-btns button.sel {
+  border-color: var(--accent);
+  background: #fef7f0;
+  color: var(--accent);
+}
+.note-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  margin-top: 6px;
+  font-family: inherit;
+  resize: none;
+  height: 36px;
+}
+.done-badge {
+  display: inline-block;
+  background: #e8f5e9;
+  color: #388e3c;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 6px;
+  font-weight: 500;
+}
+.sunday-lock {
+  text-align: center;
+  color: #c0392b;
+  font-size: 14px;
+  padding: 12px;
+  background: #fef5f5;
+  border-radius: 10px;
+  margin: 10px 0;
+}
+.sunday-winner {
+  text-align: center;
+  color: #27ae60;
+  font-size: 14px;
+  padding: 12px;
+  background: #f0faf4;
+  border-radius: 10px;
+  margin: 10px 0;
+}
+
+/* Week Table */
+.week-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.week-table th, .week-table td { padding: 6px 4px; text-align: center; border-bottom: 1px solid var(--border); }
+.week-table th { font-weight: 600; font-size: 11px; color: var(--sub); }
+.week-table td:first-child { text-align: left; font-weight: 500; white-space: nowrap; }
+.week-table .sun-col { color: #c0392b; }
+.week-table .highlight { background: #fffbe6; font-weight: 600; }
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: #d97e2e; }
+.btn-saved { background: #5b9e8c !important; color: #fff !important; pointer-events: none; }
+.btn-outline { background: var(--card); border: 1.5px solid var(--accent); color: var(--accent); }
+.btn-small { padding: 6px 14px; font-size: 12px; border-radius: 8px; }
+.btn-block { display: block; width: 100%; }
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+
+/* Encourage */
+.encourage-box {
+  background: linear-gradient(135deg, #fef9f0, #fff5e8);
+  border-left: 4px solid var(--accent);
+  padding: 14px 16px;
+  border-radius: 0 12px 12px 0;
+  margin: 14px 0;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* Summary */
+.summary-card { margin-top: 10px; }
+.summary-card .person-line { padding: 6px 0; border-bottom: 1px solid #f5f5f5; font-size: 14px; }
+.summary-card .total-line { font-weight: 700; font-size: 16px; padding: 10px 0; color: var(--accent); }
+
+/* Export Modal */
+.modal-overlay {
+  display: none;
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 100;
+  align-items: center; justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 20px;
+  max-width: 400px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.modal h3 { margin-bottom: 12px; }
+
+/* Toast */
+.toast {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  background: #3d3929; color: #fff;
+  padding: 10px 20px; border-radius: 20px;
+  font-size: 14px; z-index: 200;
+  opacity: 0; transition: opacity 0.3s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; }
+
+/* Predictions */
+.pred-input-row { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
+.pred-input-row input {
+  width: 70px; padding: 8px; border: 1.5px solid var(--border);
+  border-radius: 8px; font-size: 15px; text-align: center; font-family: inherit;
+}
+.pred-input-row .name { flex: 1; font-size: 14px; font-weight: 500; }
+.winner-tag { color: #e74c3c; font-weight: 600; font-size: 12px; margin-left: 4px; }
+
+/* Responsive */
+@media (min-width: 600px) {
+  .checkin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .checkin-grid .card { margin-bottom: 0; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🥜 五仁打卡</h1>
+  <div class="date" id="headerDate"></div>
+</header>
+
+<div class="toast" id="toast"></div>
+
+<!-- Page 1: 打卡 -->
+<div class="page active" id="page-checkin">
+  <div class="encourage-box" id="dailyEncourage"></div>
+  <div id="sundayNotice"></div>
+  <div style="font-size:12px;color:var(--sub);margin-bottom:8px;text-align:center;">👆 为每位伙伴选择学习和运动分数 → 点底部按钮保存</div>
+  <div class="checkin-grid" id="checkinGrid"></div>
+  <button class="btn btn-primary btn-block" id="btnSaveAll" onclick="saveAll()" style="margin-top:12px;">💾 保存今日打卡</button>
+</div>
+
+<!-- Page 2: 周报 -->
+<div class="page" id="page-weekly">
+  <div class="card">
+    <h3>📊 本周概览</h3>
+    <div id="weekRange" style="font-size:13px;color:var(--sub);margin-bottom:8px;"></div>
+    <div style="overflow-x:auto;" id="weekTable"></div>
+    <div class="summary-card" id="weekSummary"></div>
+  </div>
+  <div class="card">
+    <h3>🔮 上周预测结果</h3>
+    <div id="lastPredResult" style="font-size:14px;"></div>
+  </div>
+</div>
+
+<!-- Page 3: 预测 -->
+<div class="page" id="page-predict">
+  <div class="card">
+    <h3>🔮 本周日预测下周总分</h3>
+    <div id="predInfo" style="font-size:13px;color:var(--sub);margin-bottom:10px;"></div>
+    <div id="predInputs"></div>
+    <button class="btn btn-primary btn-block" onclick="savePredictions()" style="margin-top:10px;">📝 保存预测</button>
+  </div>
+  <div class="card">
+    <h3>📜 预测历史</h3>
+    <div id="predHistory"></div>
+  </div>
+</div>
+
+<!-- Page 4: 记录 & 导出 -->
+<div class="page" id="page-history">
+  <div class="card">
+    <h3>📋 导出个人记录</h3>
+    <div id="exportList"></div>
+  </div>
+  <div class="card">
+    <h3>📈 历史总览</h3>
+    <div id="historyOverview"></div>
+  </div>
+</div>
+
+<!-- Bottom Nav -->
+<nav class="tabs">
+  <button class="active" onclick="switchTab(0)"><span class="ico">📝</span>打卡</button>
+  <button onclick="switchTab(1)"><span class="ico">📊</span>周报</button>
+  <button onclick="switchTab(2)"><span class="ico">🔮</span>预测</button>
+  <button onclick="switchTab(3)"><span class="ico">📋</span>记录</button>
+</nav>
+
+<script>
+// ============ DATA LAYER ============
+const PERSONS = ['石维婧','梅妍洁','单兰迪','王珂','师旌议'];
+const DAYS = ['一','二','三','四','五','六','日'];
+
+function getMonday(d) { d = new Date(d); d.setHours(0,0,0,0); const day = d.getDay(); const diff = day === 0 ? -6 : 1 - day; d.setDate(d.getDate() + diff); return d; }
+function getSunday(monday) { const s = new Date(monday); s.setDate(s.getDate() + 6); return s; }
+function fmtDate(d) { const y = d.getFullYear(); const m = String(d.getMonth()+1).padStart(2,'0'); const day = String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${day}`; }
+function fmtDateShort(d) { return `${d.getMonth()+1}/${d.getDate()}`; }
+function fmtWeekRange(mon, sun) { return `${mon.getMonth()+1}月${mon.getDate()}日 - ${sun.getMonth()+1}月${sun.getDate()}日`; }
+function isSunday(d) { return d.getDay() === 0; }
+function isSameDay(a,b) { return fmtDate(a) === fmtDate(b); }
+
+function loadData() {
+  try { const d = localStorage.getItem('wuren_checkin_data'); return d ? JSON.parse(d) : {}; }
+  catch(e) { return {}; }
+}
+function saveData(data) {
+  localStorage.setItem('wuren_checkin_data', JSON.stringify(data));
+}
+
+function getData() {
+  let data = loadData();
+  if (!data.checkins) data.checkins = {}; // { person: { "YYYY-MM-DD": { study: n, sNote: "", exercise: n, eNote: "" } } }
+  if (!data.predictions) data.predictions = {}; // { sundayDate: { weekStart: "", preds: {person: n}, actual: n|null, winners: [] } }
+  return data;
+}
+
+function getTodayCheckin(data, person, dateStr) {
+  if (!data.checkins[person]) return null;
+  return data.checkins[person][dateStr] || null;
+}
+
+function getWeekTotal(data, person, monday) {
+  let total = 0;
+  for (let i = 0; i < 6; i++) { // Mon-Sat only
+    const d = new Date(monday); d.setDate(d.getDate() + i);
+    const c = getTodayCheckin(data, person, fmtDate(d));
+    if (c) total += (c.study || 0) + (c.exercise || 0);
+  }
+  // Add Sunday if person was a winner
+  const sun = getSunday(monday);
+  const sunStr = fmtDate(sun);
+  const predKey = getPredKeyForSunday(sun);
+  const predData = data.predictions[predKey];
+  if (predData && predData.winners && predData.winners.includes(person)) {
+    const c = getTodayCheckin(data, person, sunStr);
+    if (c) total += (c.study || 0) + (c.exercise || 0);
+  }
+  return total;
+}
+
+function getWeekAllTotal(data, monday) {
+  let total = 0;
+  PERSONS.forEach(p => { total += getWeekTotal(data, p, monday); });
+  return total;
+}
+
+function getPredKeyForSunday(sunday) {
+  // Predictions are keyed by the Sunday they were made ON
+  return fmtDate(sunday);
+}
+
+// ============ UI HELPERS ============
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function switchTab(idx) {
+  document.querySelectorAll('.page').forEach((p,i) => p.classList.toggle('active', i===idx));
+  document.querySelectorAll('nav.tabs button').forEach((b,i) => b.classList.toggle('active', i===idx));
+  if (idx === 0) renderCheckin();
+  if (idx === 1) renderWeekly();
+  if (idx === 2) renderPredict();
+  if (idx === 3) renderHistory();
+}
+
+// ============ PAGE 1: CHECK-IN ============
+function renderCheckin() {
+  const data = getData();
+  const today = new Date();
+  const todayStr = fmtDate(today);
+  const monday = getMonday(today);
+  const sunday = getSunday(monday);
+  const todayIsSun = isSunday(today);
+
+  document.getElementById('headerDate').textContent = `${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日 星期${DAYS[today.getDay()===0?6:today.getDay()-1]}`;
+  document.getElementById('dailyEncourage').innerHTML = generateEncourage(data, todayStr);
+
+  // Sunday logic: winners are from LAST Sunday's prediction
+  let sundayWinners = [];
+  if (todayIsSun) {
+    const lastSunday = new Date(today);
+    lastSunday.setDate(lastSunday.getDate() - 7);
+    const lastPredKey = getPredKeyForSunday(lastSunday);
+    const lastPredData = data.predictions[lastPredKey];
+    if (lastPredData && lastPredData.winners) sundayWinners = lastPredData.winners;
+  }
+
+  const noticeDiv = document.getElementById('sundayNotice');
+  if (todayIsSun) {
+    if (sundayWinners.length > 0) {
+      noticeDiv.innerHTML = `<div class="sunday-winner">🌟 周日福利日！本周中奖者：<strong>${sundayWinners.join('、')}</strong> —— 只有TA们今天可以打卡积分！</div>`;
+    } else {
+      noticeDiv.innerHTML = `<div class="sunday-lock">🔒 今天是周日，大部分伙伴休息。等待预测中奖者揭晓后再看谁能打卡~</div>`;
+    }
+  } else {
+    noticeDiv.innerHTML = '';
+  }
+
+  // Build checkin cards
+  let html = '';
+  PERSONS.forEach(person => {
+    const existing = getTodayCheckin(data, person, todayStr);
+    const canCheckin = !todayIsSun || sundayWinners.includes(person);
+
+    if (!canCheckin && todayIsSun) {
+      html += `<div class="card" style="opacity:0.5">
+        <div class="person-name">${person} <span style="font-size:12px;color:var(--sub);">今日休息</span></div>
+      </div>`;
+      return;
+    }
+
+    if (existing) {
+      const st = existing.study || 0;
+      const et = existing.exercise || 0;
+      html += `<div class="card">
+        <div class="person-name">${person} <span class="done-badge">✓ 已打卡</span></div>
+        <div style="font-size:14px;display:flex;gap:16px;">
+          <span>📚 学习 <strong>${st}分</strong>${existing.sNote ? ' — '+existing.sNote : ''}</span>
+          <span>🏃 运动 <strong>${et}分</strong>${existing.eNote ? ' — '+existing.eNote : ''}</span>
+        </div>
+        <button class="btn btn-outline btn-small" onclick="editCheckin('${person}')" style="margin-top:6px;">✏️ 修改</button>
+      </div>`;
+    } else {
+      html += `<div class="card" id="card-${person}">
+        <div class="person-name">${person}</div>
+        <div class="score-row">
+          <div class="score-block">
+            <div class="label"><span class="dot study"></span>📚 学习 (0-2分)</div>
+            <div class="score-btns">${scoreBtns(person,'study')}</div>
+            <input class="note-input" id="sNote-${person}" placeholder="学了什么…（选填）">
+          </div>
+        </div>
+        <div class="score-row">
+          <div class="score-block">
+            <div class="label"><span class="dot exercise"></span>🏃 运动 (0-2分)</div>
+            <div class="score-btns">${scoreBtns(person,'exercise')}</div>
+            <input class="note-input" id="eNote-${person}" placeholder="做了什么运动…（选填）">
+          </div>
+        </div>
+      </div>`;
+    }
+  });
+  document.getElementById('checkinGrid').innerHTML = html;
+
+  // Restore selections from temp state
+  if (window._tempScores) {
+    Object.keys(window._tempScores).forEach(key => {
+      const [person, type] = key.split('|');
+      selectScore(person, type, window._tempScores[key], false);
+    });
+  }
+}
+
+function scoreBtns(person, type) {
+  return [0, 0.5, 1, 1.5, 2].map(v =>
+    `<button id="btn-${person}-${type}-${v}" onclick="selectScore('${person}','${type}',${v})">${v===0?'0':v}</button>`
+  ).join('');
+}
+
+function selectScore(person, type, val, persist=true) {
+  if (!window._tempScores) window._tempScores = {};
+  if (persist) window._tempScores[person+'|'+type] = val;
+  // Reset save button if user changes scores
+  const btn = document.getElementById('btnSaveAll');
+  if (btn && btn.classList.contains('btn-saved')) {
+    btn.textContent = '💾 保存今日打卡';
+    btn.className = 'btn btn-primary btn-block';
+  }
+
+  [0, 0.5, 1, 1.5, 2].forEach(v => {
+    const btn = document.getElementById(`btn-${person}-${type}-${v}`);
+    if (btn) btn.classList.toggle('sel', v === val);
+  });
+}
+
+function editCheckin(person) {
+  const data = getData();
+  const todayStr = fmtDate(new Date());
+  const c = getTodayCheckin(data, person, todayStr);
+  if (!c) return;
+  // Remove existing to re-fill
+  delete data.checkins[person][todayStr];
+  saveData(data);
+  window._tempScores = window._tempScores || {};
+  window._tempScores[person+'|study'] = c.study || 0;
+  window._tempScores[person+'|exercise'] = c.exercise || 0;
+  renderCheckin();
+  // Fill notes
+  setTimeout(() => {
+    const sNote = document.getElementById('sNote-'+person);
+    const eNote = document.getElementById('eNote-'+person);
+    if (sNote) sNote.value = c.sNote || '';
+    if (eNote) eNote.value = c.eNote || '';
+  }, 100);
+}
+
+function saveAll() {
+  const data = getData();
+  const todayStr = fmtDate(new Date());
+  const today = new Date();
+  const monday = getMonday(today);
+  const sunday = getSunday(monday);
+  const todayIsSun = isSunday(today);
+
+  // Sunday winners are from LAST Sunday's prediction, not today's
+  let sundayWinners = [];
+  if (todayIsSun) {
+    const lastSunday = new Date(today);
+    lastSunday.setDate(lastSunday.getDate() - 7);
+    const lastPredKey = getPredKeyForSunday(lastSunday);
+    const lastPredData = data.predictions[lastPredKey];
+    if (lastPredData && lastPredData.winners) sundayWinners = lastPredData.winners;
+  }
+
+  let saved = 0;
+  PERSONS.forEach(person => {
+    if (todayIsSun && !sundayWinners.includes(person)) return;
+
+    const scores = window._tempScores || {};
+    const sVal = scores[person+'|study'];
+    const eVal = scores[person+'|exercise'];
+
+    if (sVal === undefined && eVal === undefined) return;
+
+    const sNote = document.getElementById('sNote-'+person);
+    const eNote = document.getElementById('eNote-'+person);
+
+    if (!data.checkins[person]) data.checkins[person] = {};
+    data.checkins[person][todayStr] = {
+      study: sVal || 0,
+      sNote: sNote ? sNote.value.trim() : '',
+      exercise: eVal || 0,
+      eNote: eNote ? eNote.value.trim() : ''
+    };
+    saved++;
+  });
+
+  saveData(data);
+  window._tempScores = {};
+  if (saved > 0) {
+    toast(`✅ 已保存 ${saved} 位伙伴的打卡！`);
+    const btn = document.getElementById('btnSaveAll');
+    if (btn) { btn.textContent = '✅ 已保存'; btn.className = 'btn btn-saved btn-block'; }
+    // Reset button after 3 seconds so they can save again later
+    setTimeout(() => {
+      if (btn && btn.classList.contains('btn-saved')) {
+        btn.textContent = '💾 保存今日打卡';
+        btn.className = 'btn btn-primary btn-block';
+      }
+    }, 3000);
+  } else {
+    toast('⚠️ 请至少为一位伙伴选择分数');
+  }
+  renderCheckin();
+}
+
+// ============ ENCOURAGEMENT ============
+function generateEncourage(data, todayStr) {
+  const today = new Date();
+  const d = today.getDay();
+  if (d === 0) return '🌿 周日休息，给身体和大脑放个假。回顾这周的坚持，你已经很棒了！';
+
+  const phrases = [
+    '💪 每一次打卡，都是对自己的一次承诺。今天也要加油！',
+    '🌟 不积跬步，无以至千里。半小时的学习或运动，都在塑造更好的你。',
+    '🔥 坚持不是轰轰烈烈，是每天0.5分、0.5分地积累。',
+    '📚 学习和运动，一个滋养头脑，一个强健体魄。两个都要抓~',
+    '🌈 今天的一小步，是未来的一大步。打开书本，穿上跑鞋，出发！',
+    '🎯 目标不是一天达成的，但放弃只需要一天。今天，选择坚持。',
+    '🍃 觉得累了？那就学半小时、动半小时。轻量完成也是胜利。',
+    '⭐ 你们五个人的坚持，互相照亮。看看群里谁今天最先打卡？',
+  ];
+
+  // Check who's already checked in today
+  let checkedIn = [];
+  PERSONS.forEach(p => {
+    if (getTodayCheckin(data, p, todayStr)) checkedIn.push(p);
+  });
+
+  if (checkedIn.length > 0) {
+    return `🌟 今天已有 <strong>${checkedIn.length}</strong> 位伙伴打卡（${checkedIn.join('、')}）！<br>${checkedIn.length >= 3 ? '团队过半完成了，这势头真棒！' : '其他伙伴抓紧跟上哦~'}`;
+  }
+
+  // Random phrase based on day
+  const idx = (today.getDate() * 7 + today.getMonth() * 31) % phrases.length;
+  return phrases[idx];
+}
+
+// ============ PAGE 2: WEEKLY ============
+function renderWeekly() {
+  const data = getData();
+  const today = new Date();
+  const monday = getMonday(today);
+  const sunday = getSunday(monday);
+  const weekStr = fmtWeekRange(monday, sunday);
+  document.getElementById('weekRange').textContent = `📅 ${weekStr}`;
+
+  // Build table
+  let tableHtml = '<table class="week-table"><thead><tr><th>姓名</th>';
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday); d.setDate(d.getDate() + i);
+    const isSun = i === 6;
+    tableHtml += `<th class="${isSun?'sun-col':''}">${DAYS[i]}<br>${fmtDateShort(d)}</th>`;
+  }
+  tableHtml += '<th>合计</th></tr></thead><tbody>';
+
+  const totals = {};
+  PERSONS.forEach(person => {
+    tableHtml += `<tr><td>${person}</td>`;
+    let pt = 0;
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(monday); d.setDate(d.getDate() + i);
+      const c = getTodayCheckin(data, person, fmtDate(d));
+      let cell = '-';
+      if (c) {
+        const sc = (c.study||0) + (c.exercise||0);
+        cell = sc > 0 ? sc.toFixed(1) : '-';
+        pt += sc;
+      }
+      const isSun = i === 6;
+      const isToday = isSameDay(d, today);
+      tableHtml += `<td class="${isSun?'sun-col':''}${isToday?' highlight':''}">${cell}</td>`;
+    }
+    tableHtml += `<td><strong>${pt.toFixed(1)}</strong></td></tr>`;
+    totals[person] = pt;
+  });
+  tableHtml += '</tbody></table>';
+  document.getElementById('weekTable').innerHTML = tableHtml;
+
+  // Summary
+  const allTotal = Object.values(totals).reduce((a,b)=>a+b,0);
+  let summaryHtml = `<div class="total-line">🔥 本周团队总分：${allTotal.toFixed(1)} 分</div>`;
+  PERSONS.forEach(person => {
+    const t = totals[person];
+    let comment = '';
+    if (t >= 8) comment = '🏆 太强了！';
+    else if (t >= 5) comment = '💪 稳定发挥！';
+    else if (t >= 2) comment = '🌱 稳步前进中';
+    else comment = '💤 下周加油哦';
+    summaryHtml += `<div class="person-line">${person}：<strong>${t.toFixed(1)}分</strong> ${comment}</div>`;
+  });
+  document.getElementById('weekSummary').innerHTML = summaryHtml;
+
+  // Last prediction result
+  const predKey = getPredKeyForSunday(sunday);
+  const predData = data.predictions[predKey];
+  const resultDiv = document.getElementById('lastPredResult');
+  if (predData) {
+    if (predData.actual !== null && predData.actual !== undefined) {
+      resultDiv.innerHTML = `上周预测总分实际为：<strong>${predData.actual.toFixed(1)}分</strong><br>中奖者：${predData.winners && predData.winners.length > 0 ? '<strong>'+predData.winners.join('、')+'</strong> 🎉 本周日可打卡！' : '无人预测或数据不足'}`;
+    } else {
+      resultDiv.innerHTML = '本周还未结束，周日揭晓实际总分~';
+    }
+  } else {
+    resultDiv.innerHTML = '暂无上周预测数据。周日来这里做预测吧！';
+  }
+}
+
+// ============ PAGE 3: PREDICTIONS ============
+function renderPredict() {
+  const data = getData();
+  const today = new Date();
+  const monday = getMonday(today);
+  const sunday = getSunday(monday);
+  const nextMonday = new Date(sunday); nextMonday.setDate(nextMonday.getDate() + 1);
+  const nextSunday = getSunday(nextMonday);
+
+  const predKey = getPredKeyForSunday(sunday);
+
+  // Info
+  if (isSunday(today)) {
+    document.getElementById('predInfo').innerHTML = `🗳️ 今天周日，请预测<strong>下周（${fmtWeekRange(nextMonday, nextSunday)}</strong>）的团队总分`;
+  } else {
+    document.getElementById('predInfo').innerHTML = `⏰ 预测在下周日（${sunday.getMonth()+1}月${sunday.getDate()}日）开放。届时预测下周总分。`;
+  }
+
+  // Inputs
+  let existingPreds = {};
+  if (data.predictions[predKey]) existingPreds = data.predictions[predKey].preds || {};
+
+  let inputHtml = '';
+  PERSONS.forEach(person => {
+    const val = existingPreds[person] !== undefined ? existingPreds[person] : '';
+    inputHtml += `<div class="pred-input-row">
+      <span class="name">${person}</span>
+      <input type="number" id="pred-${person}" value="${val}" placeholder="猜总分" step="0.5" min="0" max="40">
+      <span style="font-size:12px;color:var(--sub);">分</span>
+    </div>`;
+  });
+  document.getElementById('predInputs').innerHTML = inputHtml;
+  document.getElementById('predInputs').style.display = isSunday(today) ? 'block' : 'none';
+  document.querySelector('#page-predict .btn-primary').style.display = isSunday(today) ? 'block' : 'none';
+
+  // History
+  let histHtml = '';
+  const predKeys = Object.keys(data.predictions).sort().reverse();
+  predKeys.forEach(key => {
+    const pd = data.predictions[key];
+    if (!pd) return;
+    histHtml += `<div style="margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);">
+      <div style="font-weight:600;font-size:13px;">📅 预测于 ${key}</div>
+      <div style="font-size:12px;color:var(--sub);">预测周：${pd.weekStart} 起</div>`;
+    if (pd.preds) {
+      Object.keys(pd.preds).forEach(p => {
+        histHtml += `<span style="font-size:12px;">${p}: ${pd.preds[p]}分 </span>`;
+      });
+    }
+    if (pd.actual !== null && pd.actual !== undefined) {
+      histHtml += `<div style="font-size:12px;color:#27ae60;">实际：${pd.actual.toFixed(1)}分 | 中奖：${(pd.winners||[]).join('、')||'无'}</div>`;
+    } else {
+      histHtml += `<div style="font-size:12px;color:var(--sub);">等待揭晓…</div>`;
+    }
+    histHtml += '</div>';
+  });
+  if (!histHtml) histHtml = '<div style="font-size:14px;color:var(--sub);">暂无预测记录</div>';
+  document.getElementById('predHistory').innerHTML = histHtml;
+}
+
+function savePredictions() {
+  const data = getData();
+  const today = new Date();
+  if (!isSunday(today)) { toast('只有周日才能提交预测哦~'); return; }
+
+  const monday = getMonday(today);
+  const sunday = getSunday(monday);
+  const nextMonday = new Date(sunday); nextMonday.setDate(nextMonday.getDate() + 1);
+  const predKey = getPredKeyForSunday(sunday);
+
+  if (!data.predictions[predKey]) {
+    data.predictions[predKey] = { weekStart: fmtDate(nextMonday), preds: {}, actual: null, winners: [] };
+  }
+
+  let count = 0;
+  PERSONS.forEach(person => {
+    const input = document.getElementById('pred-'+person);
+    if (input && input.value !== '') {
+      data.predictions[predKey].preds[person] = parseFloat(input.value) || 0;
+      count++;
+    }
+  });
+
+  // Calculate winners for LAST week
+  // Last Sunday's predictions were for THIS week (Mon-Sat just ended)
+  const lastSunday = new Date(sunday); lastSunday.setDate(lastSunday.getDate() - 7);
+  const lastPredKey = getPredKeyForSunday(lastSunday);
+  const lastPred = data.predictions[lastPredKey];
+  if (lastPred && lastPred.actual === null) {
+    // Calculate actual for this past Mon-Sat
+    const thisMonday = new Date(sunday); thisMonday.setDate(thisMonday.getDate() - 6);
+    const actual = getWeekAllTotal(data, thisMonday);
+    lastPred.actual = actual;
+    // Find closest
+    if (lastPred.preds && Object.keys(lastPred.preds).length > 0) {
+      let minDiff = Infinity;
+      let winners = [];
+      Object.keys(lastPred.preds).forEach(p => {
+        const diff = Math.abs(lastPred.preds[p] - actual);
+        if (diff < minDiff) { minDiff = diff; winners = [p]; }
+        else if (diff === minDiff) { winners.push(p); }
+      });
+      lastPred.winners = winners;
+    }
+  }
+
+  saveData(data);
+  toast(`✅ 已保存 ${count} 位伙伴的预测！上周中奖者已揭晓，去周报页查看~`);
+  renderPredict();
+}
+
+// ============ PAGE 4: HISTORY & EXPORT ============
+function renderHistory() {
+  const data = getData();
+
+  // Export list
+  let expHtml = '';
+  PERSONS.forEach(person => {
+    expHtml += `<div class="btn-row" style="margin-bottom:8px;">
+      <button class="btn btn-outline btn-small" onclick="exportPerson('${person}')">📥 导出 ${person}</button>
+    </div>`;
+  });
+  expHtml += `<div class="btn-row"><button class="btn btn-outline btn-small" onclick="exportAll()">📥 导出全部汇总</button></div>`;
+  document.getElementById('exportList').innerHTML = expHtml;
+
+  // Overview
+  let ovHtml = '';
+  const allDates = new Set();
+  PERSONS.forEach(p => {
+    if (data.checkins[p]) Object.keys(data.checkins[p]).forEach(d => allDates.add(d));
+  });
+  const sortedDates = [...allDates].sort().reverse().slice(0, 30); // Last 30 days
+
+  if (sortedDates.length === 0) {
+    ovHtml = '<div style="font-size:14px;color:var(--sub);">还没有打卡记录，从今天开始吧！</div>';
+  } else {
+    ovHtml = '<table class="week-table"><thead><tr><th>日期</th>';
+    PERSONS.forEach(p => { ovHtml += `<th>${p.slice(0,2)}</th>`; });
+    ovHtml += '<th>日总</th></tr></thead><tbody>';
+
+    sortedDates.forEach(dStr => {
+      ovHtml += `<tr><td>${dStr.slice(5)}</td>`;
+      let dayTotal = 0;
+      PERSONS.forEach(p => {
+        const c = getTodayCheckin(data, p, dStr);
+        const sc = c ? (c.study||0)+(c.exercise||0) : 0;
+        dayTotal += sc;
+        ovHtml += `<td>${sc > 0 ? sc.toFixed(1) : '-'}</td>`;
+      });
+      ovHtml += `<td><strong>${dayTotal.toFixed(1)}</strong></td></tr>`;
+    });
+    ovHtml += '</tbody></table>';
+  }
+  document.getElementById('historyOverview').innerHTML = ovHtml;
+}
+
+function exportPerson(person) {
+  const data = getData();
+  const records = data.checkins[person] || {};
+  const dates = Object.keys(records).sort();
+
+  let txt = `📋 ${person} 的打卡记录\n`;
+  txt += `${'═'.repeat(40)}\n\n`;
+  let grandTotal = 0;
+
+  dates.forEach(d => {
+    const r = records[d];
+    const dObj = new Date(d);
+    const dayName = DAYS[dObj.getDay()===0?6:dObj.getDay()-1];
+    const sc = (r.study||0) + (r.exercise||0);
+    grandTotal += sc;
+    txt += `📅 ${d} 星期${dayName}\n`;
+    txt += `   学习：${r.study||0}分${r.sNote ? ' — '+r.sNote : ''}\n`;
+    txt += `   运动：${r.exercise||0}分${r.eNote ? ' — '+r.eNote : ''}\n`;
+    txt += `   小计：${sc.toFixed(1)}分\n\n`;
+  });
+
+  txt += `${'─'.repeat(40)}\n`;
+  txt += `📊 总计：${grandTotal.toFixed(1)}分 | 打卡天数：${dates.length}天\n`;
+  txt += `导出时间：${new Date().toLocaleString()}\n`;
+
+  downloadFile(`${person}_打卡记录.txt`, txt);
+}
+
+function exportAll() {
+  const data = getData();
+  let txt = `📋 五仁打卡 — 全员汇总\n`;
+  txt += `${'═'.repeat(50)}\n\n`;
+
+  PERSONS.forEach(person => {
+    const records = data.checkins[person] || {};
+    const dates = Object.keys(records).sort();
+    let total = 0;
+    dates.forEach(d => {
+      const r = records[d];
+      total += (r.study||0) + (r.exercise||0);
+    });
+    txt += `${person}：${total.toFixed(1)}分 | ${dates.length}天\n`;
+  });
+
+  txt += `\n导出时间：${new Date().toLocaleString()}\n`;
+  downloadFile('五仁打卡_全员汇总.txt', txt);
+}
+
+function downloadFile(filename, content) {
+  const blob = new Blob([content], {type: 'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast(`✅ 已导出：${filename}`);
+}
+
+// ============ INIT ============
+function init() {
+  renderCheckin();
+
+  // Register service worker for offline PWA
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+}
+
+init();
+</script>
+</body>
+</html>

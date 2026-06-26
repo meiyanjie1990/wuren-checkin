@@ -1,0 +1,14 @@
+{
+  "name": "五仁打卡",
+  "short_name": "五仁打卡",
+  "description": "五人学习运动打卡小组",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#faf7f2",
+  "theme_color": "#f5f0e8",
+  "icons": [{
+    "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='80'>🥜</text></svg>",
+    "sizes": "100x100",
+    "type": "image/svg+xml"
+  }]
+}
