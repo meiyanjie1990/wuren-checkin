@@ -58,6 +58,7 @@ nav.tabs button.active { color: var(--accent); font-weight: 700; }
 .page { display: none; padding: 14px; }
 .page.active { display: block; animation: fadeIn 0.25s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0);} 50%{transform:translateX(-50%) translateY(-8px);} }
 .card {
   background: var(--card); border-radius: var(--radius); padding: 16px;
   margin-bottom: 12px; box-shadow: var(--shadow); border: 1px solid var(--border);
@@ -232,7 +233,7 @@ nav.tabs button.active { color: var(--accent); font-weight: 700; }
 
 <script>
 // ============ CONFIG ============
-const APP_VERSION = 3; // 改代码后+1，所有人自动提示刷新
+const APP_VERSION = 4; // 改代码后+1，所有人自动提示刷新
 const PERSONS = ['石维婧','梅妍洁','单兰迪','王珂','师旌议'];
 const DAYS = ['一','二','三','四','五','六','日'];
 const AVATARS = { '石维婧':'🌸','梅妍洁':'🥜','单兰迪':'🌟','王珂':'🍃','师旌议':'🔥' };
