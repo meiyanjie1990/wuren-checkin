@@ -8,118 +8,146 @@
 <meta name="apple-mobile-web-app-title" content="五仁打卡">
 <link rel="apple-touch-icon" href="./icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
-<meta name="theme-color" content="#f5f0e8">
+<meta name="theme-color" content="#fef9f3">
 <link rel="manifest" href="./manifest.json">
 <title>五仁打卡</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 :root {
-  --bg: #faf7f2; --card: #ffffff; --text: #3d3929; --sub: #8b856e;
-  --accent: #e8913a; --accent2: #5b9e8c; --border: #e8e3d5;
-  --shadow: 0 2px 12px rgba(60,50,30,0.06);
+  --bg: #fef9f3; --card: #ffffff; --text: #3d3427; --sub: #9b8e7c;
+  --accent: #f0883e; --accent2: #55a392; --border: #efe8db;
+  --shadow: 0 2px 16px rgba(80,50,20,0.05);
+  --radius: 16px;
 }
 body {
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-  background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 80px;
+  background: linear-gradient(180deg, #fef9f3 0%, #fdf5ea 50%, #faf3e6 100%);
+  color: var(--text); min-height: 100vh; padding-bottom: 80px;
   -webkit-tap-highlight-color: transparent;
 }
 header {
-  background: var(--card); padding: 14px 20px; text-align: center;
-  box-shadow: var(--shadow); position: sticky; top: 0; z-index: 10;
+  background: linear-gradient(135deg, #fffbf5, #fff8ef);
+  padding: 18px 20px 14px; text-align: center;
+  box-shadow: 0 1px 20px rgba(60,40,20,0.04); position: sticky; top: 0; z-index: 10;
+  border-bottom: 1px solid #f0e8d8;
 }
-header h1 { font-size: 20px; font-weight: 700; }
-header .date { font-size: 12px; color: var(--sub); margin-top: 2px; }
-.user-bar {
-  margin-top: 8px; display: flex; gap: 6px; align-items: center;
-  justify-content: center; flex-wrap: wrap;
-}
+header h1 { font-size: 22px; font-weight: 800; letter-spacing: 1px; }
+header .date { font-size: 12px; color: var(--sub); margin-top: 3px; }
+.user-bar { margin-top: 10px; display: flex; gap: 6px; align-items: center; justify-content: center; flex-wrap: wrap; }
 .user-bar select, .user-bar input {
-  padding: 6px 10px; border-radius: 8px; border: 1.5px solid var(--border);
-  font-size: 14px; font-family: inherit;
+  padding: 7px 12px; border-radius: 10px; border: 1.5px solid var(--border);
+  font-size: 14px; font-family: inherit; background: #fffdf9;
 }
 nav.tabs {
   display: flex; position: fixed; bottom: 0; left: 0; right: 0;
-  background: var(--card); border-top: 1px solid var(--border); z-index: 10;
-  padding-bottom: env(safe-area-inset-bottom, 0);
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+  border-top: 1px solid var(--border); z-index: 10;
+  padding: 4px 0 6px; padding-bottom: calc(6px + env(safe-area-inset-bottom, 0));
 }
 nav.tabs button {
-  flex: 1; padding: 10px 4px 8px; border: none; background: none;
-  font-size: 12px; color: var(--sub); cursor: pointer;
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  flex: 1; padding: 8px 4px 6px; border: none; background: none;
+  font-size: 11px; color: var(--sub); cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  transition: color 0.2s;
 }
-nav.tabs button .ico { font-size: 20px; }
-nav.tabs button.active { color: var(--accent); font-weight: 600; }
-.page { display: none; padding: 16px; }
-.page.active { display: block; }
+nav.tabs button .ico { font-size: 22px; line-height: 1; }
+nav.tabs button.active { color: var(--accent); font-weight: 700; }
+.page { display: none; padding: 14px; }
+.page.active { display: block; animation: fadeIn 0.25s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 .card {
-  background: var(--card); border-radius: 14px; padding: 14px;
-  margin-bottom: 10px; box-shadow: var(--shadow); border: 1px solid var(--border);
+  background: var(--card); border-radius: var(--radius); padding: 16px;
+  margin-bottom: 12px; box-shadow: var(--shadow); border: 1px solid var(--border);
 }
-.card.self { border: 2px solid var(--accent); background: #fffdf7; }
-.card h3 { font-size: 16px; margin-bottom: 8px; }
-.person-name { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
-.score-row { display: flex; gap: 8px; margin-bottom: 6px; }
+.card.self {
+  border: 2px solid var(--accent);
+  background: linear-gradient(135deg, #fffdf7, #fff9f0);
+  box-shadow: 0 4px 20px rgba(240,136,62,0.1);
+}
+.card h3 { font-size: 16px; margin-bottom: 10px; }
+.person-name { font-size: 16px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.person-avatar { width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; }
+.score-row { display: flex; gap: 10px; margin-bottom: 8px; }
 .score-block { flex: 1; }
-.score-block .label { font-size: 12px; color: var(--sub); margin-bottom: 4px; }
-.score-block .label .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+.score-block .label { font-size: 12px; color: var(--sub); margin-bottom: 5px; font-weight: 600; }
+.score-block .label .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
 .score-block .label .dot.s { background: var(--accent2); }
 .score-block .label .dot.e { background: var(--accent); }
-.score-btns { display: flex; gap: 3px; flex-wrap: wrap; }
+.score-btns { display: flex; gap: 4px; }
 .score-btns button {
-  flex: 1; min-width: 34px; padding: 7px 3px; border: 1.5px solid var(--border);
-  border-radius: 8px; background: var(--card); font-size: 13px; font-weight: 600;
-  color: var(--text); cursor: pointer; transition: all 0.15s;
+  flex: 1; min-width: 36px; padding: 10px 3px; border: 2px solid #e8e1d4;
+  border-radius: 10px; background: #fdfbf6; font-size: 14px; font-weight: 700;
+  color: var(--text); cursor: pointer; transition: all 0.18s;
 }
-.score-btns button.sel { border-color: var(--accent); background: #fef7f0; color: var(--accent); }
+.score-btns button:hover { background: #fff5ea; border-color: #f0c898; }
+.score-btns button.sel {
+  border-color: var(--accent); background: #fff3e8; color: var(--accent);
+  box-shadow: 0 2px 8px rgba(240,136,62,0.15); transform: scale(1.03);
+}
 .note-input {
-  width: 100%; padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px;
-  font-size: 13px; margin-top: 4px; font-family: inherit; resize: none; height: 34px;
+  width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 10px;
+  font-size: 13px; margin-top: 6px; font-family: inherit; resize: none; height: 38px;
+  background: #fdfbf7; transition: border-color 0.2s;
 }
+.note-input:focus { border-color: var(--accent); outline: none; background: #fff; }
 .done-badge {
-  display: inline-block; background: #e8f5e9; color: #388e3c;
-  font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 6px;
+  display: inline-block; background: #e6f5ef; color: #388e6b;
+  font-size: 11px; padding: 3px 10px; border-radius: 12px; font-weight: 600;
 }
-.sunday-lock { text-align: center; color: #c0392b; font-size: 13px; padding: 10px; background: #fef5f5; border-radius: 10px; margin: 8px 0; }
-.sunday-winner { text-align: center; color: #27ae60; font-size: 13px; padding: 10px; background: #f0faf4; border-radius: 10px; margin: 8px 0; }
+.not-done { font-size: 13px; color: #c5bfb2; font-style: italic; }
+.sunday-lock { text-align: center; color: #d3545a; font-size: 13px; padding: 12px; background: #fef7f7; border-radius: 12px; margin: 10px 0; line-height: 1.6; }
+.sunday-winner { text-align: center; color: #27ae60; font-size: 13px; padding: 12px; background: #f2faf6; border-radius: 12px; margin: 10px 0; line-height: 1.6; }
 .week-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.week-table th, .week-table td { padding: 5px 3px; text-align: center; border-bottom: 1px solid var(--border); }
-.week-table th { font-weight: 600; font-size: 11px; color: var(--sub); }
-.week-table td:first-child { text-align: left; font-weight: 500; }
-.week-table .sun-col { color: #c0392b; }
-.week-table .highlight { background: #fffbe6; font-weight: 600; }
+.week-table th, .week-table td { padding: 6px 3px; text-align: center; border-bottom: 1px solid #f5f0e8; }
+.week-table th { font-weight: 700; font-size: 11px; color: var(--sub); }
+.week-table td:first-child { text-align: left; font-weight: 600; }
+.week-table .sun-col { color: #c0392b; background: #fef9f9; }
+.week-table .highlight { background: #fffdf4; font-weight: 700; box-shadow: inset 0 0 0 1px var(--accent); border-radius: 4px; }
 .btn {
-  display: inline-block; padding: 10px 18px; border-radius: 10px; border: none;
-  font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
+  display: inline-block; padding: 10px 20px; border-radius: 12px; border: none;
+  font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
+  transition: all 0.2s; letter-spacing: 0.5px;
 }
-.btn-primary { background: var(--accent); color: #fff; }
-.btn-saved { background: var(--accent2) !important; color: #fff !important; pointer-events: none; }
-.btn-outline { background: var(--card); border: 1.5px solid var(--accent); color: var(--accent); }
-.btn-small { padding: 5px 12px; font-size: 12px; border-radius: 8px; }
+.btn-primary { background: linear-gradient(135deg, #f0883e, #e67a30); color: #fff; box-shadow: 0 3px 12px rgba(240,136,62,0.25); }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(240,136,62,0.35); }
+.btn-primary:active { transform: scale(0.97); }
+.btn-saved { background: linear-gradient(135deg, #55a392, #489b85) !important; color: #fff !important; box-shadow: 0 3px 12px rgba(85,163,146,0.25) !important; pointer-events: none; }
+.btn-outline { background: #fff; border: 2px solid var(--accent); color: var(--accent); }
+.btn-outline:hover { background: #fff8f2; }
+.btn-small { padding: 6px 14px; font-size: 12px; border-radius: 9px; }
 .btn-block { display: block; width: 100%; }
-.btn-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
 .encourage-box {
-  background: linear-gradient(135deg, #fef9f0, #fff5e8); border-left: 4px solid var(--accent);
-  padding: 12px 14px; border-radius: 0 10px 10px 0; margin: 10px 0; font-size: 13px; line-height: 1.6;
+  background: linear-gradient(135deg, #fffbf5, #fff6ea);
+  border-left: 4px solid var(--accent);
+  padding: 16px 18px; border-radius: 0 14px 14px 0; margin: 12px 0; font-size: 14px;
+  line-height: 1.8; box-shadow: 0 2px 8px rgba(240,136,62,0.06);
 }
-.summary-card { margin-top: 8px; }
-.summary-card .person-line { padding: 5px 0; border-bottom: 1px solid #f5f5f5; font-size: 13px; }
-.summary-card .total-line { font-weight: 700; font-size: 15px; padding: 8px 0; color: var(--accent); }
-.pred-input-row { display: flex; align-items: center; gap: 8px; margin: 5px 0; }
+.encourage-box .greeting { font-size: 17px; font-weight: 800; margin-bottom: 6px; }
+.encourage-box .body { color: #5c4d38; }
+.encourage-box .humor { color: #9b8e7c; font-style: italic; margin-top: 6px; }
+.summary-card { margin-top: 10px; }
+.summary-card .person-line { padding: 6px 0; border-bottom: 1px solid #f8f5f0; font-size: 14px; }
+.summary-card .total-line { font-weight: 800; font-size: 16px; padding: 10px 0; color: var(--accent); }
+.pred-input-row { display: flex; align-items: center; gap: 10px; margin: 6px 0; }
 .pred-input-row input {
-  width: 65px; padding: 7px; border: 1.5px solid var(--border);
-  border-radius: 8px; font-size: 14px; text-align: center; font-family: inherit;
+  width: 70px; padding: 9px; border: 2px solid var(--border);
+  border-radius: 10px; font-size: 15px; text-align: center; font-family: inherit;
+  font-weight: 600;
 }
-.pred-input-row .name { flex: 1; font-size: 13px; font-weight: 500; }
-.winner-tag { color: #e74c3c; font-weight: 600; font-size: 11px; margin-left: 4px; }
+.pred-input-row .name { flex: 1; font-size: 14px; font-weight: 600; }
+.winner-tag { color: #e74c3c; font-weight: 700; font-size: 12px; margin-left: 4px; }
 .toast {
   position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-  background: #3d3929; color: #fff; padding: 10px 20px; border-radius: 20px;
-  font-size: 13px; z-index: 200; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+  background: #3d3427; color: #fff; padding: 12px 24px; border-radius: 24px;
+  font-size: 14px; z-index: 200; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
 }
 .toast.show { opacity: 1; }
-.sync-bar { font-size: 11px; color: var(--sub); text-align: center; margin-top: 4px; }
+.sync-bar { font-size: 11px; color: var(--sub); text-align: center; margin-top: 5px; min-height: 16px; }
+.streak-fire { color: #f0883e; font-size: 13px; font-weight: 700; margin-top: 4px; }
 @media (min-width: 600px) {
-  .checkin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .checkin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .checkin-grid .card { margin-bottom: 0; }
 }
 </style>
@@ -130,7 +158,7 @@ nav.tabs button.active { color: var(--accent); font-weight: 600; }
   <h1>🥜 五仁打卡</h1>
   <div class="date" id="headerDate"></div>
   <div class="user-bar">
-    <span style="font-size:13px;">👤 我是</span>
+    <span style="font-size:13px;font-weight:600;">👤 我是</span>
     <select id="currentUser" onchange="onUserSwitch()">
       <option value="">选择自己</option>
     </select>
@@ -145,9 +173,9 @@ nav.tabs button.active { color: var(--accent); font-weight: 600; }
 <div class="page active" id="page-checkin">
   <div class="encourage-box" id="dailyEncourage"></div>
   <div id="sundayNotice"></div>
-  <div style="text-align:center;margin-bottom:8px;font-size:12px;color:var(--sub);">
-    选择日期：<input type="date" id="checkinDate" onchange="renderCheckin()" style="padding:5px 8px;border-radius:6px;border:1px solid var(--border);font-family:inherit;font-size:13px;">
-    <span id="dateBadge" style="font-size:11px;color:#c0392b;margin-left:6px;"></span>
+  <div style="text-align:center;margin-bottom:10px;font-size:13px;color:var(--sub);">
+    📅 <input type="date" id="checkinDate" onchange="renderCheckin()" style="padding:6px 10px;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:13px;background:#fffdf9;">
+    <span id="dateBadge" style="font-size:11px;color:#c0392b;font-weight:600;margin-left:6px;"></span>
   </div>
   <div id="checkinArea"></div>
 </div>
@@ -155,14 +183,14 @@ nav.tabs button.active { color: var(--accent); font-weight: 600; }
 <!-- Page 2: 周报 -->
 <div class="page" id="page-weekly">
   <div class="card">
-    <h3>📊 本周概览</h3>
-    <div id="weekRange" style="font-size:13px;color:var(--sub);margin-bottom:8px;"></div>
+    <h3>📊 本周战报</h3>
+    <div id="weekRange" style="font-size:13px;color:var(--sub);margin-bottom:10px;"></div>
     <div style="overflow-x:auto;" id="weekTable"></div>
     <div class="summary-card" id="weekSummary"></div>
   </div>
   <div class="card">
-    <h3>🔮 上周预测结果</h3>
-    <div id="lastPredResult" style="font-size:14px;"></div>
+    <h3>🔮 上周预测揭晓</h3>
+    <div id="lastPredResult" style="font-size:14px;line-height:1.8;"></div>
   </div>
 </div>
 
@@ -170,9 +198,9 @@ nav.tabs button.active { color: var(--accent); font-weight: 600; }
 <div class="page" id="page-predict">
   <div class="card">
     <h3>🔮 预测下周总分</h3>
-    <div id="predInfo" style="font-size:13px;color:var(--sub);margin-bottom:10px;"></div>
+    <div id="predInfo" style="font-size:13px;color:var(--sub);margin-bottom:12px;line-height:1.6;"></div>
     <div id="predInputs"></div>
-    <button class="btn btn-primary btn-block" onclick="savePredictions()" style="margin-top:10px;">📝 保存预测</button>
+    <button class="btn btn-primary btn-block" onclick="savePredictions()" style="margin-top:12px;">📝 提交预测</button>
   </div>
   <div class="card">
     <h3>📜 预测历史</h3>
@@ -203,685 +231,319 @@ nav.tabs button.active { color: var(--accent); font-weight: 600; }
 // ============ CONFIG ============
 const PERSONS = ['石维婧','梅妍洁','单兰迪','王珂','师旌议'];
 const DAYS = ['一','二','三','四','五','六','日'];
-// Token parts (avoid GitHub secret scanning)
-const TK1 = 'ghp_Ry5Qgv1WAuuUTXdU5BNjFYy';
-const TK2 = 'IeJyvbj1HGOvE';
-const GITHUB_TOKEN = TK1 + TK2;
-const REPO = 'meiyanjie1990/wuren-checkin';
-const API_URL = `https://api.github.com/repos/${REPO}/contents/data.json`;
-const RAW_BASE = `https://raw.githubusercontent.com/${REPO}/main`;
+const AVATARS = { '石维婧':'🌸','梅妍洁':'🥜','单兰迪':'🌟','王珂':'🍃','师旌议':'🔥' };
+const TK1='ghp_Ry5Qgv1WAuuUTXdU5BNjFYy',TK2='IeJyvbj1HGOvE';
+const GITHUB_TOKEN=TK1+TK2, REPO='meiyanjie1990/wuren-checkin';
+const API_URL=`https://api.github.com/repos/${REPO}/contents/data.json`;
 
 // ============ HELPERS ============
-function getMonday(d) { d = new Date(d); d.setHours(0,0,0,0); const day = d.getDay(); d.setDate(d.getDate() + (day===0?-6:1-day)); return d; }
-function getSunday(m) { const s = new Date(m); s.setDate(s.getDate()+6); return s; }
-function fmtDate(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
-function fmtDateShort(d) { return `${d.getMonth()+1}/${d.getDate()}`; }
-function fmtWeekRange(m,s) { return `${m.getMonth()+1}月${m.getDate()}日 - ${s.getMonth()+1}月${s.getDate()}日`; }
-function isSunday(d) { return d.getDay()===0; }
-function isSameDay(a,b) { return fmtDate(a)===fmtDate(b); }
-function toast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
-function getCurrentUser() { return document.getElementById('currentUser').value; }
-function getCheckinDate() { const v=document.getElementById('checkinDate').value; return v||fmtDate(new Date()); }
+function getMonday(d){d=new Date(d);d.setHours(0,0,0,0);const day=d.getDay();d.setDate(d.getDate()+(day===0?-6:1-day));return d;}
+function getSunday(m){const s=new Date(m);s.setDate(s.getDate()+6);return s;}
+function fmtDate(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function fmtDateShort(d){return `${d.getMonth()+1}/${d.getDate()}`;}
+function fmtWeekRange(m,s){return `${m.getMonth()+1}月${m.getDate()}日 - ${s.getMonth()+1}月${s.getDate()}日`;}
+function isSunday(d){return d.getDay()===0;}
+function isSameDay(a,b){return fmtDate(a)===fmtDate(b);}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function getCurrentUser(){return document.getElementById('currentUser').value;}
+function getCheckinDate(){const v=document.getElementById('checkinDate').value;return v||fmtDate(new Date());}
 
 // ============ DATA ============
-let _dataSha = null;
-let _localData = null;
+let _dataSha=null,_localData=null;
+function loadLocal(){try{const d=localStorage.getItem('wuren_data');return d?JSON.parse(d):{};}catch(e){return{};}}
+function saveLocal(data){_localData=data;localStorage.setItem('wuren_data',JSON.stringify(data));}
+function getLocal(){if(_localData)return _localData;let d=loadLocal();if(!d.checkins)d.checkins={};if(!d.predictions)d.predictions={};_localData=d;return d;}
+function getPersonCheckin(data,person,dateStr){if(!data.checkins[person])return null;return data.checkins[person][dateStr]||null;}
 
-function loadLocal() {
-  try { const d=localStorage.getItem('wuren_data'); return d?JSON.parse(d):{}; }
-  catch(e) { return {}; }
-}
-function saveLocal(data) {
-  _localData = data;
-  localStorage.setItem('wuren_data', JSON.stringify(data));
-}
-function getLocal() {
-  if (_localData) return _localData;
-  let d = loadLocal();
-  if (!d.checkins) d.checkins = {};
-  if (!d.predictions) d.predictions = {};
-  _localData = d;
-  return d;
-}
-
-function getPersonCheckin(data, person, dateStr) {
-  if (!data.checkins[person]) return null;
-  return data.checkins[person][dateStr] || null;
-}
-
-// ============ GITHUB SYNC ============
-async function fetchRemoteData() {
-  try {
-    const resp = await fetch(API_URL, {
-      headers: { 'Authorization':'token '+GITHUB_TOKEN, 'Accept':'application/vnd.github.v3+json' },
-      cache: 'no-cache'
-    });
-    if (!resp.ok) return null;
-    const json = await resp.json();
-    _dataSha = json.sha;
-    // Decode base64 content
-    const raw = atob(json.content.replace(/\s/g,''));
+// ============ SYNC ============
+async function fetchRemoteData(){
+  try{
+    const resp=await fetch(API_URL,{headers:{'Authorization':'token '+GITHUB_TOKEN,'Accept':'application/vnd.github.v3+json'},cache:'no-cache'});
+    if(!resp.ok)return null;
+    const json=await resp.json();_dataSha=json.sha;
+    const raw=atob(json.content.replace(/\s/g,''));
     return JSON.parse(decodeURIComponent(escape(raw)));
-  } catch(e) {
-    console.log('Fetch remote error:', e.message);
-    return null;
+  }catch(e){console.log('Fetch err:',e.message);return null;}
+}
+async function pushRemote(data){
+  const jsonStr=JSON.stringify(data,null,2);
+  const content=btoa(unescape(encodeURIComponent(jsonStr)));
+  const body={message:'📝 打卡更新',content,branch:'main'};
+  if(_dataSha)body.sha=_dataSha;
+  try{
+    const resp=await fetch(API_URL,{method:'PUT',headers:{'Authorization':'token '+GITHUB_TOKEN,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(!resp.ok){const err=await resp.json();if(err.message&&err.message.includes('sha')){const refetch=await fetch(API_URL,{headers:{'Authorization':'token '+GITHUB_TOKEN,'Accept':'application/vnd.github.v3+json'}});if(refetch.ok){const rd=await refetch.json();body.sha=rd.sha;const retry=await fetch(API_URL,{method:'PUT',headers:{'Authorization':'token '+GITHUB_TOKEN,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify(body)});if(retry.ok){_dataSha=(await retry.json()).content.sha;return true;}}}return false;}
+    const result=await resp.json();_dataSha=result.content.sha;return true;
+  }catch(e){console.log('Push err:',e.message);return false;}
+}
+async function syncNow(silent){
+  const bar=document.getElementById('syncBar');if(bar)bar.textContent='⏳ 同步中…';
+  const remote=await fetchRemoteData();
+  if(remote){saveLocal(remote);if(bar)bar.textContent='☁️ 已同步';if(!silent){renderAll();toast('✅ 数据已同步');}setTimeout(()=>{if(bar)bar.textContent='';},3000);return true;}
+  else{if(bar)bar.textContent='⚠️ 离线模式';if(!silent)toast('⚠️ 无法连接云端，使用本地数据');setTimeout(()=>{if(bar)bar.textContent='';},4000);return false;}
+}
+async function saveAndSync(data){saveLocal(data);const ok=await pushRemote(data);const bar=document.getElementById('syncBar');if(ok){if(bar)bar.textContent='☁️ 已同步';setTimeout(()=>{if(bar)bar.textContent='';},3000);}else{if(bar)bar.textContent='⚠️ 已存本地，联网后自动同步';setTimeout(()=>{if(bar)bar.textContent='';},5000);}return ok;}
+function onUserSwitch(){const user=getCurrentUser();if(user){localStorage.setItem('wuren_me',user);toast(`👤 ${user}，你好！`);}renderCheckin();}
+
+// ============ ENCOURAGEMENT MASTER ============
+function countStreak(data, person) {
+  let streak=0; const d=new Date(); d.setDate(d.getDate()-1);
+  while(d.getFullYear()>=2026){
+    const c=getPersonCheckin(data,person,fmtDate(d));
+    if(!c||((c.study||0)+(c.exercise||0))===0)break;
+    streak++; d.setDate(d.getDate()-1);
   }
+  return streak;
+}
+function countWeeklyDone(data, person) {
+  const today=new Date(); const monday=getMonday(today);
+  let days=0;
+  for(let i=0;i<6;i++){const d=new Date(monday);d.setDate(d.getDate()+i);const c=getPersonCheckin(data,person,fmtDate(d));if(c&&((c.study||0)+(c.exercise||0))>0)days++;}
+  return days;
 }
 
-async function pushRemote(data) {
-  const jsonStr = JSON.stringify(data, null, 2);
-  const content = btoa(unescape(encodeURIComponent(jsonStr)));
-  const body = { message:'📝 打卡更新', content, branch:'main' };
-  if (_dataSha) body.sha = _dataSha;
+function generateEncourage(data, dateStr, currentUser) {
+  const d=new Date(dateStr+'T00:00:00');
+  const todayStr=fmtDate(new Date());
+  const isToday=(dateStr===todayStr);
+  const hour=new Date().getHours();
+  const timeGreeting=hour<9?'☀️ 早安':hour<12?'🌤️ 上午好':hour<14?'🌞 中午好':hour<18?'🌤️ 下午好':hour<21?'🌅 晚上好':'🌙 夜深了';
 
-  try {
-    const resp = await fetch(API_URL, {
-      method:'PUT',
-      headers: {
-        'Authorization':'token '+GITHUB_TOKEN,
-        'Accept':'application/vnd.github.v3+json',
-        'Content-Type':'application/json'
-      },
-      body: JSON.stringify(body)
-    });
-    if (!resp.ok) {
-      const err = await resp.json();
-      // SHA conflict - retry once with fresh SHA
-      if (err.message && err.message.includes('sha')) {
-        const refetch = await fetch(API_URL, {
-          headers: { 'Authorization':'token '+GITHUB_TOKEN, 'Accept':'application/vnd.github.v3+json' }
-        });
-        if (refetch.ok) {
-          const refetchData = await refetch.json();
-          body.sha = refetchData.sha;
-          const retry = await fetch(API_URL, { method:'PUT', headers:{
-            'Authorization':'token '+GITHUB_TOKEN,
-            'Accept':'application/vnd.github.v3+json',
-            'Content-Type':'application/json'
-          }, body:JSON.stringify(body) });
-          if (retry.ok) { _dataSha = retry.json().sha; return true; }
-        }
-      }
-      console.log('Push error:', err.message);
-      return false;
+  if(d.getDay()===0)return `<div class="greeting">🌿 周日休息日</div><div class="body">一周的坚持值得好好放松。泡杯茶、散个步、翻几页闲书——<br>充电也是为了下一周跑得更远。</div><div class="humor">周日的卡路里，不算热量 😌</div>`;
+  if(!currentUser)return `<div class="greeting">${timeGreeting}！</div><div class="body">👆 先在上方选一下你是谁，然后就能开始打卡啦。<br>今天也是元气满满的一天！</div>`;
+
+  const existing=getPersonCheckin(data,currentUser,dateStr);
+  const streak=countStreak(data,currentUser);
+  const weekDone=countWeeklyDone(data,currentUser);
+  const dayOfWeek=d.getDay()||7;
+
+  if(existing) {
+    const total=(existing.study||0)+(existing.exercise||0);
+    const st=existing.study||0, et=existing.exercise||0;
+    let msgs=[], humor='';
+
+    if(total>=3.5){
+      msgs=[
+        `今天已经拿下 <strong>${total.toFixed(1)}分</strong>！这效率，简直像开了外挂 🚀`,
+        `学习${st>0?st+'分':''}${st>0&&et>0?' + ':''}运动${et>0?et+'分':''}，全面发展的一天。`
+      ];
+      humor=st>et?'大脑今天吃得很饱，腿表示：下次该我了 🦵':et>st?'身体在燃烧，书本在角落里投来幽怨的目光 📖':'文武双全，谁也别嫉妒谁 😎';
+    } else if(total>=1.5){
+      msgs=[
+        `已拿下 <strong>${total.toFixed(1)}分</strong>，稳稳地走了一步。`,
+        `积少成多，这些0.5分0.5分的积累，最终会成为别人羡慕的"别人家的坚持"。`
+      ];
+      humor='一只蜗牛走了一米，另一只蜗牛问：你是怎么坚持的？蜗牛说：我只是没停下来 🐌';
+    } else {
+      msgs=[
+        `今天打卡了 <strong>${total.toFixed(1)}分</strong>——小步快跑也是跑。`,
+        `哪怕只有半小时，也比躺在沙发上焦虑强一百倍。`
+      ];
+      humor='种一棵树最好的时间是十年前，其次是……算了别喝鸡汤了，你已经很棒了 🌱';
     }
-    const result = await resp.json();
-    _dataSha = result.content.sha;
-    return true;
-  } catch(e) {
-    console.log('Push exception:', e.message);
-    return false;
-  }
-}
 
-async function syncNow(silent) {
-  const bar = document.getElementById('syncBar');
-  if (bar) bar.textContent = '⏳ 同步中…';
-  const remote = await fetchRemoteData();
-  if (remote) {
-    // Merge: remote wins, but preserve local if remote is older/empty
-    saveLocal(remote);
-    if (bar) bar.textContent = '☁️ 已同步';
-    if (!silent) { renderAll(); toast('✅ 数据已同步'); }
-    setTimeout(()=>{ if(bar) bar.textContent=''; },3000);
-    return true;
+    if(streak>=7) msgs.push(`🔥 连续 <strong>${streak}</strong> 天打卡！你是五仁里面的定海神针。`);
+    else if(streak>=3) msgs.push(`⭐ 连续 <strong>${streak}</strong> 天打卡，势头正好！`);
+
+    if(dayOfWeek===6) msgs.push(`📌 周六了！本周最后一天冲刺，周日的休息在向你招手~`);
+    if(weekDone===6) msgs.push(`🏆 本周全勤！你就是五仁的模范生！`);
+
+    if(isToday){
+      // Check others
+      let doneList=[]; PERSONS.forEach(p=>{if(p!==currentUser&&getPersonCheckin(data,p,dateStr))doneList.push(p);});
+      if(doneList.length>=3) msgs.push(`👀 今天已有 <strong>${doneList.length}</strong> 位伙伴也打卡了，你们这届五仁很卷啊。`);
+      else if(doneList.length>0) msgs.push(`还有 <strong>${5-doneList.length-1}</strong> 位伙伴在酝酿中……你是最早的行动派！`);
+      else msgs.push(`你是今天第一个打卡的！剩下的四位朋友还在被窝里挣扎吗？🤔`);
+    }
+
+    return `<div class="greeting">${timeGreeting}，${currentUser}！</div><div class="body">${msgs.join('<br>')}</div><div class="humor">${humor}</div>`;
+  }
+
+  // Not yet checked in
+  let tips=[], humor='';
+  if(dayOfWeek===1){
+    tips=[`新的一周，新的开始！<strong>周一是拉开差距的一天</strong>——不是在跟别人比，是在跟昨天的自己比。`,`今天给自己定个小目标：哪怕1分，也是从0到1的跨越。`];
+    humor='周一不努力，周二徒伤悲，周三周四继续累，周五发现……咦这周又过去了 😅';
+  } else if(dayOfWeek===5||dayOfWeek===6){
+    tips=[`周末快到了，但今天还不是松懈的时候！<strong>越到最后越要保持节奏。</strong>`,`周五六坚持住，周日才能心安理得地躺平。`];
+    humor='周五：一周中最甜美的折磨日。咖啡续命，运动续魂 ☕🏃';
   } else {
-    if (bar) bar.textContent = '⚠️ 离线（使用本地数据）';
-    if (!silent) toast('⚠️ 无法连接，使用本地数据');
-    setTimeout(()=>{ if(bar) bar.textContent=''; },4000);
-    return false;
+    const r=Math.floor(Math.random()*5);
+    tips=[
+      [`每一次打卡，都是在跟"算了不做了"的自己较劲——而你每次都赢了。`,`半小时的学习，可能是你一年后回头看时那根关键的杠杆。`],
+      [`很多人高估了一天能做的事，低估了一百天能积累的事。<strong>你现在的每0.5分，都在悄悄改变你。</strong>`,`打开书本或穿上跑鞋的前五分钟最难熬，熬过去就顺了。`],
+      [`打卡不是任务，是给自己的一份交代。<strong>你今天对自己认真了吗？</strong>`,`学习和运动是这世界少有的"付出必有回报"的事。`],
+      [`五仁的意义就是：一个人可能走得快，但五个人才能走得远。<strong>看看群里谁先动？</strong>`,`做第一个打卡的人，有种莫名的成就感——试试看。`],
+      [`你看过小狗钱钱的金钱魔法吗？<strong>每天半小时，就是你的学习魔法。</strong>`,`复利不只是钱的事，知识也讲复利——每天0.5分，一年后看看你积累了什么。`]
+    ][r];
+    humor=['拖延症晚期患者温馨提示：开始比完美重要 100 倍 🤒','大脑：我好累不想动。身体：我也是。理智：你俩闭嘴，先做半小时 🧠','懒惰就像一张信用卡，今天刷得爽，月底还到哭 💳'][Math.floor(Math.random()*3)];
   }
-}
 
-async function saveAndSync(data) {
-  saveLocal(data);
-  // Try push in background
-  const ok = await pushRemote(data);
-  const bar = document.getElementById('syncBar');
-  if (ok) {
-    if (bar) bar.textContent = '☁️ 已同步到云端';
-    setTimeout(()=>{ if(bar) bar.textContent=''; },3000);
-  } else {
-    if (bar) bar.textContent = '⚠️ 已存本地，联网后自动同步';
-    setTimeout(()=>{ if(bar) bar.textContent=''; },5000);
-  }
-  return ok;
-}
+  if(streak>=7) tips.push(`💎 你已经连续 <strong>${streak}</strong> 天了！今天也别断——这个记录太珍贵了。`);
 
-function onUserSwitch() {
-  const user = getCurrentUser();
-  if (user) {
-    localStorage.setItem('wuren_me', user);
-    toast(`👤 ${user}，你好！`);
-  }
-  renderCheckin();
+  return `<div class="greeting">${timeGreeting}，${currentUser}！</div><div class="body">${tips.join('<br><br>')}</div><div class="humor">${humor}</div>`;
 }
 
 // ============ RENDER CHECKIN ============
-function renderCheckin() {
-  const data = getLocal();
-  const checkinDateStr = getCheckinDate();
-  const checkinDate = new Date(checkinDateStr + 'T00:00:00');
-  const today = new Date();
-  const todayStr = fmtDate(today);
-  const monday = getMonday(checkinDate);
-  const sunday = getSunday(monday);
-  const isSun = isSunday(checkinDate);
-  const isToday = (checkinDateStr === todayStr);
-  const currentUser = getCurrentUser();
+function renderCheckin(){
+  const data=getLocal(); const checkinDateStr=getCheckinDate();
+  const checkinDate=new Date(checkinDateStr+'T00:00:00'); const today=new Date();
+  const todayStr=fmtDate(today); const monday=getMonday(checkinDate);
+  const sunday=getSunday(monday); const isSun=isSunday(checkinDate);
+  const isToday=(checkinDateStr===todayStr); const currentUser=getCurrentUser();
 
-  // Header date
-  document.getElementById('headerDate').textContent = `${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日 星期${DAYS[today.getDay()===0?6:today.getDay()-1]}`;
+  document.getElementById('headerDate').textContent=`${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日 星期${DAYS[today.getDay()===0?6:today.getDay()-1]}`;
+  document.getElementById('dateBadge').textContent=isToday?'':'⚠️ 补打卡';
+  document.getElementById('dailyEncourage').innerHTML=generateEncourage(data,checkinDateStr,currentUser);
 
-  // Date badge
-  const badge = document.getElementById('dateBadge');
-  badge.textContent = isToday ? '' : '⚠️ 补打卡';
+  let sundayWinners=[];
+  if(isSun){const lastSun=new Date(checkinDate);lastSun.setDate(lastSun.getDate()-7);const predData=data.predictions[fmtDate(lastSun)];if(predData&&predData.winners)sundayWinners=predData.winners;}
+  const noticeDiv=document.getElementById('sundayNotice');
+  if(isSun){noticeDiv.innerHTML=sundayWinners.length>0?`<div class="sunday-winner">🌟 周日福利日！中奖者：<strong>${sundayWinners.join('、')}</strong> —— 只有TA们今天可以打卡积分！</div>`:`<div class="sunday-lock">🔒 周日休息日。等待预测中奖者揭晓~<br><span style="font-size:12px;">一周的坚持辛苦了，给自己放个假吧 🌿</span></div>`;}else{noticeDiv.innerHTML='';}
 
-  // Sunday winners
-  let sundayWinners = [];
-  if (isSun) {
-    const lastSun = new Date(checkinDate); lastSun.setDate(lastSun.getDate()-7);
-    const predData = data.predictions[fmtDate(lastSun)];
-    if (predData && predData.winners) sundayWinners = predData.winners;
-  }
+  let html='';
+  if(!currentUser){html+=`<div style="text-align:center;color:var(--sub);padding:30px;font-size:15px;">👆 请先在上方选择"我是谁"<br><span style="font-size:12px;">选完后就能看到自己的打卡卡片了</span></div>`;}
 
-  // Sunday notice
-  const noticeDiv = document.getElementById('sundayNotice');
-  if (isSun) {
-    if (sundayWinners.length > 0) {
-      noticeDiv.innerHTML = `<div class="sunday-winner">🌟 周日福利！中奖者：<strong>${sundayWinners.join('、')}</strong> 可以打卡</div>`;
-    } else {
-      noticeDiv.innerHTML = `<div class="sunday-lock">🔒 周日休息。等待预测中奖者揭晓~</div>`;
-    }
-  } else {
-    noticeDiv.innerHTML = '';
-  }
+  PERSONS.forEach(person=>{
+    const existing=getPersonCheckin(data,person,checkinDateStr);
+    const canCheckin=!isSun||sundayWinners.includes(person);
+    const isMe=(currentUser===person);
+    const cardClass=isMe?'card self':'card';
+    const avatar=AVATARS[person]||'👤';
 
-  // Encourage
-  document.getElementById('dailyEncourage').innerHTML = generateEncourage(data, checkinDateStr, currentUser);
+    if(!isMe&&!existing){return;}
+    if(isSun&&!canCheckin&&!existing)return;
 
-  // Build cards
-  let html = '';
-  if (!currentUser) {
-    html += `<div style="text-align:center;color:var(--sub);padding:20px;">👆 请先在上方选择"我是谁"</div>`;
-  }
-
-  PERSONS.forEach(person => {
-    const existing = getPersonCheckin(data, person, checkinDateStr);
-    const canCheckin = !isSun || sundayWinners.includes(person);
-    const isMe = (currentUser === person);
-    const cardClass = isMe ? 'card self' : 'card';
-
-    if (isSun && !canCheckin && !existing) {
-      html += `<div class="${cardClass}" style="opacity:0.6">
-        <div class="person-name">${person} ${isMe?'👈':''}</div>
-        <div style="font-size:12px;color:var(--sub);">今日休息</div>
-      </div>`;
-      return;
-    }
-
-    if (existing) {
-      // Show read-only result for everyone
-      const st = existing.study||0, et = existing.exercise||0;
-      html += `<div class="${cardClass}">
-        <div class="person-name">${person} ${isMe?'👈':''} <span class="done-badge">✓</span></div>
-        <div style="font-size:13px;display:flex;gap:12px;flex-wrap:wrap;">
-          <span>📚 学习 <strong>${st}分</strong>${existing.sNote?' — '+existing.sNote:''}</span>
-          <span>🏃 运动 <strong>${et}分</strong>${existing.eNote?' — '+existing.eNote:''}</span>
+    if(existing){
+      const st=existing.study||0,et=existing.exercise||0;
+      html+=`<div class="${cardClass}">
+        <div class="person-name"><span class="person-avatar" style="background:${isMe?'#fff3e8':'#f5f5f5'};">${avatar}</span>${person} ${isMe?'👈':''} <span class="done-badge">✓ 已打卡</span></div>
+        <div style="font-size:14px;display:flex;gap:14px;flex-wrap:wrap;line-height:1.8;">
+          <span>📚 学习 <strong style="color:var(--accent2)">${st}分</strong>${existing.sNote?'<br><span style=\"font-size:12px;color:var(--sub);\">“'+existing.sNote+'”</span>':''}</span>
+          <span>🏃 运动 <strong style="color:var(--accent)">${et}分</strong>${existing.eNote?'<br><span style=\"font-size:12px;color:var(--sub);\">“'+existing.eNote+'”</span>':''}</span>
         </div>
-        ${isMe ? `<div class="btn-row"><button class="btn btn-outline btn-small" onclick="editMyCheckin()">✏️ 修改</button><button class="btn btn-outline btn-small" onclick="deleteMyCheckin()" style="color:#c0392b;border-color:#c0392b;">🗑️ 撤销</button></div>` : ''}
+        ${isMe?`<div class="btn-row"><button class="btn btn-outline btn-small" onclick="editMyCheckin()">✏️ 修改</button><button class="btn btn-outline btn-small" onclick="deleteMyCheckin()" style="color:#c0392b;border-color:#c0392b;">🗑️ 撤销</button></div>`:''}
       </div>`;
-    } else if (isMe && canCheckin) {
-      // Show input fields ONLY for current user
-      html += `<div class="card self" id="myCard">
-        <div class="person-name">${person} 👈</div>
+    }else if(isMe&&canCheckin){
+      html+=`<div class="card self" id="myCard">
+        <div class="person-name"><span class="person-avatar" style="background:#fff3e8;">${avatar}</span>${person} 👈</div>
         <div class="score-row">
-          <div class="score-block">
-            <div class="label"><span class="dot s"></span>📚 学习 (0-2分)</div>
-            <div class="score-btns">${scoreBtns('study')}</div>
-            <input class="note-input" id="sNote" placeholder="学了什么…（选填）">
-          </div>
+          <div class="score-block"><div class="label"><span class="dot s"></span>📚 学习 (0-2分)</div><div class="score-btns">${scoreBtns('study')}</div><input class="note-input" id="sNote" placeholder="学了什么？一句话记录就好…"></div>
         </div>
         <div class="score-row">
-          <div class="score-block">
-            <div class="label"><span class="dot e"></span>🏃 运动 (0-2分)</div>
-            <div class="score-btns">${scoreBtns('exercise')}</div>
-            <input class="note-input" id="eNote" placeholder="做了什么运动…（选填）">
-          </div>
+          <div class="score-block"><div class="label"><span class="dot e"></span>🏃 运动 (0-2分)</div><div class="score-btns">${scoreBtns('exercise')}</div><input class="note-input" id="eNote" placeholder="做了什么运动？跑步？瑜伽？…"></div>
         </div>
-        <button class="btn btn-primary btn-block" id="btnSave" onclick="saveMyCheckin()" style="margin-top:8px;">💾 保存打卡</button>
+        <button class="btn btn-primary btn-block" id="btnSave" onclick="saveMyCheckin()" style="margin-top:10px;">💾 保存打卡</button>
       </div>`;
-    } else if (!isMe) {
-      // Other person, not checked in yet
-      html += `<div class="${cardClass}">
-        <div class="person-name">${person}</div>
-        <div style="font-size:12px;color:var(--sub);">还没打卡~</div>
-      </div>`;
-    } else if (isSun && !canCheckin) {
-      html += `<div class="card self">
-        <div class="person-name">${person} 👈</div>
-        <div style="font-size:12px;color:#c0392b;">今日不是你打卡，休息一下吧</div>
-      </div>`;
+    }else if(isMe&&!canCheckin){
+      html+=`<div class="card self"><div class="person-name"><span class="person-avatar" style="background:#fff3e8;">${avatar}</span>${person} 👈</div><div style="font-size:13px;color:#c0392b;">⏸️ 今天不是你的打卡日，休息一下~</div></div>`;
     }
   });
 
-  document.getElementById('checkinArea').innerHTML = html;
+  document.getElementById('checkinArea').innerHTML=html||`<div style="text-align:center;color:var(--sub);padding:20px;">所有人都还没打卡，等待第一位行动派！</div>`;
 
-  // Restore temp selections
-  if (window._tmp && (checkinDateStr === window._tmpDate)) {
-    [0,0.5,1,1.5,2].forEach(v=>{
-      const bs=document.getElementById('bs-'+v), be=document.getElementById('be-'+v);
-      if (bs && window._tmp.study===v) bs.classList.add('sel');
-      if (be && window._tmp.exercise===v) be.classList.add('sel');
-    });
-    const sn=document.getElementById('sNote'), en=document.getElementById('eNote');
-    if (sn) sn.value = window._tmp.sNote||'';
-    if (en) en.value = window._tmp.eNote||'';
-  }
+  // Restore temp
+  if(window._tmp&&(checkinDateStr===window._tmpDate)){[0,0.5,1,1.5,2].forEach(v=>{const bs=document.getElementById('bs-'+v),be=document.getElementById('be-'+v);if(bs&&window._tmp.study===v)bs.classList.add('sel');if(be&&window._tmp.exercise===v)be.classList.add('sel');});const sn=document.getElementById('sNote'),en=document.getElementById('eNote');if(sn)sn.value=window._tmp.sNote||'';if(en)en.value=window._tmp.eNote||'';}
 }
 
-function scoreBtns(type) {
-  const id = type==='study'?'bs':'be';
-  return [0,0.5,1,1.5,2].map(v=>
-    `<button id="${id}-${v}" onclick="selectScore('${type}',${v})">${v===0?'0':v}</button>`
-  ).join('');
+function scoreBtns(type){const id=type==='study'?'bs':'be';return[0,0.5,1,1.5,2].map(v=>`<button id="${id}-${v}" onclick="selectScore('${type}',${v})">${v===0?'0':v}</button>`).join('');}
+
+function selectScore(type,val){
+  if(!window._tmp)window._tmp={study:0,exercise:0,sNote:'',eNote:''};window._tmpDate=getCheckinDate();window._tmp[type]=val;
+  const prefix=type==='study'?'bs':'be';[0,0.5,1,1.5,2].forEach(v=>{const btn=document.getElementById(prefix+'-'+v);if(btn)btn.classList.toggle('sel',v===val);});
+  const btn=document.getElementById('btnSave');if(btn&&btn.classList.contains('btn-saved')){btn.textContent='💾 保存打卡';btn.className='btn btn-primary btn-block';}
 }
 
-function selectScore(type, val) {
-  if (!window._tmp) window._tmp = {study:0,exercise:0,sNote:'',eNote:''};
-  window._tmpDate = getCheckinDate();
-  window._tmp[type] = val;
-  const prefix = type==='study'?'bs':'be';
-  [0,0.5,1,1.5,2].forEach(v=>{
-    const btn=document.getElementById(prefix+'-'+v);
-    if (btn) btn.classList.toggle('sel', v===val);
-  });
-  // Reset save button
-  const btn=document.getElementById('btnSave');
-  if (btn && btn.classList.contains('btn-saved')) {
-    btn.textContent='💾 保存打卡'; btn.className='btn btn-primary btn-block';
-  }
-}
-
-async function saveMyCheckin() {
-  const currentUser = getCurrentUser();
-  if (!currentUser) { toast('请先选择自己'); return; }
-  const checkinDateStr = getCheckinDate();
-  const isSun = isSunday(new Date(checkinDateStr+'T00:00:00'));
-
-  // Check Sunday permission
-  if (isSun) {
-    const d = new Date(checkinDateStr+'T00:00:00');
-    const lastSun = new Date(d); lastSun.setDate(lastSun.getDate()-7);
-    const data = getLocal();
-    const predData = data.predictions[fmtDate(lastSun)];
-    const winners = (predData && predData.winners) ? predData.winners : [];
-    if (!winners.includes(currentUser)) {
-      toast('❌ 今天周日，你不是中奖者，不能打卡');
-      return;
-    }
-  }
-
-  if (!window._tmp) { toast('请选择分数'); return; }
-
-  const data = getLocal();
-  const record = {
-    study: window._tmp.study||0,
-    sNote: (document.getElementById('sNote')?.value||'').trim(),
-    exercise: window._tmp.exercise||0,
-    eNote: (document.getElementById('eNote')?.value||'').trim()
-  };
-
-  if (record.study===0 && record.exercise===0) {
-    toast('⚠️ 请至少选择一项分数');
-    return;
-  }
-
-  if (!data.checkins[currentUser]) data.checkins[currentUser] = {};
-  data.checkins[currentUser][checkinDateStr] = record;
-
-  await saveAndSync(data);
-  window._tmp = null; window._tmpDate = null;
-
-  const btn = document.getElementById('btnSave');
-  if (btn) { btn.textContent='✅ 已保存'; btn.className='btn btn-saved btn-block'; }
-  toast('✅ 打卡已保存！');
-  setTimeout(()=>{
-    if (btn && btn.classList.contains('btn-saved')) {
-      btn.textContent='💾 保存打卡'; btn.className='btn btn-primary btn-block';
-    }
-  },3000);
+async function saveMyCheckin(){
+  const currentUser=getCurrentUser();if(!currentUser){toast('请先选择自己');return;}
+  const checkinDateStr=getCheckinDate();const isSun=isSunday(new Date(checkinDateStr+'T00:00:00'));
+  if(isSun){const d=new Date(checkinDateStr+'T00:00:00');const lastSun=new Date(d);lastSun.setDate(lastSun.getDate()-7);const data=getLocal();const predData=data.predictions[fmtDate(lastSun)];const winners=(predData&&predData.winners)?predData.winners:[];if(!winners.includes(currentUser)){toast('❌ 今天周日，你不是中奖者，不能打卡');return;}}
+  if(!window._tmp){toast('请选择分数');return;}
+  const data=getLocal();
+  const record={study:window._tmp.study||0,sNote:(document.getElementById('sNote')?.value||'').trim(),exercise:window._tmp.exercise||0,eNote:(document.getElementById('eNote')?.value||'').trim()};
+  if(record.study===0&&record.exercise===0){toast('⚠️ 请至少选择一项分数');return;}
+  if(!data.checkins[currentUser])data.checkins[currentUser]={};
+  data.checkins[currentUser][checkinDateStr]=record;
+  await saveAndSync(data);window._tmp=null;window._tmpDate=null;
+  const btn=document.getElementById('btnSave');if(btn){btn.textContent='✅ 已保存';btn.className='btn btn-saved btn-block';}
+  toast('✅ 打卡已保存！');setTimeout(()=>{if(btn&&btn.classList.contains('btn-saved')){btn.textContent='💾 保存打卡';btn.className='btn btn-primary btn-block';}},3000);
   renderCheckin();
 }
 
-function editMyCheckin() {
-  const currentUser = getCurrentUser();
-  const checkinDateStr = getCheckinDate();
-  const data = getLocal();
-  const existing = getPersonCheckin(data, currentUser, checkinDateStr);
-  if (!existing) return;
-  window._tmp = {study:existing.study||0, exercise:existing.exercise||0, sNote:existing.sNote||'', eNote:existing.eNote||''};
-  window._tmpDate = checkinDateStr;
-  delete data.checkins[currentUser][checkinDateStr];
-  saveLocal(data);
-  renderCheckin();
-}
+function editMyCheckin(){const currentUser=getCurrentUser();const checkinDateStr=getCheckinDate();const data=getLocal();const existing=getPersonCheckin(data,currentUser,checkinDateStr);if(!existing)return;window._tmp={study:existing.study||0,exercise:existing.exercise||0,sNote:existing.sNote||'',eNote:existing.eNote||''};window._tmpDate=checkinDateStr;delete data.checkins[currentUser][checkinDateStr];saveLocal(data);renderCheckin();}
 
-async function deleteMyCheckin() {
-  const currentUser = getCurrentUser();
-  const checkinDateStr = getCheckinDate();
-  const data = getLocal();
-  const existing = getPersonCheckin(data, currentUser, checkinDateStr);
-  if (!existing) return;
-  if (!confirm(`确定要撤销 ${currentUser} 在 ${checkinDateStr} 的打卡记录吗？`)) return;
-  delete data.checkins[currentUser][checkinDateStr];
-  await saveAndSync(data);
-  window._tmp = null; window._tmpDate = null;
-  toast('🗑️ 已撤销打卡');
-  renderCheckin();
-}
+async function deleteMyCheckin(){const currentUser=getCurrentUser();const checkinDateStr=getCheckinDate();const data=getLocal();const existing=getPersonCheckin(data,currentUser,checkinDateStr);if(!existing)return;if(!confirm(`确定要撤销 ${currentUser} 在 ${checkinDateStr} 的打卡记录吗？`))return;delete data.checkins[currentUser][checkinDateStr];await saveAndSync(data);window._tmp=null;window._tmpDate=null;toast('🗑️ 已撤销打卡');renderCheckin();}
 
-function renderAll() {
-  renderCheckin();
-  renderWeekly();
-  renderPredict();
-  renderHistory();
-}
-
-// ============ ENCOURAGEMENT ============
-function generateEncourage(data, dateStr, currentUser) {
-  const d = new Date(dateStr+'T00:00:00');
-  if (d.getDay()===0) return '🌿 周日休息。回顾这周的坚持，你已经很棒了！';
-
-  if (!currentUser) return '👆 请先选择"我是谁"，然后开始打卡吧！';
-
-  const existing = getPersonCheckin(data, currentUser, dateStr);
-  if (existing) {
-    const total = (existing.study||0)+(existing.exercise||0);
-    if (total>=3) return `🔥 太棒了！今天已经拿下 <strong>${total.toFixed(1)}分</strong>，继续保持！`;
-    if (total>=1) return `💪 不错！今天已打卡 <strong>${total.toFixed(1)}分</strong>，还能再加把劲~`;
-    return `✅ 今日已打卡，哪怕一点点也是进步！`;
-  }
-
-  const phrases = [
-    '💪 每一次打卡，都是对自己的一次承诺。今天也要加油！',
-    '🌟 不积跬步，无以至千里。半小时的学习或运动，都在塑造更好的你。',
-    '🔥 坚持不是轰轰烈烈，是每天0.5分、0.5分地积累。',
-    '📚 学习和运动，一个滋养头脑，一个强健体魄。',
-    '🌈 今天的一小步，是未来的一大步。出发！',
-  ];
-
-  // Check how many checked in today
-  let count = 0;
-  PERSONS.forEach(p => { if (getPersonCheckin(data, p, dateStr)) count++; });
-  if (count > 0) {
-    return `🌟 今天已有 <strong>${count}</strong> 位伙伴打卡！${count>=3?'团队势头真棒！':'其他伙伴也加油哦~'}`;
-  }
-
-  return phrases[new Date().getDate() % phrases.length];
-}
+function renderAll(){renderCheckin();renderWeekly();renderPredict();renderHistory();}
 
 // ============ WEEKLY ============
-function renderWeekly() {
-  const data = getLocal();
-  const today = new Date();
-  const monday = getMonday(today);
-  const sunday = getSunday(monday);
-  document.getElementById('weekRange').textContent = `📅 ${fmtWeekRange(monday, sunday)}`;
-
-  let tableHtml = '<table class="week-table"><thead><tr><th>姓名</th>';
-  for (let i=0;i<7;i++) {
-    const d=new Date(monday);d.setDate(d.getDate()+i);
-    tableHtml += `<th class="${i===6?'sun-col':''}">${DAYS[i]}<br>${fmtDateShort(d)}</th>`;
-  }
-  tableHtml += '<th>合计</th></tr></thead><tbody>';
-
-  const totals = {};
-  PERSONS.forEach(person => {
-    tableHtml += `<tr><td>${person}</td>`;
-    let pt=0;
-    for (let i=0;i<7;i++) {
-      const d=new Date(monday);d.setDate(d.getDate()+i);
-      const c = getPersonCheckin(data, person, fmtDate(d));
-      let cell='-';
-      if (c) { const sc=(c.study||0)+(c.exercise||0); cell=sc>0?sc.toFixed(1):'-'; pt+=sc; }
-      tableHtml += `<td class="${i===6?'sun-col':''}${isSameDay(d,today)?' highlight':''}">${cell}</td>`;
-    }
-    tableHtml += `<td><strong>${pt.toFixed(1)}</strong></td></tr>`;
-    totals[person]=pt;
-  });
-  tableHtml += '</tbody></table>';
-  document.getElementById('weekTable').innerHTML = tableHtml;
-
-  const allTotal = Object.values(totals).reduce((a,b)=>a+b,0);
-  let sumHtml = `<div class="total-line">🔥 团队总分：${allTotal.toFixed(1)} 分</div>`;
-  PERSONS.forEach(p=>{
+function renderWeekly(){
+  const data=getLocal();const today=new Date();const monday=getMonday(today);const sunday=getSunday(monday);
+  document.getElementById('weekRange').textContent=`📅 ${fmtWeekRange(monday,sunday)}`;
+  let tableHtml='<table class="week-table"><thead><tr><th>姓名</th>';
+  for(let i=0;i<7;i++){const d=new Date(monday);d.setDate(d.getDate()+i);tableHtml+=`<th class="${i===6?'sun-col':''}">${DAYS[i]}<br>${fmtDateShort(d)}</th>`;}
+  tableHtml+='<th>合计</th></tr></thead><tbody>';
+  const totals={};
+  PERSONS.forEach(person=>{tableHtml+=`<tr><td>${AVATARS[person]||''} ${person}</td>`;let pt=0;for(let i=0;i<7;i++){const d=new Date(monday);d.setDate(d.getDate()+i);const c=getPersonCheckin(data,person,fmtDate(d));let cell='-';if(c){const sc=(c.study||0)+(c.exercise||0);cell=sc>0?sc.toFixed(1):'-';pt+=sc;}tableHtml+=`<td class="${i===6?'sun-col':''}${isSameDay(d,today)?' highlight':''}">${cell}</td>`;}tableHtml+=`<td><strong>${pt.toFixed(1)}</strong></td></tr>`;totals[person]=pt;});
+  tableHtml+='</tbody></table>';
+  document.getElementById('weekTable').innerHTML=tableHtml;
+  const allTotal=Object.values(totals).reduce((a,b)=>a+b,0);
+  let sumHtml=`<div class="total-line">🔥 团队总分：${allTotal.toFixed(1)} 分</div>`;
+  const sorted=[...PERSONS].sort((a,b)=>totals[b]-totals[a]);
+  sorted.forEach((p,i)=>{
     const t=totals[p];
-    sumHtml += `<div class="person-line">${p}：<strong>${t.toFixed(1)}分</strong> ${t>=8?'🏆':t>=5?'💪':t>=2?'🌱':'💤'}</div>`;
+    const emoji=i===0?'🥇':i===1?'🥈':i===2?'🥉':t>=8?'🏆':t>=5?'💪':t>=2?'🌱':'💤';
+    sumHtml+=`<div class="person-line">${AVATARS[p]||''} ${p}：<strong>${t.toFixed(1)}分</strong> ${emoji} ${t>=8?'这周太强了！':t>=5?'稳定输出':t>=2?'还在路上':'下周等你爆发'}</div>`;
   });
-  document.getElementById('weekSummary').innerHTML = sumHtml;
-
-  // Last prediction
-  const predKey = fmtDate(sunday);
-  const predData = data.predictions[predKey];
-  const resDiv = document.getElementById('lastPredResult');
-  if (predData && predData.actual!==null && predData.actual!==undefined) {
-    resDiv.innerHTML = `实际总分：<strong>${predData.actual.toFixed(1)}分</strong><br>中奖者：${(predData.winners||[]).join('、')||'无'} 🎉`;
-  } else {
-    resDiv.innerHTML = '暂无结果，周日揭晓~';
-  }
+  document.getElementById('weekSummary').innerHTML=sumHtml;
+  const predKey=fmtDate(sunday);const predData=data.predictions[predKey];
+  const resDiv=document.getElementById('lastPredResult');
+  if(predData&&predData.actual!==null&&predData.actual!==undefined){resDiv.innerHTML=`实际总分：<strong>${predData.actual.toFixed(1)}分</strong><br>🏅 中奖者：<strong>${(predData.winners||[]).join('、')||'无'}</strong> 🎉<br><span style="font-size:12px;color:var(--sub);">TA们这周日可以打卡积分！</span>`;}else{resDiv.innerHTML='本周还未结束，周日揭晓结果~';}
 }
 
 // ============ PREDICTIONS ============
-function renderPredict() {
-  const data = getLocal();
-  const today = new Date();
-  const monday = getMonday(today);
-  const sunday = getSunday(monday);
-  const nextMon = new Date(sunday); nextMon.setDate(nextMon.getDate()+1);
-  const nextSun = getSunday(nextMon);
-  const isSun = isSunday(today);
-
-  document.getElementById('predInfo').innerHTML = isSun
-    ? `🗳️ 预测下周（${fmtWeekRange(nextMon, nextSun)}）团队总分`
-    : `⏰ 下周日开放预测`;
-
-  const predKey = fmtDate(sunday);
-  let existingPreds = (data.predictions[predKey]&&data.predictions[predKey].preds) ? data.predictions[predKey].preds : {};
-
-  let inputs = '';
-  PERSONS.forEach(p=>{
-    const val = existingPreds[p]!==undefined ? existingPreds[p] : '';
-    inputs += `<div class="pred-input-row"><span class="name">${p}</span><input type="number" id="pred-${p}" value="${val}" placeholder="猜总分" step="0.5" min="0" max="40"><span style="font-size:12px;color:var(--sub);">分</span></div>`;
-  });
-  document.getElementById('predInputs').innerHTML = inputs;
-  document.getElementById('predInputs').style.display = isSun?'block':'none';
-  document.querySelector('#page-predict .btn-primary').style.display = isSun?'block':'none';
-
-  let hist = '';
-  Object.keys(data.predictions).sort().reverse().forEach(key=>{
-    const pd=data.predictions[key]; if(!pd) return;
-    hist += `<div style="margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">
-      <div style="font-weight:600;font-size:13px;">📅 ${key}</div>
-      <div style="font-size:12px;color:var(--sub);">预测周：${pd.weekStart} 起</div>`;
-    if (pd.preds) Object.keys(pd.preds).forEach(p=>{ hist += `<span style="font-size:12px;">${p}:${pd.preds[p]}分 </span>`; });
-    if (pd.actual!==null && pd.actual!==undefined) {
-      hist += `<div style="font-size:12px;color:#27ae60;">实际：${pd.actual.toFixed(1)}分 | 中奖：${(pd.winners||[]).join('、')||'无'}</div>`;
-    } else {
-      hist += `<div style="font-size:12px;color:var(--sub);">等待揭晓…</div>`;
-    }
-    hist += '</div>';
-  });
-  document.getElementById('predHistory').innerHTML = hist || '<div style="font-size:13px;color:var(--sub);">暂无预测记录</div>';
+function renderPredict(){
+  const data=getLocal();const today=new Date();const monday=getMonday(today);const sunday=getSunday(monday);
+  const nextMon=new Date(sunday);nextMon.setDate(nextMon.getDate()+1);const nextSun=getSunday(nextMon);
+  const isSun=isSunday(today);
+  document.getElementById('predInfo').innerHTML=isSun?`🗳️ 预测下周（${fmtWeekRange(nextMon,nextSun)}）团队总分<br><span style="font-size:12px;">上周猜最准的人，下周周日可以额外打卡</span>`:`⏰ 下周日开放预测<br><span style="font-size:12px;">猜下周团队总分，最接近的人获得周日打卡权</span>`;
+  const predKey=fmtDate(sunday);let existingPreds=(data.predictions[predKey]&&data.predictions[predKey].preds)?data.predictions[predKey].preds:{};
+  let inputs='';PERSONS.forEach(p=>{const val=existingPreds[p]!==undefined?existingPreds[p]:'';inputs+=`<div class="pred-input-row"><span class="name">${AVATARS[p]||''} ${p}</span><input type="number" id="pred-${p}" value="${val}" placeholder="猜总分" step="0.5" min="0" max="40"><span style="font-size:12px;color:var(--sub);">分</span></div>`;});
+  document.getElementById('predInputs').innerHTML=inputs;document.getElementById('predInputs').style.display=isSun?'block':'none';
+  document.querySelector('#page-predict .btn-primary').style.display=isSun?'block':'none';
+  let hist='';Object.keys(data.predictions).sort().reverse().forEach(key=>{const pd=data.predictions[key];if(!pd)return;hist+=`<div style="margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #f5f0e8;"><div style="font-weight:700;font-size:14px;">📅 ${key}</div><div style="font-size:12px;color:var(--sub);">预测周：${pd.weekStart} 起</div>`;if(pd.preds)Object.keys(pd.preds).forEach(p=>{hist+=`<span style="font-size:13px;">${p}:${pd.preds[p]}分 </span>`;});if(pd.actual!==null&&pd.actual!==undefined){hist+=`<div style="font-size:13px;color:#27ae60;">✅ 实际：${pd.actual.toFixed(1)}分 | 🏅 ${(pd.winners||[]).join('、')||'无'}</div>`;}else{hist+=`<div style="font-size:12px;color:var(--sub);">⏳ 等待揭晓…</div>`;}hist+='</div>';});
+  document.getElementById('predHistory').innerHTML=hist||'<div style="font-size:14px;color:var(--sub);text-align:center;padding:20px;">还没有预测记录<br><span style="font-size:12px;">周日来这里，一起猜下周总分！</span></div>';
 }
 
-async function savePredictions() {
-  const data = getLocal();
-  const today = new Date();
-  if (!isSunday(today)) { toast('只有周日才能提交预测哦~'); return; }
-
-  const monday = getMonday(today);
-  const sunday = getSunday(monday);
-  const nextMon = new Date(sunday); nextMon.setDate(nextMon.getDate()+1);
-  const predKey = fmtDate(sunday);
-  if (!data.predictions[predKey]) data.predictions[predKey] = {weekStart:fmtDate(nextMon), preds:{}, actual:null, winners:[]};
-
-  let count=0;
-  PERSONS.forEach(p=>{
-    const inp=document.getElementById('pred-'+p);
-    if (inp && inp.value!=='') { data.predictions[predKey].preds[p]=parseFloat(inp.value)||0; count++; }
-  });
-
-  // Calculate LAST week winners
-  const lastSun = new Date(sunday); lastSun.setDate(lastSun.getDate()-7);
-  const lastKey = fmtDate(lastSun);
-  const lastPred = data.predictions[lastKey];
-  if (lastPred && lastPred.actual===null) {
-    const thisMon = new Date(sunday); thisMon.setDate(thisMon.getDate()-6);
-    const actual = getWeekAllTotal(data, thisMon);
-    lastPred.actual = actual;
-    if (lastPred.preds && Object.keys(lastPred.preds).length>0) {
-      let minDiff=Infinity, winners=[];
-      Object.keys(lastPred.preds).forEach(p=>{
-        const diff=Math.abs(lastPred.preds[p]-actual);
-        if (diff<minDiff){minDiff=diff;winners=[p];}
-        else if (diff===minDiff){winners.push(p);}
-      });
-      lastPred.winners = winners;
-    }
-  }
-
-  await saveAndSync(data);
-  toast(`✅ 已保存 ${count} 位预测！`);
-  renderPredict();
+async function savePredictions(){
+  const data=getLocal();const today=new Date();if(!isSunday(today)){toast('只有周日才能提交预测哦~');return;}
+  const monday=getMonday(today);const sunday=getSunday(monday);const nextMon=new Date(sunday);nextMon.setDate(nextMon.getDate()+1);const predKey=fmtDate(sunday);
+  if(!data.predictions[predKey])data.predictions[predKey]={weekStart:fmtDate(nextMon),preds:{},actual:null,winners:[]};
+  let count=0;PERSONS.forEach(p=>{const inp=document.getElementById('pred-'+p);if(inp&&inp.value!==''){data.predictions[predKey].preds[p]=parseFloat(inp.value)||0;count++;}});
+  const lastSun=new Date(sunday);lastSun.setDate(lastSun.getDate()-7);const lastKey=fmtDate(lastSun);const lastPred=data.predictions[lastKey];
+  if(lastPred&&lastPred.actual===null){const thisMon=new Date(sunday);thisMon.setDate(thisMon.getDate()-6);const actual=getWeekAllTotal(data,thisMon);lastPred.actual=actual;if(lastPred.preds&&Object.keys(lastPred.preds).length>0){let minDiff=Infinity,winners=[];Object.keys(lastPred.preds).forEach(p=>{const diff=Math.abs(lastPred.preds[p]-actual);if(diff<minDiff){minDiff=diff;winners=[p];}else if(diff===minDiff){winners.push(p);}});lastPred.winners=winners;}}
+  await saveAndSync(data);toast(`✅ 已保存 ${count} 位预测！中奖者已揭晓~`);renderPredict();
 }
-
-function getWeekAllTotal(data, monday) {
-  let total=0;
-  PERSONS.forEach(p=>{ total+=getWeekTotal(data,p,monday); });
-  return total;
-}
-
-function getWeekTotal(data, person, monday) {
-  let total=0;
-  for (let i=0;i<6;i++) {
-    const d=new Date(monday);d.setDate(d.getDate()+i);
-    const c=getPersonCheckin(data,person,fmtDate(d));
-    if (c) total+=(c.study||0)+(c.exercise||0);
-  }
-  const sun=getSunday(monday); const sunStr=fmtDate(sun);
-  const predData = data.predictions[sunStr];
-  if (predData && predData.winners && predData.winners.includes(person)) {
-    const c=getPersonCheckin(data,person,sunStr);
-    if (c) total+=(c.study||0)+(c.exercise||0);
-  }
-  return total;
-}
+function getWeekAllTotal(data,monday){let total=0;PERSONS.forEach(p=>{total+=getWeekTotal(data,p,monday);});return total;}
+function getWeekTotal(data,person,monday){let total=0;for(let i=0;i<6;i++){const d=new Date(monday);d.setDate(d.getDate()+i);const c=getPersonCheckin(data,person,fmtDate(d));if(c)total+=(c.study||0)+(c.exercise||0);}const sun=getSunday(monday);const sunStr=fmtDate(sun);const predData=data.predictions[sunStr];if(predData&&predData.winners&&predData.winners.includes(person)){const c=getPersonCheckin(data,person,sunStr);if(c)total+=(c.study||0)+(c.exercise||0);}return total;}
 
 // ============ HISTORY ============
-function renderHistory() {
-  const data = getLocal();
-  let expHtml = '';
-  PERSONS.forEach(p=>{
-    expHtml += `<div style="margin-bottom:6px;"><button class="btn btn-outline btn-small" onclick="exportPerson('${p}')">📥 导出 ${p}</button></div>`;
-  });
-  expHtml += `<button class="btn btn-outline btn-small" onclick="exportAll()">📥 导出全部汇总</button>`;
-  document.getElementById('exportList').innerHTML = expHtml;
-
-  const allDates=new Set();
-  PERSONS.forEach(p=>{ if(data.checkins[p]) Object.keys(data.checkins[p]).forEach(d=>allDates.add(d)); });
-  const sorted=[...allDates].sort().reverse().slice(0,30);
-  if (sorted.length===0) {
-    document.getElementById('historyOverview').innerHTML='<div style="font-size:13px;color:var(--sub);">还没有打卡记录</div>';
-  } else {
-    let tbl='<table class="week-table"><thead><tr><th>日期</th>';
-    PERSONS.forEach(p=>{tbl+=`<th>${p.slice(0,2)}</th>`;});
-    tbl+='<th>日总</th></tr></thead><tbody>';
-    sorted.forEach(dStr=>{
-      tbl+=`<tr><td>${dStr.slice(5)}</td>`;
-      let dt=0;
-      PERSONS.forEach(p=>{
-        const c=getPersonCheckin(data,p,dStr);
-        const sc=c?(c.study||0)+(c.exercise||0):0; dt+=sc;
-        tbl+=`<td>${sc>0?sc.toFixed(1):'-'}</td>`;
-      });
-      tbl+=`<td><strong>${dt.toFixed(1)}</strong></td></tr>`;
-    });
-    tbl+='</tbody></table>';
-    document.getElementById('historyOverview').innerHTML = tbl;
-  }
-}
-
-function exportPerson(person) {
-  const data=getLocal();
-  const records=data.checkins[person]||{};
-  const dates=Object.keys(records).sort();
-  let txt=`📋 ${person} 打卡记录\n${'═'.repeat(40)}\n\n`;
-  let grand=0;
-  dates.forEach(d=>{
-    const r=records[d];
-    const dObj=new Date(d+'T00:00:00');
-    const dayName=DAYS[dObj.getDay()===0?6:dObj.getDay()-1];
-    const sc=(r.study||0)+(r.exercise||0); grand+=sc;
-    txt+=`📅 ${d} 星期${dayName}\n   学习：${r.study||0}分${r.sNote?' — '+r.sNote:''}\n   运动：${r.exercise||0}分${r.eNote?' — '+r.eNote:''}\n   小计：${sc.toFixed(1)}分\n\n`;
-  });
-  txt+=`${'─'.repeat(40)}\n📊 总计：${grand.toFixed(1)}分 | ${dates.length}天\n导出时间：${new Date().toLocaleString()}\n`;
-  downloadFile(`${person}_打卡记录.txt`, txt);
-}
-
-function exportAll() {
-  const data=getLocal();
-  let txt=`📋 五仁打卡汇总\n${'═'.repeat(50)}\n\n`;
-  PERSONS.forEach(p=>{
-    const records=data.checkins[p]||{};
-    const dates=Object.keys(records).sort();
-    let total=0; dates.forEach(d=>{ const r=records[d]; total+=(r.study||0)+(r.exercise||0); });
-    txt+=`${p}：${total.toFixed(1)}分 | ${dates.length}天\n`;
-  });
-  txt+=`\n导出时间：${new Date().toLocaleString()}\n`;
-  downloadFile('五仁打卡_汇总.txt', txt);
-}
-
-function downloadFile(filename, content) {
-  const blob=new Blob([content],{type:'text/plain;charset=utf-8'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a'); a.href=url; a.download=filename;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  toast(`✅ 已导出：${filename}`);
-}
+function renderHistory(){const data=getLocal();let expHtml='';PERSONS.forEach(p=>{expHtml+=`<div style="margin-bottom:8px;"><button class="btn btn-outline btn-small" onclick="exportPerson('${p}')">📥 导出 ${p}</button></div>`;});expHtml+=`<button class="btn btn-outline btn-small" onclick="exportAll()">📥 导出全部汇总</button>`;document.getElementById('exportList').innerHTML=expHtml;const allDates=new Set();PERSONS.forEach(p=>{if(data.checkins[p])Object.keys(data.checkins[p]).forEach(d=>allDates.add(d));});const sorted=[...allDates].sort().reverse().slice(0,30);if(sorted.length===0){document.getElementById('historyOverview').innerHTML='<div style="text-align:center;color:var(--sub);padding:30px;font-size:14px;">📭 还没有打卡记录<br><span style="font-size:12px;">快去打卡吧，第一个记录从这里开始！</span></div>';}else{let tbl='<table class="week-table"><thead><tr><th>日期</th>';PERSONS.forEach(p=>{tbl+=`<th>${p.slice(0,2)}</th>`;});tbl+='<th>日总</th></tr></thead><tbody>';sorted.forEach(dStr=>{tbl+=`<tr><td>${dStr.slice(5)}</td>`;let dt=0;PERSONS.forEach(p=>{const c=getPersonCheckin(data,p,dStr);const sc=c?(c.study||0)+(c.exercise||0):0;dt+=sc;tbl+=`<td>${sc>0?sc.toFixed(1):'-'}</td>`;});tbl+=`<td><strong>${dt.toFixed(1)}</strong></td></tr>`;});tbl+='</tbody></table>';document.getElementById('historyOverview').innerHTML=tbl;}}
+function exportPerson(person){const data=getLocal();const records=data.checkins[person]||{};const dates=Object.keys(records).sort();let txt=`📋 ${person} 打卡记录\n${'═'.repeat(40)}\n\n`;let grand=0;dates.forEach(d=>{const r=records[d];const dObj=new Date(d+'T00:00:00');const dayName=DAYS[dObj.getDay()===0?6:dObj.getDay()-1];const sc=(r.study||0)+(r.exercise||0);grand+=sc;txt+=`📅 ${d} 星期${dayName}\n   学习：${r.study||0}分${r.sNote?' — '+r.sNote:''}\n   运动：${r.exercise||0}分${r.eNote?' — '+r.eNote:''}\n   小计：${sc.toFixed(1)}分\n\n`;});txt+=`${'─'.repeat(40)}\n📊 总计：${grand.toFixed(1)}分 | ${dates.length}天\n导出时间：${new Date().toLocaleString()}\n`;downloadFile(`${person}_打卡记录.txt`,txt);}
+function exportAll(){const data=getLocal();let txt=`📋 五仁打卡汇总\n${'═'.repeat(50)}\n\n`;PERSONS.forEach(p=>{const records=data.checkins[p]||{};const dates=Object.keys(records).sort();let total=0;dates.forEach(d=>{const r=records[d];total+=(r.study||0)+(r.exercise||0);});txt+=`${p}：${total.toFixed(1)}分 | ${dates.length}天\n`;});txt+=`\n导出时间：${new Date().toLocaleString()}\n`;downloadFile('五仁打卡_汇总.txt',txt);}
+function downloadFile(filename,content){const blob=new Blob([content],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);toast(`✅ 已导出：${filename}`);}
 
 // ============ TABS ============
-function switchTab(idx) {
-  document.querySelectorAll('.page').forEach((p,i)=>p.classList.toggle('active',i===idx));
-  document.querySelectorAll('nav.tabs button').forEach((b,i)=>b.classList.toggle('active',i===idx));
-  if (idx===0) renderCheckin();
-  if (idx===1) renderWeekly();
-  if (idx===2) renderPredict();
-  if (idx===3) renderHistory();
-}
+function switchTab(idx){document.querySelectorAll('.page').forEach((p,i)=>p.classList.toggle('active',i===idx));document.querySelectorAll('nav.tabs button').forEach((b,i)=>b.classList.toggle('active',i===idx));if(idx===0)renderCheckin();if(idx===1)renderWeekly();if(idx===2)renderPredict();if(idx===3)renderHistory();}
 
 // ============ INIT ============
-async function init() {
-  // Populate user selector
-  const sel=document.getElementById('currentUser');
-  sel.innerHTML='<option value="">选择自己</option>'+PERSONS.map(p=>`<option value="${p}">${p}</option>`).join('');
-  const saved=localStorage.getItem('wuren_me');
-  if (saved && PERSONS.includes(saved)) sel.value=saved;
-
-  // Set date to today
-  document.getElementById('checkinDate').value = fmtDate(new Date());
-
-  // Sync from GitHub
-  await syncNow(true);
-  renderAll();
-
-  // Register service worker
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').catch(()=>{});
-  }
+async function init(){
+  const sel=document.getElementById('currentUser');sel.innerHTML='<option value="">选择自己</option>'+PERSONS.map(p=>`<option value="${p}">${AVATARS[p]||''} ${p}</option>`).join('');
+  const saved=localStorage.getItem('wuren_me');if(saved&&PERSONS.includes(saved))sel.value=saved;
+  document.getElementById('checkinDate').value=fmtDate(new Date());
+  await syncNow(true);renderAll();
+  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
 }
-
 init();
 </script>
 </body>
