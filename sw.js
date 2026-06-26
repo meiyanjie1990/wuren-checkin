@@ -1,36 +1,27 @@
-const CACHE_NAME = 'wuren-checkin-v2';
-const FILES = [
-  './index.html',
-  './manifest.json'
-];
+const CACHE_NAME = 'wuren-v3';
 
-self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(FILES))
-  );
-});
-
+// Network-first: always try to get latest, fall back to cache only when offline
 self.addEventListener('fetch', e => {
   e.respondWith(
-    caches.match(e.request).then(cached => {
-      // Return cached response, otherwise fetch network
-      return cached || fetch(e.request).then(response => {
-        // Cache new requests for offline
+    fetch(e.request)
+      .then(response => {
+        // Cache the fresh response
         if (response.ok && response.type === 'basic') {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
         }
         return response;
-      });
-    })
+      })
+      .catch(() => {
+        // Offline: try cache
+        return caches.match(e.request);
+      })
   );
 });
 
-// Clean old caches
+// Clean ALL old caches
 self.addEventListener('activate', e => {
   e.waitUntil(
-    caches.keys().then(keys => Promise.all(
-      keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-    ))
+    caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))))
   );
 });
