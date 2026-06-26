@@ -86,6 +86,7 @@ nav.tabs button.active { color: var(--accent); font-weight: 600; }
   border: 1px solid var(--border);
 }
 .card h3 { font-size: 16px; margin-bottom: 10px; }
+.card.current-user { border: 2px solid var(--accent); background: #fffdf7; }
 .card .person-name { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
 
 /* Score Row */
@@ -250,6 +251,14 @@ nav.tabs button.active { color: var(--accent); font-weight: 600; }
 <header>
   <h1>🥜 五仁打卡</h1>
   <div class="date" id="headerDate"></div>
+  <div style="margin-top:8px;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;">
+    <span style="font-size:13px;">👤 我是：</span>
+    <select id="currentUser" onchange="onUserSwitch()" style="padding:6px 10px;border-radius:8px;border:1.5px solid var(--border);font-size:14px;font-family:inherit;">
+      <option value="">选择自己</option>
+    </select>
+    <button class="btn btn-outline btn-small" onclick="syncFromGitHub()">🔄 刷新</button>
+    <span id="syncStatus" style="font-size:11px;color:var(--sub);"></span>
+  </div>
 </header>
 
 <div class="toast" id="toast"></div>
@@ -312,6 +321,15 @@ nav.tabs button.active { color: var(--accent); font-weight: 600; }
 </nav>
 
 <script>
+// ============ GITHUB CONFIG ============
+const GITHUB_TOKEN = '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';
+const GITHUB_REPO = 'meiyanjie1990/wuren-checkin';
+const DATA_FILE = 'data.json';
+const RAW_URL = `https://raw.githubusercontent.com/${GITHUB_REPO}/main/${DATA_FILE}`;
+const API_URL = `https://api.github.com/repos/${GITHUB_REPO}/contents/${DATA_FILE}`;
+
+let _dataSha = null;  // SHA of remote file for updates
+
 // ============ DATA LAYER ============
 const PERSONS = ['石维婧','梅妍洁','单兰迪','王珂','师旌议'];
 const DAYS = ['一','二','三','四','五','六','日'];
@@ -337,6 +355,108 @@ function getData() {
   if (!data.checkins) data.checkins = {}; // { person: { "YYYY-MM-DD": { study: n, sNote: "", exercise: n, eNote: "" } } }
   if (!data.predictions) data.predictions = {}; // { sundayDate: { weekStart: "", preds: {person: n}, actual: n|null, winners: [] } }
   return data;
+}
+
+// ============ GITHUB SYNC ============
+function getCurrentUser() {
+  return document.getElementById('currentUser').value;
+}
+
+async function syncFromGitHub(silent) {
+  const status = document.getElementById('syncStatus');
+  if (status) status.textContent = '⏳ 同步中…';
+  try {
+    const resp = await fetch(RAW_URL + '?t=' + Date.now(), { cache: 'no-cache' });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const remoteData = await resp.json();
+    // Also get SHA for later writes
+    const shaResp = await fetch(API_URL, {
+      headers: { 'Authorization': 'token ' + GITHUB_TOKEN, 'Accept': 'application/vnd.github.v3+json' },
+      cache: 'no-cache'
+    });
+    if (shaResp.ok) {
+      const shaData = await shaResp.json();
+      _dataSha = shaData.sha;
+    }
+    // Merge: remote data is the source of truth
+    saveData(remoteData);
+    if (status && !silent) status.textContent = '✅ 已同步';
+    if (!silent) { renderCheckin(); toast('✅ 数据已从云端同步'); }
+    setTimeout(() => { if (status) status.textContent = ''; }, 3000);
+    return true;
+  } catch(e) {
+    if (status && !silent) status.textContent = '⚠️ 离线模式';
+    console.log('Sync error:', e.message);
+    if (!silent) { setTimeout(() => { if (status) status.textContent = ''; }, 3000); }
+    return false;
+  }
+}
+
+async function pushToGitHub() {
+  const data = getData();
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+  const body = {
+    message: '📝 更新打卡数据',
+    content: content,
+    branch: 'main'
+  };
+  if (_dataSha) body.sha = _dataSha;
+
+  const status = document.getElementById('syncStatus');
+  try {
+    const resp = await fetch(API_URL, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'token ' + GITHUB_TOKEN,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    if (!resp.ok) {
+      const err = await resp.json();
+      // If SHA conflict, refresh and retry once
+      if (err.message && err.message.includes('sha') && !body._retried) {
+        await syncFromGitHub(true);
+        body.sha = _dataSha;
+        body._retried = true;
+        const retryResp = await fetch(API_URL, {
+          method: 'PUT',
+          headers: {
+            'Authorization': 'token ' + GITHUB_TOKEN,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(body)
+        });
+        if (!retryResp.ok) throw new Error('Retry failed');
+        const retryData = await retryResp.json();
+        _dataSha = retryData.content.sha;
+      } else {
+        throw err;
+      }
+    } else {
+      const result = await resp.json();
+      _dataSha = result.content.sha;
+    }
+    if (status) status.textContent = '☁️ 已同步';
+    setTimeout(() => { if (status) status.textContent = ''; }, 3000);
+    return true;
+  } catch(e) {
+    if (status) status.textContent = '⚠️ 未同步';
+    console.log('Push error:', e.message);
+    setTimeout(() => { if (status) status.textContent = ''; }, 4000);
+    return false;
+  }
+}
+
+function onUserSwitch() {
+  const user = getCurrentUser();
+  if (user) {
+    localStorage.setItem('wuren_current_user', user);
+    toast(`👤 当前用户：${user}`);
+  }
+  renderCheckin();
 }
 
 function getTodayCheckin(data, person, dateStr) {
@@ -424,14 +544,17 @@ function renderCheckin() {
   }
 
   // Build checkin cards
+  const currentUser = getCurrentUser();
   let html = '';
   PERSONS.forEach(person => {
     const existing = getTodayCheckin(data, person, todayStr);
     const canCheckin = !todayIsSun || sundayWinners.includes(person);
+    const isMe = (currentUser === person);
+    const cardClass = isMe ? 'card current-user' : 'card';
 
     if (!canCheckin && todayIsSun) {
-      html += `<div class="card" style="opacity:0.5">
-        <div class="person-name">${person} <span style="font-size:12px;color:var(--sub);">今日休息</span></div>
+      html += `<div class="${cardClass}" style="opacity:0.5">
+        <div class="person-name">${person} ${isMe?'👈':''} <span style="font-size:12px;color:var(--sub);">今日休息</span></div>
       </div>`;
       return;
     }
@@ -439,8 +562,8 @@ function renderCheckin() {
     if (existing) {
       const st = existing.study || 0;
       const et = existing.exercise || 0;
-      html += `<div class="card">
-        <div class="person-name">${person} <span class="done-badge">✓ 已打卡</span></div>
+      html += `<div class="${cardClass}">
+        <div class="person-name">${person} ${isMe?'👈':''} <span class="done-badge">✓ 已打卡</span></div>
         <div style="font-size:14px;display:flex;gap:16px;">
           <span>📚 学习 <strong>${st}分</strong>${existing.sNote ? ' — '+existing.sNote : ''}</span>
           <span>🏃 运动 <strong>${et}分</strong>${existing.eNote ? ' — '+existing.eNote : ''}</span>
@@ -448,8 +571,8 @@ function renderCheckin() {
         <button class="btn btn-outline btn-small" onclick="editCheckin('${person}')" style="margin-top:6px;">✏️ 修改</button>
       </div>`;
     } else {
-      html += `<div class="card" id="card-${person}">
-        <div class="person-name">${person}</div>
+      html += `<div class="${cardClass}" id="card-${person}">
+        <div class="person-name">${person} ${isMe?'👈':''}</div>
         <div class="score-row">
           <div class="score-block">
             <div class="label"><span class="dot study"></span>📚 学习 (0-2分)</div>
@@ -568,13 +691,14 @@ function saveAll() {
     toast(`✅ 已保存 ${saved} 位伙伴的打卡！`);
     const btn = document.getElementById('btnSaveAll');
     if (btn) { btn.textContent = '✅ 已保存'; btn.className = 'btn btn-saved btn-block'; }
-    // Reset button after 3 seconds so they can save again later
     setTimeout(() => {
       if (btn && btn.classList.contains('btn-saved')) {
         btn.textContent = '💾 保存今日打卡';
         btn.className = 'btn btn-primary btn-block';
       }
     }, 3000);
+    // Push to GitHub for shared sync
+    pushToGitHub();
   } else {
     toast('⚠️ 请至少为一位伙伴选择分数');
   }
@@ -791,6 +915,7 @@ function savePredictions() {
 
   saveData(data);
   toast(`✅ 已保存 ${count} 位伙伴的预测！上周中奖者已揭晓，去周报页查看~`);
+  pushToGitHub();
   renderPredict();
 }
 
@@ -899,7 +1024,15 @@ function downloadFile(filename, content) {
 }
 
 // ============ INIT ============
-function init() {
+async function init() {
+  // Populate user selector
+  const sel = document.getElementById('currentUser');
+  sel.innerHTML = '<option value="">选择自己</option>' + PERSONS.map(p => `<option value="${p}">${p}</option>`).join('');
+  const savedUser = localStorage.getItem('wuren_current_user');
+  if (savedUser && PERSONS.includes(savedUser)) sel.value = savedUser;
+
+  // Try to sync from GitHub first
+  await syncFromGitHub(true);
   renderCheckin();
 
   // Register service worker for offline PWA
