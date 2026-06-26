@@ -233,7 +233,7 @@ nav.tabs button.active { color: var(--accent); font-weight: 700; }
 
 <script>
 // ============ CONFIG ============
-const APP_VERSION = 5; // 改代码后+1，所有人自动提示刷新
+const APP_VERSION = 6; // 改代码后+1，所有人自动提示刷新
 const PERSONS = ['石维婧','梅妍洁','单兰迪','王珂','师旌议'];
 const DAYS = ['一','二','三','四','五','六','日'];
 const AVATARS = { '石维婧':'🌸','梅妍洁':'🥜','单兰迪':'🌟','王珂':'🍃','师旌议':'🔥' };
@@ -551,26 +551,28 @@ function switchTab(idx){document.querySelectorAll('.page').forEach((p,i)=>p.clas
 // ============ INIT ============
 async function checkVersion(){
   try{
-    const resp=await fetch(`https://raw.githubusercontent.com/${REPO}/main/version.json?t=${Date.now()}`,{cache:'no-cache'});
+    // Use API (more reliable in China than raw.githubusercontent.com)
+    const resp=await fetch(`https://api.github.com/repos/${REPO}/contents/version.json?t=${Date.now()}`,{
+      headers:{'Authorization':'token '+GITHUB_TOKEN,'Accept':'application/vnd.github.v3+json'},
+      cache:'no-cache'
+    });
     if(resp.ok){
-      const remote=await resp.json();
-      const storedVer=parseInt(localStorage.getItem('wuren_app_ver')||'0');
-      const currentVer=Math.max(APP_VERSION, storedVer);
-      if(remote.version>currentVer){
+      const json=await resp.json();
+      const remoteVer=JSON.parse(decodeURIComponent(escape(atob(json.content.replace(/\s/g,''))))).version;
+      const storedVer=parseInt(localStorage.getItem('wuren_ver')||'0');
+      if(remoteVer>storedVer){
         const banner=document.createElement('div');
+        banner.id='verBanner';
         banner.style.cssText='position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:300;background:#f0883e;color:#fff;padding:10px 20px;border-radius:0 0 16px 16px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);animation:bounce 0.5s ease;';
         banner.textContent='🆕 有新版本！点此刷新 →';
         banner.onclick=()=>{
-          localStorage.setItem('wuren_app_ver',String(remote.version));
+          localStorage.setItem('wuren_ver',String(remoteVer));
           if('serviceWorker'in navigator){navigator.serviceWorker.getRegistrations().then(regs=>regs.forEach(r=>r.unregister()));}
           banner.textContent='✅ 已更新！';banner.style.background='#55a392';
           setTimeout(()=>location.reload(true),300);
         };
         document.body.appendChild(banner);
-        setTimeout(()=>{if(banner.parentNode)banner.remove();},20000);
-      } else {
-        // Up to date: store the version we have
-        localStorage.setItem('wuren_app_ver',String(remote.version));
+        setTimeout(()=>{const b=document.getElementById('verBanner');if(b)b.remove();},20000);
       }
     }
   }catch(e){}
@@ -580,7 +582,6 @@ async function init(){
   const sel=document.getElementById('currentUser');sel.innerHTML='<option value="">选择自己</option>'+PERSONS.map(p=>`<option value="${p}">${AVATARS[p]||''} ${p}</option>`).join('');
   const saved=localStorage.getItem('wuren_me');if(saved&&PERSONS.includes(saved))sel.value=saved;
   document.getElementById('checkinDate').value=fmtDate(new Date());
-  localStorage.setItem('wuren_app_ver',APP_VERSION);
   await syncNow(true);renderAll();
   checkVersion(); // Check for updates in background
   if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
