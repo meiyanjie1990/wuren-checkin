@@ -429,7 +429,7 @@ function renderCheckin() {
           <span>📚 学习 <strong>${st}分</strong>${existing.sNote?' — '+existing.sNote:''}</span>
           <span>🏃 运动 <strong>${et}分</strong>${existing.eNote?' — '+existing.eNote:''}</span>
         </div>
-        ${isMe ? `<button class="btn btn-outline btn-small" onclick="editMyCheckin()" style="margin-top:6px;">✏️ 修改</button>` : ''}
+        ${isMe ? `<div class="btn-row"><button class="btn btn-outline btn-small" onclick="editMyCheckin()">✏️ 修改</button><button class="btn btn-outline btn-small" onclick="deleteMyCheckin()" style="color:#c0392b;border-color:#c0392b;">🗑️ 撤销</button></div>` : ''}
       </div>`;
     } else if (isMe && canCheckin) {
       // Show input fields ONLY for current user
@@ -560,12 +560,24 @@ function editMyCheckin() {
   const data = getLocal();
   const existing = getPersonCheckin(data, currentUser, checkinDateStr);
   if (!existing) return;
-  // Load into temp
   window._tmp = {study:existing.study||0, exercise:existing.exercise||0, sNote:existing.sNote||'', eNote:existing.eNote||''};
   window._tmpDate = checkinDateStr;
-  // Remove from data so card shows as editable
   delete data.checkins[currentUser][checkinDateStr];
   saveLocal(data);
+  renderCheckin();
+}
+
+async function deleteMyCheckin() {
+  const currentUser = getCurrentUser();
+  const checkinDateStr = getCheckinDate();
+  const data = getLocal();
+  const existing = getPersonCheckin(data, currentUser, checkinDateStr);
+  if (!existing) return;
+  if (!confirm(`确定要撤销 ${currentUser} 在 ${checkinDateStr} 的打卡记录吗？`)) return;
+  delete data.checkins[currentUser][checkinDateStr];
+  await saveAndSync(data);
+  window._tmp = null; window._tmpDate = null;
+  toast('🗑️ 已撤销打卡');
   renderCheckin();
 }
 
