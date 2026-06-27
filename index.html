@@ -484,11 +484,13 @@ function generateEncourage(data, dateStr, currentUser) {
     const total=(existing.study||0)+(existing.exercise||0);
     const st=existing.study||0, et=existing.exercise||0;
     const sNote=existing.sNote||'', eNote=existing.eNote||'';
-    // AI reply available?
-    if (existing._aiReply && existing._aiTime && (Date.now() - existing._aiTime < 86400000)) {
+// AI reply available? (from separate cache)
+    const aiCache = JSON.parse(localStorage.getItem('wuren_ai_cache')||'{}');
+    const aiEntry = aiCache[currentUser+'|'+dateStr];
+    if (aiEntry && aiEntry.reply && aiEntry.time && (Date.now() - aiEntry.time < 86400000)) {
       const prefix = greeting + '，'+currentUser+'！';
       const streakExtra = streak>=7 ? ' 🔥连续'+streak+'天！' : streak>=3 ? ' ⭐连续'+streak+'天' : '';
-      return '<div class="greeting">'+prefix+'</div><div class="body">'+existing._aiReply+streakExtra+'</div><div class="humor">🤖 AI定制回复（离线时用关键词兜底）</div>';
+      return '<div class="greeting">'+prefix+'</div><div class="body">'+aiEntry.reply+streakExtra+'</div><div class="humor">🤖 AI定制回复（离线时用关键词兜底）</div>';
     }
     const sReaction=st>0?noteReaction(sNote,'study'):null;
     const eReaction=et>0?noteReaction(eNote,'exercise'):null;
@@ -710,14 +712,13 @@ async function saveMyCheckin(){
     const timeGreeting = hour<7?'清晨':hour<10?'上午':hour<13?'中午':hour<17?'下午':hour<20?'傍晚':'晚上';
     callDeepSeek(currentUser, record.study||0, record.sNote||'', record.exercise||0, record.eNote||'', streak, weekDone, new Date(checkinDateStr+'T00:00:00').getDay()||7, timeGreeting).then(aiReply => {
       if (aiReply) {
-        // Store AI reply and re-render
-        const d = getLocal();
-        if (d.checkins[currentUser] && d.checkins[currentUser][checkinDateStr]) {
-          d.checkins[currentUser][checkinDateStr]._aiReply = aiReply;
-          d.checkins[currentUser][checkinDateStr]._aiTime = Date.now();
-          saveLocal(d);
-          renderCheckin();
-        }
+        // Store in separate AI cache (not affected by sync)
+        const aiCache = JSON.parse(localStorage.getItem('wuren_ai_cache')||'{}');
+        aiCache[currentUser+'|'+checkinDateStr] = {reply:aiReply, time:Date.now()};
+        localStorage.setItem('wuren_ai_cache', JSON.stringify(aiCache));
+        const thinkEl = document.getElementById('aiThinking');
+        if (thinkEl) thinkEl.remove();
+        renderCheckin();
       }
     });
   }
