@@ -167,7 +167,7 @@ async function callAI(name,ss,sn,es,en,streak,wd,dow,tg){
   if(ss>0)parts.push('学习'+ss+'分'+(sn?'：'+sn:''));
   if(es>0)parts.push('运动'+es+'分'+(en?'：'+en:''));
   if(parts.length===0)return null;
-  var prompt='写一句打卡鼓励，给30-40岁自律成年人。口语化、带冷幽默。要自然回应ta具体做了什么。50-80字。直接回复。\n时间：'+tg+'\n用户：'+name+'\n'+parts.join('；')+'\n连续：'+streak+'天 本周：'+wd+'天';
+  var prompt='给30-40岁自律成年人写打卡鼓励。口语化像损友，幽默温暖。如果ta学习和运动都做了，两项都得回应。60-100字。直接回复不要前缀。\n时间：'+tg+'\n用户：'+name+'\n'+parts.join('；')+'\n连续：'+streak+'天 本周：'+wd+'天';
   try{
     var ctrl=new AbortController();setTimeout(function(){ctrl.abort()},10000);
     var resp=await fetch('https://api.deepseek.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+DS_KEY},body:JSON.stringify({model:'deepseek-chat',messages:[{role:'user',content:prompt}],max_tokens:300,temperature:0.95}),signal:ctrl.signal});
@@ -278,7 +278,7 @@ function genMini(data,dateStr,person){
   var total=(ex.study||0)+(ex.exercise||0);
   if(total===0)return'';
   var av=AVATARS[person]||'👤';
-  if(ex._ai){var full=ex._ai;var short=full.length>40?full.slice(0,40)+'...':full;var id='ai-full-'+person.replace(/[^a-zA-Z]/g,'');return'<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;padding:4px 0;border-bottom:1px solid #f5f5f5"><span style="font-size:16px">'+av+'</span><span><strong>'+person+'</strong> '+total.toFixed(1)+'分<span style="font-size:8px;background:#e8e8e8;color:#999;padding:1px 4px;border-radius:6px;margin-left:2px">AI</span><br><span style="color:#5c4d38" id="'+id+'-short">'+short+'</span><span style="color:#5c4d38;display:none" id="'+id+'-full">'+full+'</span>'+'<br><button class="btn btn-small" style="font-size:10px;padding:2px 8px;margin-top:3px" onclick="var s=document.getElementById(''+id+'-short');var f=document.getElementById(''+id+'-full');var b=this;if(f.style.display==='none'){s.style.display='none';f.style.display='inline';b.textContent='收起'}else{s.style.display='inline';f.style.display='none';b.textContent='展开全部'}">展开全部</button></span></div>'}
+  if(ex._ai){return'<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;padding:4px 0;border-bottom:1px solid #f5f5f5"><span style="font-size:16px">'+av+'</span><span><strong>'+person+'</strong> '+total.toFixed(1)+'分<span style="font-size:8px;background:#e8e8e8;color:#999;padding:1px 4px;border-radius:6px;margin-left:2px">AI</span><br><span style="color:#5c4d38;font-size:12px;line-height:1.6">'+ex._ai+'</span></span></div>'}
   var r1=(ex.study||0)>0?noteReact(ex.sNote||'','study'):null;
   var r2=(ex.exercise||0)>0?noteReact(ex.eNote||'','exercise'):null;
   var r=r1||r2||'';
