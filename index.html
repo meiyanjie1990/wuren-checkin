@@ -403,7 +403,6 @@ function generateEncourage(data, dateStr, currentUser) {
     if(sReaction) parts.push(sReaction);
     if(eReaction) parts.push(eReaction);
     if(!sReaction&&!eReaction&&st>0) parts.push('今天没写备注？没关系，行动比文字更重要。但下次写一句话呗，我想夸得更准一点 😉');
-    if(sReaction||eReaction) parts.push('（读了你的分享，上面那句是针对你写的，不是机器人模板哦 👆）');
 
     // Streak
     if(streak>=30) parts.push('🔥 连续 <strong>'+streak+'</strong> 天！整整一个月以上的坚持——你不是在打卡，你是在重新定义自己。');
