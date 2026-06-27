@@ -89,12 +89,7 @@ nav.tabs button.active{color:var(--sage)}
 .card h3{font-family:'EB Garamond',serif;font-size:17px;font-weight:600;margin-bottom:10px}
 
 .person-name{font-size:15px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.person-avatar{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-family:'EB Garamond',serif;font-weight:600;color:#FFF}
-.person-avatar.av-shi{background:linear-gradient(135deg,#E8C8B8,#D4A090)}
-.person-avatar.av-mei{background:linear-gradient(135deg,#D8C8E0,#C0A8D0)}
-.person-avatar.av-shan{background:linear-gradient(135deg,#C8DCC8,#A8C8A8)}
-.person-avatar.av-wang{background:linear-gradient(135deg,#D8D0C0,#C8B898)}
-.person-avatar.av-shi2{background:linear-gradient(135deg,#D0CCC8,#B8B0A8)}
+.person-avatar{display:none}
 
 .score-row{display:flex;gap:10px;margin-bottom:8px}
 .score-block{flex:1}
@@ -163,11 +158,6 @@ nav.tabs button.active{color:var(--sage)}
 .ai-tag{font-size:9px;color:var(--sepia);border:1px solid var(--thread);border-radius:6px;padding:1px 6px;margin-left:4px;vertical-align:middle;font-weight:500}
 .other-ai{font-size:12px;color:var(--sepia);line-height:1.6;font-style:italic}
 
-.person-avatar.av-shi{background:linear-gradient(135deg,#E8C8B8,#D4A090);color:#FFF;font-family:'EB Garamond',serif;font-size:16px;font-weight:600}
-.person-avatar.av-mei{background:linear-gradient(135deg,#D8C8E0,#C0A8D0);color:#FFF;font-family:'EB Garamond',serif;font-size:16px;font-weight:600}
-.person-avatar.av-shan{background:linear-gradient(135deg,#C8DCC8,#A8C8A8);color:#FFF;font-family:'EB Garamond',serif;font-size:16px;font-weight:600}
-.person-avatar.av-wang{background:linear-gradient(135deg,#D8D0C0,#C8B898);color:#FFF;font-family:'EB Garamond',serif;font-size:16px;font-weight:600}
-.person-avatar.av-shi2{background:linear-gradient(135deg,#D0CCC8,#B8B0A8);color:#FFF;font-family:'EB Garamond',serif;font-size:16px;font-weight:600}
 
 @media(min-width:600px){.checkin-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.checkin-grid .card{margin-bottom:0}}
 </style>
@@ -176,7 +166,7 @@ nav.tabs button.active{color:var(--sage)}
 
 <header>
 <div class="top-row">
-  <h1><span class="emoji" id="headerEmoji">🥜</span><span id="headerName">五仁打卡</span></h1>
+  <h1><span id="headerName">五仁打卡</span></h1>
   <div class="date-col" id="headerDate"></div>
 </div>
 <div class="sub-line">
@@ -592,7 +582,7 @@ async function init(){
   if(saved&&PERSONS.indexOf(saved)>-1){
     sel.value=saved;
     document.getElementById('headerName').textContent=saved;
-    document.getElementById('headerEmoji').textContent=AVATARS[saved]||'🥜';
+    
   }
   document.getElementById('checkinDate').value=fd(new Date());
   // Render immediately with local data, then sync
@@ -601,7 +591,7 @@ async function init(){
   renderAll();
   if(cu()){
     document.getElementById('headerName').textContent=cu();
-    document.getElementById('headerEmoji').textContent=AVATARS[cu()]||'🥜';
+    
   }
   await syncNow(true);
   renderAll();
@@ -609,7 +599,7 @@ async function init(){
   checkVersion();
   if(cu()){
     document.getElementById('headerName').textContent=cu();
-    document.getElementById('headerEmoji').textContent=AVATARS[cu()]||'🥜';
+    
     setTimeout(function(){renderCheckin();},100);
     setTimeout(function(){renderCheckin();},400);
   }
