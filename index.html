@@ -370,8 +370,8 @@ function generateEncourage(data, dateStr, currentUser) {
     const total=(existing.study||0)+(existing.exercise||0);
     const st=existing.study||0, et=existing.exercise||0;
     const sNote=existing.sNote||'', eNote=existing.eNote||'';
-    const sReaction=noteReaction(sNote,'study');
-    const eReaction=noteReaction(eNote,'exercise');
+    const sReaction=st>0?noteReaction(sNote,'study'):null;
+    const eReaction=et>0?noteReaction(eNote,'exercise'):null;
     const seed=hashStr(currentUser+dateStr);
     let parts=[], humor='';
 
@@ -402,7 +402,7 @@ function generateEncourage(data, dateStr, currentUser) {
     // Note-specific reactions - the KEY personalization
     if(sReaction) parts.push(sReaction);
     if(eReaction) parts.push(eReaction);
-    if(!sReaction&&!eReaction&&st>0) parts.push('今天没写备注？没关系，行动比文字更重要。但下次写一句话呗，我想夸得更准一点 😉');
+    if(!sReaction&&!eReaction&&(st>0||et>0)) { if(st>0&&!sNote) parts.push('学习打卡了但没写备注——下次分享一句呗，我想夸得更准一点 😉'); else if(et>0&&!eNote) parts.push('运动打卡了但没写备注——说说做了什么呗，让我为你欢呼 🎉'); }
 
     // Streak
     if(streak>=30) parts.push('🔥 连续 <strong>'+streak+'</strong> 天！整整一个月以上的坚持——你不是在打卡，你是在重新定义自己。');
