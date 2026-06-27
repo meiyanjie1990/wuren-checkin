@@ -776,36 +776,6 @@ function downloadFile(filename, content){
 }
 
 // ============ TABS ============
-async function enhanceWithAI() {
-  const currentUser = getCurrentUser();
-  if (!currentUser) { toast('请先选择自己'); return; }
-  const checkinDateStr = getCheckinDate();
-  const data = getLocal();
-  const existing = getPersonCheckin(data, currentUser, checkinDateStr);
-  if (!existing || ((existing.study||0)+(existing.exercise||0))===0) { toast('请先打卡'); return; }
-  
-  const btn = document.querySelector('#aiBtn button');
-  if (btn) { btn.textContent = '⏳ AI思考中…'; btn.disabled = true; }
-  
-  const streak = countStreak(data, currentUser);
-  const weekDone = countWeeklyDone(data, currentUser);
-  const hour = new Date().getHours();
-  const timeGreeting = hour<7?'清晨':hour<10?'上午':hour<13?'中午':hour<17?'下午':hour<20?'傍晚':'晚上';
-  
-  const aiReply = await callDeepSeek(currentUser, existing.study||0, existing.sNote||'', existing.exercise||0, existing.eNote||'', streak, weekDone, new Date(checkinDateStr+'T00:00:00').getDay()||7, timeGreeting);
-  
-  if (aiReply) {
-    const aiCache = JSON.parse(localStorage.getItem('wuren_ai_cache')||'{}');
-    aiCache[currentUser+'|'+checkinDateStr] = {reply:aiReply, time:Date.now()};
-    localStorage.setItem('wuren_ai_cache', JSON.stringify(aiCache));
-    renderCheckin();
-    toast('✅ AI回复已生成');
-  } else {
-    if (btn) { btn.textContent = '🤖 AI润色回复'; btn.disabled = false; }
-    toast('⚠️ AI暂时不可用，使用关键词回复');
-  }
-}
-
 function switchTab(idx){document.querySelectorAll('.page').forEach((p,i)=>p.classList.toggle('active',i===idx));document.querySelectorAll('nav.tabs button').forEach((b,i)=>b.classList.toggle('active',i===idx));if(idx===0)renderCheckin();if(idx===1)renderWeekly();if(idx===2)renderPredict();if(idx===3)renderHistory();}
 
 // ============ INIT ============
