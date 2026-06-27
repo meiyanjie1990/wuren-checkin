@@ -273,7 +273,7 @@ ${context}
         max_tokens: 80,
         temperature: 0.9
       }),
-      signal: AbortSignal.timeout(5000)
+      signal: (()=>{const c=new AbortController();setTimeout(()=>c.abort(),5000);return c.signal;})()
     });
     if (!resp.ok) { _aiEnabled = false; return null; }
     const data = await resp.json();
@@ -711,6 +711,7 @@ async function saveMyCheckin(){
     const hour = new Date().getHours();
     const timeGreeting = hour<7?'清晨':hour<10?'上午':hour<13?'中午':hour<17?'下午':hour<20?'傍晚':'晚上';
     callDeepSeek(currentUser, record.study||0, record.sNote||'', record.exercise||0, record.eNote||'', streak, weekDone, new Date(checkinDateStr+'T00:00:00').getDay()||7, timeGreeting).then(aiReply => {
+      console.log('DeepSeek reply:', aiReply ? aiReply.slice(0,50) : 'NULL');
       if (aiReply) {
         // Store in separate AI cache (not affected by sync)
         const aiCache = JSON.parse(localStorage.getItem('wuren_ai_cache')||'{}');
