@@ -488,7 +488,7 @@ function renderCheckin(){
   document.getElementById('dailyEncourage').innerHTML=generateEncourage(data,checkinDateStr,currentUser);
 
   let sundayWinners=[];
-  if(isSun){const lastSun=new Date(checkinDate);lastSun.setDate(lastSun.getDate()-7);const predData=data.predictions[fmtDate(lastSun)];if(predData&&predData.winners)sundayWinners=predData.winners;}
+  if(isSun){const twoSundaysAgo=new Date(checkinDate);twoSundaysAgo.setDate(twoSundaysAgo.getDate()-14);const predData=data.predictions[fmtDate(twoSundaysAgo)];if(predData&&predData.winners)sundayWinners=predData.winners;}
   const noticeDiv=document.getElementById('sundayNotice');
   if(isSun){noticeDiv.innerHTML=sundayWinners.length>0?`<div class="sunday-winner">🌟 周日福利日！中奖者：<strong>${sundayWinners.join('、')}</strong> —— 只有TA们今天可以打卡积分！</div>`:`<div class="sunday-lock">🔒 周日休息日。等待预测中奖者揭晓~<br><span style="font-size:12px;">一周的坚持辛苦了，给自己放个假吧 🌿</span></div>`;}else{noticeDiv.innerHTML='';}
 
@@ -548,7 +548,7 @@ function selectScore(type,val){
 async function saveMyCheckin(){
   const currentUser=getCurrentUser();if(!currentUser){toast('请先选择自己');return;}
   const checkinDateStr=getCheckinDate();const isSun=isSunday(new Date(checkinDateStr+'T00:00:00'));
-  if(isSun){const d=new Date(checkinDateStr+'T00:00:00');const lastSun=new Date(d);lastSun.setDate(lastSun.getDate()-7);const data=getLocal();const predData=data.predictions[fmtDate(lastSun)];const winners=(predData&&predData.winners)?predData.winners:[];if(!winners.includes(currentUser)){toast('❌ 今天周日，你不是中奖者，不能打卡');return;}}
+  if(isSun){const d=new Date(checkinDateStr+'T00:00:00');const twoSundaysAgo=new Date(d);twoSundaysAgo.setDate(twoSundaysAgo.getDate()-14);const data=getLocal();const predData=data.predictions[fmtDate(twoSundaysAgo)];const winners=(predData&&predData.winners)?predData.winners:[];if(!winners.includes(currentUser)){toast('❌ 今天周日，你不是中奖者，不能打卡');return;}}
   if(!window._tmp){toast('请选择分数');return;}
   const data=getLocal();
   const record={study:window._tmp.study||0,sNote:(document.getElementById('sNote')?.value||'').trim(),exercise:window._tmp.exercise||0,eNote:(document.getElementById('eNote')?.value||'').trim()};
@@ -616,7 +616,7 @@ async function savePredictions(){
   await saveAndSync(data);toast(`✅ 已保存 ${count} 位预测！中奖者已揭晓~`);renderPredict();
 }
 function getWeekAllTotal(data,monday){let total=0;PERSONS.forEach(p=>{total+=getWeekTotal(data,p,monday);});return total;}
-function getWeekTotal(data,person,monday){let total=0;for(let i=0;i<6;i++){const d=new Date(monday);d.setDate(d.getDate()+i);const c=getPersonCheckin(data,person,fmtDate(d));if(c)total+=(c.study||0)+(c.exercise||0);}const sun=getSunday(monday);const sunStr=fmtDate(sun);const predData=data.predictions[sunStr];if(predData&&predData.winners&&predData.winners.includes(person)){const c=getPersonCheckin(data,person,sunStr);if(c)total+=(c.study||0)+(c.exercise||0);}return total;}
+function getWeekTotal(data,person,monday){let total=0;for(let i=0;i<6;i++){const d=new Date(monday);d.setDate(d.getDate()+i);const c=getPersonCheckin(data,person,fmtDate(d));if(c)total+=(c.study||0)+(c.exercise||0);}const sun=getSunday(monday);const sunStr=fmtDate(sun);const winnerKey=fmtDate(new Date(sun.getTime()-14*86400000));const predData=data.predictions[winnerKey];if(predData&&predData.winners&&predData.winners.includes(person)){const c=getPersonCheckin(data,person,sunStr);if(c)total+=(c.study||0)+(c.exercise||0);}return total;}
 
 // ============ HISTORY ============
 function renderHistory(){const data=getLocal();let expHtml='';PERSONS.forEach(p=>{expHtml+=`<div style="margin-bottom:8px;"><button class="btn btn-outline btn-small" onclick="exportPerson('${p}')">📥 导出 ${p}</button></div>`;});expHtml+=`<button class="btn btn-outline btn-small" onclick="exportAll()">📥 导出全部汇总</button>`;document.getElementById('exportList').innerHTML=expHtml;const allDates=new Set();PERSONS.forEach(p=>{if(data.checkins[p])Object.keys(data.checkins[p]).forEach(d=>allDates.add(d));});const sorted=[...allDates].sort().reverse().slice(0,30);if(sorted.length===0){document.getElementById('historyOverview').innerHTML='<div style="text-align:center;color:var(--sub);padding:30px;font-size:14px;">📭 还没有打卡记录<br><span style="font-size:12px;">快去打卡吧，第一个记录从这里开始！</span></div>';}else{let tbl='<table class="week-table"><thead><tr><th>日期</th>';PERSONS.forEach(p=>{tbl+=`<th>${p.slice(0,2)}</th>`;});tbl+='<th>日总</th></tr></thead><tbody>';sorted.forEach(dStr=>{tbl+=`<tr><td>${dStr.slice(5)}</td>`;let dt=0;PERSONS.forEach(p=>{const c=getPersonCheckin(data,p,dStr);const sc=c?(c.study||0)+(c.exercise||0):0;dt+=sc;tbl+=`<td>${sc>0?sc.toFixed(1):'-'}</td>`;});tbl+=`<td><strong>${dt.toFixed(1)}</strong></td></tr>`;});tbl+='</tbody></table>';document.getElementById('historyOverview').innerHTML=tbl;}}
