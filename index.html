@@ -15,650 +15,357 @@
 <link rel="manifest" href="./manifest.json">
 <title>五仁打卡</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-:root {
-  --bg: #fef9f3; --card: #ffffff; --text: #3d3427; --sub: #9b8e7c;
-  --accent: #f0883e; --accent2: #55a392; --border: #efe8db;
-  --shadow: 0 2px 16px rgba(80,50,20,0.05);
-  --radius: 16px;
-}
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-  background: linear-gradient(180deg, #fef9f3 0%, #fdf5ea 50%, #faf3e6 100%);
-  color: var(--text); min-height: 100vh; padding-bottom: 80px;
-  -webkit-tap-highlight-color: transparent;
-}
-header {
-  background: linear-gradient(135deg, #fffbf5, #fff8ef);
-  padding: 18px 20px 14px; text-align: center;
-  box-shadow: 0 1px 20px rgba(60,40,20,0.04); position: sticky; top: 0; z-index: 10;
-  border-bottom: 1px solid #f0e8d8;
-}
-header h1 { font-size: 22px; font-weight: 800; letter-spacing: 1px; }
-header .date { font-size: 12px; color: var(--sub); margin-top: 3px; }
-.user-bar { margin-top: 10px; display: flex; gap: 6px; align-items: center; justify-content: center; flex-wrap: wrap; }
-.user-bar select, .user-bar input {
-  padding: 7px 12px; border-radius: 10px; border: 1.5px solid var(--border);
-  font-size: 14px; font-family: inherit; background: #fffdf9;
-}
-nav.tabs {
-  display: flex; position: fixed; bottom: 0; left: 0; right: 0;
-  background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
-  border-top: 1px solid var(--border); z-index: 10;
-  padding: 4px 0 6px; padding-bottom: calc(6px + env(safe-area-inset-bottom, 0));
-}
-nav.tabs button {
-  flex: 1; padding: 8px 4px 6px; border: none; background: none;
-  font-size: 11px; color: var(--sub); cursor: pointer;
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  transition: color 0.2s;
-}
-nav.tabs button .ico { font-size: 22px; line-height: 1; }
-nav.tabs button.active { color: var(--accent); font-weight: 700; }
-.page { display: none; padding: 14px; }
-.page.active { display: block; animation: fadeIn 0.25s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0);} 50%{transform:translateX(-50%) translateY(-8px);} }
-.card {
-  background: var(--card); border-radius: var(--radius); padding: 16px;
-  margin-bottom: 12px; box-shadow: var(--shadow); border: 1px solid var(--border);
-}
-.card.self {
-  border: 2px solid var(--accent);
-  background: linear-gradient(135deg, #fffdf7, #fff9f0);
-  box-shadow: 0 4px 20px rgba(240,136,62,0.1);
-}
-.card h3 { font-size: 16px; margin-bottom: 10px; }
-.person-name { font-size: 16px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-.person-avatar { width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; }
-.score-row { display: flex; gap: 10px; margin-bottom: 8px; }
-.score-block { flex: 1; }
-.score-block .label { font-size: 12px; color: var(--sub); margin-bottom: 5px; font-weight: 600; }
-.score-block .label .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
-.score-block .label .dot.s { background: var(--accent2); }
-.score-block .label .dot.e { background: var(--accent); }
-.score-btns { display: flex; gap: 4px; }
-.score-btns button {
-  flex: 1; min-width: 36px; padding: 10px 3px; border: 2px solid #e8e1d4;
-  border-radius: 10px; background: #fdfbf6; font-size: 14px; font-weight: 700;
-  color: var(--text); cursor: pointer; transition: all 0.18s;
-}
-.score-btns button:hover { background: #fff5ea; border-color: #f0c898; }
-.score-btns button.sel {
-  border-color: var(--accent); background: #fff3e8; color: var(--accent);
-  box-shadow: 0 2px 8px rgba(240,136,62,0.15); transform: scale(1.03);
-}
-.note-input {
-  width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 10px;
-  font-size: 13px; margin-top: 6px; font-family: inherit; resize: none; height: 38px;
-  background: #fdfbf7; transition: border-color 0.2s;
-}
-.note-input:focus { border-color: var(--accent); outline: none; background: #fff; }
-.done-badge {
-  display: inline-block; background: #e6f5ef; color: #388e6b;
-  font-size: 11px; padding: 3px 10px; border-radius: 12px; font-weight: 600;
-}
-.not-done { font-size: 13px; color: #c5bfb2; font-style: italic; }
-.sunday-lock { text-align: center; color: #d3545a; font-size: 13px; padding: 12px; background: #fef7f7; border-radius: 12px; margin: 10px 0; line-height: 1.6; }
-.sunday-winner { text-align: center; color: #27ae60; font-size: 13px; padding: 12px; background: #f2faf6; border-radius: 12px; margin: 10px 0; line-height: 1.6; }
-.week-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.week-table th, .week-table td { padding: 6px 3px; text-align: center; border-bottom: 1px solid #f5f0e8; }
-.week-table th { font-weight: 700; font-size: 11px; color: var(--sub); }
-.week-table td:first-child { text-align: left; font-weight: 600; }
-.week-table .sun-col { color: #c0392b; background: #fef9f9; }
-.week-table .highlight { background: #fffdf4; font-weight: 700; box-shadow: inset 0 0 0 1px var(--accent); border-radius: 4px; }
-.btn {
-  display: inline-block; padding: 10px 20px; border-radius: 12px; border: none;
-  font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
-  transition: all 0.2s; letter-spacing: 0.5px;
-}
-.btn-primary { background: linear-gradient(135deg, #f0883e, #e67a30); color: #fff; box-shadow: 0 3px 12px rgba(240,136,62,0.25); }
-.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(240,136,62,0.35); }
-.btn-primary:active { transform: scale(0.97); }
-.btn-saved { background: linear-gradient(135deg, #55a392, #489b85) !important; color: #fff !important; box-shadow: 0 3px 12px rgba(85,163,146,0.25) !important; pointer-events: none; }
-.btn-outline { background: #fff; border: 2px solid var(--accent); color: var(--accent); }
-.btn-outline:hover { background: #fff8f2; }
-.btn-small { padding: 6px 14px; font-size: 12px; border-radius: 9px; }
-.btn-block { display: block; width: 100%; }
-.btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-.encourage-box {
-  background: linear-gradient(135deg, #fffbf5, #fff6ea);
-  border-left: 4px solid var(--accent);
-  padding: 16px 18px; border-radius: 0 14px 14px 0; margin: 12px 0; font-size: 14px;
-  line-height: 1.8; box-shadow: 0 2px 8px rgba(240,136,62,0.06);
-}
-.encourage-box .greeting { font-size: 17px; font-weight: 800; margin-bottom: 6px; }
-.encourage-box .body { color: #5c4d38; }
-.encourage-box .humor { color: #9b8e7c; font-style: italic; margin-top: 6px; }
-.summary-card { margin-top: 10px; }
-.summary-card .person-line { padding: 6px 0; border-bottom: 1px solid #f8f5f0; font-size: 14px; }
-.summary-card .total-line { font-weight: 800; font-size: 16px; padding: 10px 0; color: var(--accent); }
-.pred-input-row { display: flex; align-items: center; gap: 10px; margin: 6px 0; }
-.pred-input-row input {
-  width: 70px; padding: 9px; border: 2px solid var(--border);
-  border-radius: 10px; font-size: 15px; text-align: center; font-family: inherit;
-  font-weight: 600;
-}
-.pred-input-row .name { flex: 1; font-size: 14px; font-weight: 600; }
-.winner-tag { color: #e74c3c; font-weight: 700; font-size: 12px; margin-left: 4px; }
-.toast {
-  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-  background: #3d3427; color: #fff; padding: 12px 24px; border-radius: 24px;
-  font-size: 14px; z-index: 200; opacity: 0; transition: opacity 0.3s; pointer-events: none;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-}
-.toast.show { opacity: 1; }
-.sync-bar { font-size: 11px; color: var(--sub); text-align: center; margin-top: 5px; min-height: 16px; }
-.streak-fire { color: #f0883e; font-size: 13px; font-weight: 700; margin-top: 4px; }
-@media (min-width: 600px) {
-  .checkin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .checkin-grid .card { margin-bottom: 0; }
-}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#fef9f3;--card:#fff;--text:#3d3427;--sub:#9b8e7c;--accent:#f0883e;--accent2:#55a392;--border:#efe8db;--shadow:0 2px 16px rgba(80,50,20,0.05);--radius:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:linear-gradient(180deg,#fef9f3 0%,#fdf5ea 50%,#faf3e6 100%);color:var(--text);min-height:100vh;padding-bottom:80px;-webkit-tap-highlight-color:transparent}
+header{background:linear-gradient(135deg,#fffbf5,#fff8ef);padding:18px 20px 14px;text-align:center;box-shadow:0 1px 20px rgba(60,40,20,0.04);position:sticky;top:0;z-index:10;border-bottom:1px solid #f0e8d8}
+header h1{font-size:22px;font-weight:800;letter-spacing:1px}
+header .date{font-size:12px;color:var(--sub);margin-top:3px}
+.user-bar{margin-top:10px;display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap}
+.user-bar select,.user-bar input{padding:7px 12px;border-radius:10px;border:1.5px solid var(--border);font-size:14px;font-family:inherit;background:#fffdf9}
+nav.tabs{display:flex;position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-top:1px solid var(--border);z-index:10;padding:4px 0 6px;padding-bottom:calc(6px + env(safe-area-inset-bottom,0))}
+nav.tabs button{flex:1;padding:8px 4px 6px;border:none;background:none;font-size:11px;color:var(--sub);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color 0.2s}
+nav.tabs button .ico{font-size:22px;line-height:1}
+nav.tabs button.active{color:var(--accent);font-weight:700}
+.page{display:none;padding:14px}
+.page.active{display:block;animation:fadeIn 0.25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-8px)}}
+.card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.card.self{border:2px solid var(--accent);background:linear-gradient(135deg,#fffdf7,#fff9f0);box-shadow:0 4px 20px rgba(240,136,62,0.1)}
+.card h3{font-size:16px;margin-bottom:10px}
+.person-name{font-size:16px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.person-avatar{width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:16px}
+.score-row{display:flex;gap:10px;margin-bottom:8px}
+.score-block{flex:1}
+.score-block .label{font-size:12px;color:var(--sub);margin-bottom:5px;font-weight:600}
+.score-block .label .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.score-block .label .dot.s{background:var(--accent2)}.score-block .label .dot.e{background:var(--accent)}
+.score-btns{display:flex;gap:4px}
+.score-btns button{flex:1;min-width:36px;padding:10px 3px;border:2px solid #e8e1d4;border-radius:10px;background:#fdfbf6;font-size:14px;font-weight:700;color:var(--text);cursor:pointer;transition:all 0.18s}
+.score-btns button:hover{background:#fff5ea;border-color:#f0c898}
+.score-btns button.sel{border-color:var(--accent);background:#fff3e8;color:var(--accent);box-shadow:0 2px 8px rgba(240,136,62,0.15);transform:scale(1.03)}
+.note-input{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;margin-top:6px;font-family:inherit;resize:none;height:38px;background:#fdfbf7;transition:border-color 0.2s}
+.note-input:focus{border-color:var(--accent);outline:none;background:#fff}
+.done-badge{display:inline-block;background:#e6f5ef;color:#388e6b;font-size:11px;padding:3px 10px;border-radius:12px;font-weight:600}
+.sunday-lock{text-align:center;color:#d3545a;font-size:13px;padding:12px;background:#fef7f7;border-radius:12px;margin:10px 0;line-height:1.6}
+.sunday-winner{text-align:center;color:#27ae60;font-size:13px;padding:12px;background:#f2faf6;border-radius:12px;margin:10px 0;line-height:1.6}
+.week-table{width:100%;border-collapse:collapse;font-size:12px}
+.week-table th,.week-table td{padding:6px 3px;text-align:center;border-bottom:1px solid #f5f0e8}
+.week-table th{font-weight:700;font-size:11px;color:var(--sub)}
+.week-table td:first-child{text-align:left;font-weight:600}
+.week-table .sun-col{color:#c0392b;background:#fef9f9}
+.week-table .highlight{background:#fffdf4;font-weight:700;box-shadow:inset 0 0 0 1px var(--accent);border-radius:4px}
+.btn{display:inline-block;padding:10px 20px;border-radius:12px;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;letter-spacing:0.5px}
+.btn-primary{background:linear-gradient(135deg,#f0883e,#e67a30);color:#fff;box-shadow:0 3px 12px rgba(240,136,62,0.25)}
+.btn-saved{background:linear-gradient(135deg,#55a392,#489b85)!important;color:#fff!important;box-shadow:0 3px 12px rgba(85,163,146,0.25)!important;pointer-events:none}
+.btn-outline{background:#fff;border:2px solid var(--accent);color:var(--accent)}
+.btn-small{padding:6px 14px;font-size:12px;border-radius:9px}
+.btn-block{display:block;width:100%}.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.encourage-box{background:linear-gradient(135deg,#fffbf5,#fff6ea);border-left:4px solid var(--accent);padding:16px 18px;border-radius:0 14px 14px 0;margin:12px 0;font-size:14px;line-height:1.8;box-shadow:0 2px 8px rgba(240,136,62,0.06)}
+.encourage-box .greeting{font-size:17px;font-weight:800;margin-bottom:6px}
+.encourage-box .body{color:#5c4d38}.encourage-box .humor{color:#9b8e7c;font-style:italic;margin-top:6px}
+.summary-card{margin-top:10px}.summary-card .person-line{padding:6px 0;border-bottom:1px solid #f8f5f0;font-size:14px}
+.summary-card .total-line{font-weight:800;font-size:16px;padding:10px 0;color:var(--accent)}
+.pred-input-row{display:flex;align-items:center;gap:10px;margin:6px 0}
+.pred-input-row input{width:70px;padding:9px;border:2px solid var(--border);border-radius:10px;font-size:15px;text-align:center;font-family:inherit;font-weight:600}
+.pred-input-row .name{flex:1;font-size:14px;font-weight:600}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#3d3427;color:#fff;padding:12px 24px;border-radius:24px;font-size:14px;z-index:200;opacity:0;transition:opacity 0.3s;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,0.2)}
+.toast.show{opacity:1}
+.sync-bar{font-size:11px;color:var(--sub);text-align:center;margin-top:5px;min-height:16px}
+@media(min-width:600px){.checkin-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.checkin-grid .card{margin-bottom:0}}
 </style>
 </head>
 <body>
-
-<header>
-  <h1>🥜 五仁打卡</h1>
-  <div class="date" id="headerDate"></div>
-  <div class="user-bar">
-    <span style="font-size:13px;font-weight:600;">👤 我是</span>
-    <select id="currentUser" onchange="onUserSwitch()">
-      <option value="">选择自己</option>
-    </select>
-    <button class="btn btn-outline btn-small" onclick="syncNow()">🔄 同步</button>
-  </div>
-  <div class="sync-bar" id="syncBar"></div>
-</header>
-
+<header><h1>🥜 五仁打卡</h1><div class="date" id="headerDate"></div>
+<div class="user-bar"><span style="font-size:13px;font-weight:600">👤 我是</span>
+<select id="currentUser" onchange="onUserSwitch()"><option value="">选择自己</option></select>
+<button class="btn btn-outline btn-small" onclick="syncNow()">🔄 同步</button></div>
+<div class="sync-bar" id="syncBar"></div></header>
 <div class="toast" id="toast"></div>
 
-<!-- Page 1: 打卡 -->
+<!-- 打卡页 -->
 <div class="page active" id="page-checkin">
-  <div class="encourage-box" id="dailyEncourage"></div>
-  <div id="sundayNotice"></div>
-  <div style="text-align:center;margin-bottom:10px;font-size:13px;color:var(--sub);">
-    📅 <input type="date" id="checkinDate" onchange="renderCheckin()" style="padding:6px 10px;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:13px;background:#fffdf9;">
-    <span id="dateBadge" style="font-size:11px;color:#c0392b;font-weight:600;margin-left:6px;"></span>
-  </div>
-  <div id="checkinArea"></div>
-</div>
+<div class="encourage-box" id="dailyEncourage"></div>
+<div id="sundayNotice"></div>
+<div style="text-align:center;margin-bottom:10px;font-size:13px;color:var(--sub)">
+📅 <input type="date" id="checkinDate" onchange="renderCheckin()" style="padding:6px 10px;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:13px;background:#fffdf9">
+<span id="dateBadge" style="font-size:11px;color:#c0392b;font-weight:600;margin-left:6px"></span></div>
+<div id="checkinArea"></div></div>
 
-<!-- Page 2: 周报 -->
-<div class="page" id="page-weekly">
-  <div class="card">
-    <h3>📊 本周战报</h3>
-    <div id="weekRange" style="font-size:13px;color:var(--sub);margin-bottom:10px;"></div>
-    <div style="overflow-x:auto;" id="weekTable"></div>
-    <div class="summary-card" id="weekSummary"></div>
-  </div>
-  <div class="card">
-    <h3>🔮 上周预测揭晓</h3>
-    <div id="lastPredResult" style="font-size:14px;line-height:1.8;"></div>
-  </div>
-</div>
+<!-- 周报页 -->
+<div class="page" id="page-weekly"><div class="card"><h3>📊 本周战报</h3>
+<div id="weekRange" style="font-size:13px;color:var(--sub);margin-bottom:10px"></div>
+<div style="overflow-x:auto" id="weekTable"></div><div class="summary-card" id="weekSummary"></div></div>
+<div class="card"><h3>🔮 上周预测揭晓</h3><div id="lastPredResult" style="font-size:14px;line-height:1.8"></div></div></div>
 
-<!-- Page 3: 预测 -->
-<div class="page" id="page-predict">
-  <div class="card">
-    <h3>🔮 预测下周总分</h3>
-    <div id="predInfo" style="font-size:13px;color:var(--sub);margin-bottom:12px;line-height:1.6;"></div>
-    <div id="predInputs"></div>
-    <button class="btn btn-primary btn-block" onclick="savePredictions()" style="margin-top:12px;">📝 提交预测</button>
-  </div>
-  <div class="card">
-    <h3>📜 预测历史</h3>
-    <div id="predHistory"></div>
-  </div>
-</div>
+<!-- 预测页 -->
+<div class="page" id="page-predict"><div class="card"><h3>🔮 预测下周总分</h3>
+<div id="predInfo" style="font-size:13px;color:var(--sub);margin-bottom:12px;line-height:1.6"></div>
+<div id="predInputs"></div><button class="btn btn-primary btn-block" onclick="savePredictions()" style="margin-top:12px">📝 提交预测</button></div>
+<div class="card"><h3>📜 预测历史</h3><div id="predHistory"></div></div></div>
 
-<!-- Page 4: 记录 & 导出 -->
-<div class="page" id="page-history">
-  <div class="card">
-    <h3>📋 导出个人记录</h3>
-    <div id="exportList"></div>
-  </div>
-  <div class="card">
-    <h3>📈 近期记录</h3>
-    <div id="historyOverview"></div>
-  </div>
-</div>
+<!-- 记录页 -->
+<div class="page" id="page-history"><div class="card"><h3>📋 导出个人记录</h3><div id="exportList"></div></div>
+<div class="card"><h3>📈 近期记录</h3><div id="historyOverview"></div></div></div>
 
 <nav class="tabs">
-  <button class="active" onclick="switchTab(0)"><span class="ico">📝</span>打卡</button>
-  <button onclick="switchTab(1)"><span class="ico">📊</span>周报</button>
-  <button onclick="switchTab(2)"><span class="ico">🔮</span>预测</button>
-  <button onclick="switchTab(3)"><span class="ico">📋</span>记录</button>
+<button class="active" onclick="switchTab(0)"><span class="ico">📝</span>打卡</button>
+<button onclick="switchTab(1)"><span class="ico">📊</span>周报</button>
+<button onclick="switchTab(2)"><span class="ico">🔮</span>预测</button>
+<button onclick="switchTab(3)"><span class="ico">📋</span>记录</button>
 </nav>
 
 <script>
-// ============ CONFIG ============
-const APP_VERSION = 5; // 改代码后+1，所有人自动提示刷新
-const PERSONS = ['石维婧','梅妍洁','单兰迪','王珂','师旌议'];
-const DAYS = ['一','二','三','四','五','六','日'];
-const AVATARS = { '石维婧':'🌸','梅妍洁':'🥜','单兰迪':'🌟','王珂':'🍃','师旌议':'🔥' };
-const TK1='ghp_Ry5Qgv1WAuuUTXdU5BNjFYy',TK2='IeJyvbj1HGOvE';
-const GITHUB_TOKEN=TK1+TK2, REPO='meiyanjie1990/wuren-checkin';
+// ===== CONFIG =====
+const PERSONS=['石维婧','梅妍洁','单兰迪','王珂','师旌议'];
+const DAYS=['一','二','三','四','五','六','日'];
+const AVATARS={石维婧:'🌸',梅妍洁:'🥜',单兰迪:'🌟',王珂:'🍃',师旌议:'🔥'};
+const TK='ghp_Ry5Qgv1WAuuUTXdU5BNjFYy'+'IeJyvbj1HGOvE';
+const REPO='meiyanjie1990/wuren-checkin';
 const API_URL=`https://api.github.com/repos/${REPO}/contents/data.json`;
-// ============ AI CONFIG ============
-const DS_KEY = "sk-b536a934fbea40c58afd" + "92739665db75";
-const DS_URL = "https://api.deepseek.com/v1/chat/completions";
-let _aiEnabled = true; // auto-disabled if API fails
+const DS_KEY='sk-b536a934fbea40c58afd'+'92739665db75';
+const APP_VER=21;
 
-async function callDeepSeek(personName, studyScore, studyNote, exerciseScore, exerciseNote, streak, weekDone, dayOfWeek, timeGreeting) {
-  if (!_aiEnabled) return null;
-  const parts = [];
-  if (studyScore > 0) parts.push("学习" + studyScore + "分" + (studyNote ? "，内容：" + studyNote : ""));
-  if (exerciseScore > 0) parts.push("运动" + exerciseScore + "分" + (exerciseNote ? "，内容：" + exerciseNote : ""));
-  if (parts.length === 0) return null;
+// ===== HELPERS =====
+function getMonday(d){d=new Date(d);d.setHours(0,0,0,0);const day=d.getDay();d.setDate(d.getDate()+(day===0?-6:1-day));return d}
+function getSunday(m){const s=new Date(m);s.setDate(s.getDate()+6);return s}
+function fmtDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function fmtDateShort(d){return (d.getMonth()+1)+'/'+d.getDate()}
+function fmtWeekRange(m,s){return (m.getMonth()+1)+'月'+m.getDate()+'日 - '+(s.getMonth()+1)+'月'+s.getDate()+'日'}
+function isSunday(d){return d.getDay()===0}
+function isSameDay(a,b){return fmtDate(a)===fmtDate(b)}
+function hashStr(s){let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0}return Math.abs(h)}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+function getCurrentUser(){return document.getElementById('currentUser').value}
+function getCheckinDate(){return document.getElementById('checkinDate').value||fmtDate(new Date())}
 
-  const context = parts.join("；");
-  const prompt = `你是一个打卡App里的鼓励助手，给30-40岁的自律成年人写一句温暖的、有活人感的打卡反馈。用口语化的中文，像朋友之间的鼓励。要轻松自然，不要喊口号，不要用感叹号堆砌。偶尔可以有一点点冷幽默。40-60字，像个话痨但温暖的朋友。
-
-时间：${timeGreeting}
-用户：${personName}
-${context}
-连续打卡：${streak}天
-本周已打卡：${weekDone}天
-
-根据ta写的内容给定制反馈，回应ta具体做了什么。直接给回复内容，不需要前缀。`;
-
-  try {
-    const resp = await fetch(DS_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + DS_KEY },
-      body: JSON.stringify({
-        model: "deepseek-chat",
-        messages: [{ role: "user", content: prompt }],
-        max_tokens: 150,
-        temperature: 0.9
-      }),
-      signal: (()=>{const c=new AbortController();setTimeout(()=>c.abort(),5000);return c.signal;})()
-    });
-    if (!resp.ok) { _aiEnabled = false; return null; }
-    const data = await resp.json();
-    const reply = data.choices?.[0]?.message?.content?.trim();
-    if (!reply || reply.length < 2) return null;
-    return reply;
-  } catch(e) {
-    return null;
-  }
-}
-
-
-// ============ HELPERS ============
-function getMonday(d){d=new Date(d);d.setHours(0,0,0,0);const day=d.getDay();d.setDate(d.getDate()+(day===0?-6:1-day));return d;}
-function getSunday(m){const s=new Date(m);s.setDate(s.getDate()+6);return s;}
-function fmtDate(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
-function fmtDateShort(d){return `${d.getMonth()+1}/${d.getDate()}`;}
-function fmtWeekRange(m,s){return `${m.getMonth()+1}月${m.getDate()}日 - ${s.getMonth()+1}月${s.getDate()}日`;}
-function isSunday(d){return d.getDay()===0;}
-function isSameDay(a,b){return fmtDate(a)===fmtDate(b);}
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
-function getCurrentUser(){return document.getElementById('currentUser').value;}
-function getCheckinDate(){const v=document.getElementById('checkinDate').value;return v||fmtDate(new Date());}
-
-// ============ DATA ============
+// ===== DATA =====
 let _dataSha=null,_localData=null;
-function loadLocal(){try{const d=localStorage.getItem('wuren_data');return d?JSON.parse(d):{};}catch(e){return{};}}
-function saveLocal(data){_localData=data;localStorage.setItem('wuren_data',JSON.stringify(data));}
-function getLocal(){if(_localData)return _localData;let d=loadLocal();if(!d.checkins)d.checkins={};if(!d.predictions)d.predictions={};_localData=d;return d;}
-function getPersonCheckin(data,person,dateStr){if(!data.checkins[person])return null;return data.checkins[person][dateStr]||null;}
+function loadLocal(){try{const d=localStorage.getItem('wuren_data');return d?JSON.parse(d):{}}catch(e){return{}}}
+function saveLocal(data){_localData=data;localStorage.setItem('wuren_data',JSON.stringify(data))}
+function getLocal(){if(_localData)return _localData;let d=loadLocal();if(!d.checkins)d.checkins={};if(!d.predictions)d.predictions={};_localData=d;return d}
+function getPersonCheckin(data,person,dateStr){if(!data.checkins[person])return null;return data.checkins[person][dateStr]||null}
 
-// ============ SYNC ============
+// ===== GITHUB SYNC =====
 async function fetchRemoteData(){
   try{
-    const resp=await fetch(API_URL,{headers:{'Authorization':'token '+GITHUB_TOKEN,'Accept':'application/vnd.github.v3+json'},cache:'no-cache'});
+    const resp=await fetch(API_URL,{headers:{Authorization:'token '+TK,Accept:'application/vnd.github.v3+json'},cache:'no-cache'});
     if(!resp.ok)return null;
     const json=await resp.json();_dataSha=json.sha;
     const raw=atob(json.content.replace(/\s/g,''));
     return JSON.parse(decodeURIComponent(escape(raw)));
-  }catch(e){console.log('Fetch err:',e.message);return null;}
+  }catch(e){console.log('Fetch err:',e.message);return null}
 }
 async function pushRemote(data){
   const jsonStr=JSON.stringify(data,null,2);
   const content=btoa(unescape(encodeURIComponent(jsonStr)));
-  const body={message:'📝 打卡更新',content,branch:'main'};
+  const body={message:'update',content,branch:'main'};
   if(_dataSha)body.sha=_dataSha;
   try{
-    const resp=await fetch(API_URL,{method:'PUT',headers:{'Authorization':'token '+GITHUB_TOKEN,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify(body)});
-    if(!resp.ok){const err=await resp.json();if(err.message&&err.message.includes('sha')){const refetch=await fetch(API_URL,{headers:{'Authorization':'token '+GITHUB_TOKEN,'Accept':'application/vnd.github.v3+json'}});if(refetch.ok){const rd=await refetch.json();body.sha=rd.sha;const retry=await fetch(API_URL,{method:'PUT',headers:{'Authorization':'token '+GITHUB_TOKEN,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify(body)});if(retry.ok){_dataSha=(await retry.json()).content.sha;return true;}}}return false;}
+    const resp=await fetch(API_URL,{method:'PUT',headers:{Authorization:'token '+TK,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(!resp.ok){const err=await resp.json();if(err.message&&err.message.includes('sha')){const refetch=await fetch(API_URL,{headers:{Authorization:'token '+TK,Accept:'application/vnd.github.v3+json'}});if(refetch.ok){const rd=await refetch.json();body.sha=rd.sha;const retry=await fetch(API_URL,{method:'PUT',headers:{Authorization:'token '+TK,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify(body)});if(retry.ok){_dataSha=(await retry.json()).content.sha;return true}}}return false}
     const result=await resp.json();_dataSha=result.content.sha;return true;
-  }catch(e){console.log('Push err:',e.message);return false;}
+  }catch(e){console.log('Push err:',e.message);return false}
 }
 async function syncNow(silent){
-  const bar=document.getElementById('syncBar');if(bar)bar.textContent='⏳ 同步中…';
+  const bar=document.getElementById('syncBar');if(bar)bar.textContent='syncing...';
   const remote=await fetchRemoteData();
   if(remote){
-    // Merge: keep local AI replies that remote doesn't have
-    const local = getLocal();
-    if(local.checkins) for(const p in local.checkins) for(const d in local.checkins[p]) {
-      const le = local.checkins[p][d], re = remote.checkins?.[p]?.[d];
-      if(le && le._aiReply && re && !re._aiReply) {
-        if(!remote.checkins[p]) remote.checkins[p] = {};
-        if(!remote.checkins[p][d]) remote.checkins[p][d] = {};
-        remote.checkins[p][d]._aiReply = le._aiReply;
-        remote.checkins[p][d]._aiTime = le._aiTime;
-      }
+    // Merge: keep local AI replies that remote is missing
+    const local=getLocal();
+    if(local.checkins)for(const p in local.checkins)for(const d in local.checkins[p]){
+      const le=local.checkins[p][d],re=remote.checkins?.[p]?.[d];
+      if(le&&le._ai&&re&&!re._ai){if(!remote.checkins[p])remote.checkins[p]={};if(!remote.checkins[p][d])remote.checkins[p][d]={};remote.checkins[p][d]._ai=le._ai}
     }
-    saveLocal(remote);if(bar)bar.textContent='☁️ 已同步';if(!silent){renderAll();toast('✅ 数据已同步');}setTimeout(()=>{if(bar)bar.textContent='';},3000);return true;}
-  else{if(bar)bar.textContent='⚠️ 离线模式';if(!silent)toast('⚠️ 无法连接云端，使用本地数据');setTimeout(()=>{if(bar)bar.textContent='';},4000);return false;}
+    saveLocal(remote);if(bar)bar.textContent='OK';if(!silent){renderAll();toast('synced')}
+    setTimeout(()=>{if(bar)bar.textContent=''},3000);return true;
+  }else{if(bar)bar.textContent='offline';if(!silent)toast('offline');setTimeout(()=>{if(bar)bar.textContent=''},4000);return false}
 }
-async function saveAndSync(data){saveLocal(data);const ok=await pushRemote(data);const bar=document.getElementById('syncBar');if(ok){if(bar)bar.textContent='☁️ 已同步';setTimeout(()=>{if(bar)bar.textContent='';},3000);}else{if(bar)bar.textContent='⚠️ 已存本地，联网后自动同步';setTimeout(()=>{if(bar)bar.textContent='';},5000);}return ok;}
-function onUserSwitch(){const user=getCurrentUser();if(user){localStorage.setItem('wuren_me',user);toast(`👤 ${user}，你好！`);}renderCheckin();}
+async function saveAndSync(data){saveLocal(data);const ok=await pushRemote(data);const bar=document.getElementById('syncBar');if(ok){bar.textContent='OK';setTimeout(()=>{bar.textContent=''},3000)}else{bar.textContent='saved locally';setTimeout(()=>{bar.textContent=''},5000)};return ok}
+function onUserSwitch(){const user=getCurrentUser();if(user){localStorage.setItem('wuren_me',user);toast(user+'!')}renderCheckin()}
 
-// ============ ENCOURAGEMENT MASTER ============
-function countStreak(data, person) {
-  let streak=0; const d=new Date(); d.setDate(d.getDate()-1);
-  while(d.getFullYear()>=2026){
-    const c=getPersonCheckin(data,person,fmtDate(d));
-    if(!c||((c.study||0)+(c.exercise||0))===0)break;
-    streak++; d.setDate(d.getDate()-1);
-  }
-  return streak;
+// ===== AI (DeepSeek) =====
+async function callAI(personName,studyScore,studyNote,exerciseScore,exerciseNote,streak,weekDone,dayOfWeek,timeGreeting){
+  const parts=[];
+  if(studyScore>0)parts.push('学习'+studyScore+'分'+(studyNote?'，内容：'+studyNote:''));
+  if(exerciseScore>0)parts.push('运动'+exerciseScore+'分'+(exerciseNote?'，内容：'+exerciseNote:''));
+  if(parts.length===0)return null;
+  const prompt='你是一个打卡App里的鼓励助手，给30-40岁的自律成年人写温暖的打卡反馈。口语化，像朋友之间。40-60字，轻松自然，可以有一点冷幽默。直接给回复。\n时间：'+timeGreeting+'\n用户：'+personName+'\n'+parts.join('；')+'\n连续打卡：'+streak+'天\n本周已打卡：'+weekDone+'天\n根据ta写的内容给定制反馈，回应ta具体做了什么。';
+  try{
+    const resp=await fetch('https://api.deepseek.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+DS_KEY},body:JSON.stringify({model:'deepseek-chat',messages:[{role:'user',content:prompt}],max_tokens:150,temperature:0.9}),signal:AbortSignal.timeout(8000)});
+    if(!resp.ok)return null;
+    const data=await resp.json();
+    const reply=data.choices?.[0]?.message?.content?.trim();
+    return (reply&&reply.length>2)?reply:null;
+  }catch(e){return null}
 }
-function countWeeklyDone(data, person) {
-  const today=new Date(); const monday=getMonday(today);
-  let days=0;
-  for(let i=0;i<6;i++){const d=new Date(monday);d.setDate(d.getDate()+i);const c=getPersonCheckin(data,person,fmtDate(d));if(c&&((c.study||0)+(c.exercise||0))>0)days++;}
-  return days;
-}
 
-function hashStr(s){let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0;}return Math.abs(h);}
-
-function noteReaction(note, type) {
+// ===== ENCOURAGEMENT =====
+function noteReaction(note,type){
   if(!note||note.trim()==='')return null;
   const n=note.toLowerCase();
   const reactions={
     study:[
-      {kw:'英语 单词 语法 阅读 听力 口语 作文 翻译 english toefl ielts'.split(' '),r:['英语是个慢功夫，今天这步走得很稳 ✍️','语言这东西，每天碰一点比周末猛攻有效得多 🗣️','学语言的快乐：有一天突然发现能听懂了，那种感觉很妙']},
-      {kw:'数学 做题 公式 代数 几何 高数'.split(' '),r:['动脑子的快乐，只有动脑子的人懂 🔢','保持大脑运转，是最好的抗衰老秘方']},
-      {kw:'书 看书 读 页 章 小说 文学 历史 哲学 传记 散文'.split(' '),r:['阅读是最低成本的旅行，今天你又出发了 📖','一本书、半小时，比刷手机充实太多——虽然刷手机确实更轻松 😄']},
-      {kw:'考试 复习 备考 刷题 真题 模拟 考证 职称'.split(' '),r:['成年人主动学习，比学生时代的被动用功酷多了 💯','不是为了分数，是为了那个更好的自己 🎯']},
-      {kw:'课 上课 听课 网课 教程 课程 得到 樊登 喜马拉雅'.split(' '),r:['保持学习的状态，本身就是一种能力 🌱','听课也是学习——耳朵在输入，大脑在更新']},
-      {kw:'笔记 整理 思维导图 总结 复盘'.split(' '),r:['会整理的人，学一遍顶别人三遍 🧠','整理笔记 = 给大脑做收纳，以后找什么都快']},
-      {kw:'代码 编程 python java 写代码 程序'.split(' '),r:['写代码的人，逻辑和耐心都差不了 💻','一行行代码，构建的是另一个世界']},
-      {kw:'播客 听书 音频 电台'.split(' '),r:['耳朵学习法——通勤时间也不浪费 🎧','听进去的东西，某天会不经意冒出来帮你']},
-      {kw:'纪录片 电影 剧 ted 演讲'.split(' '),r:['好片子也是学习。视角打开了，比记住知识点更重要 🎬','看世界的方式不止一种——今天你看的，会成为明天的谈资']},
-      {kw:'画画 绘画 素描 水彩 书法 练字 手账'.split(' '),r:['拿起笔就是另一种表达。创作让人安静 🎨','手的记忆比大脑更持久——练字画画都是修行']},
-      {kw:'乐器 钢琴 吉他 弹琴 练琴 小提琴 古筝 音乐'.split(' '),r:['音乐是大脑的体操，手指的记忆比想象中更强大 🎵','练琴的人，耐心和毅力都是一流的']},
-      {kw:'博物馆 看展 展览 美术馆 画廊'.split(' '),r:['逛博物馆是最好的通识教育——站在时间面前，人会变得谦虚 🏛️','看展的人，眼睛里装着另一个世界']},
-      {kw:'写作 日记 写东西 公众号 文章 随笔'.split(' '),r:['把想法写成文字，是对思考的二次加工 ✍️','写作不是为了给别人看——是给自己整理思绪']},
-      {kw:'冥想 正念 静坐 打坐'.split(' '),r:['冥想不是发呆，是给大脑做深度清洁 🧘','安静下来的十分钟，比忙忙碌碌一小时还有效']},
-      {kw:'摄影 拍照 扫街'.split(' '),r:['摄影是发现美的训练——你看世界的角度会不一样 📷','按下快门的瞬间，是跟这个世界的对话']},
-      {kw:'做菜 做饭 烘焙 料理 下厨'.split(' '),r:['厨房里的创造力，比办公室还多！🍳','做饭是最高级的正念——切菜的时候，全世界只有你和你手里的刀']},
-      {kw:['投资','理财','股票','基金','财报','经济学'],r:['理财也是学习,为未来铺的每一块砖都算数','搞懂钱的规律,是成年人最重要的功课之一']},
-      {kw:['育儿','亲子','孩子','带娃','陪娃','绘本','启蒙'],r:['最好的教育是陪伴,今天又多陪了一程','育儿也是育己,孩子让你成为更好的人']},
-      {kw:['养生','中医','艾灸','喝茶','茶道','穴位'],r:['会养的人,都在默默变好','三十岁以后,养生不是选项,是责任']},
-      {kw:['宠物','猫','狗','猫咪','狗狗','主子','遛狗','撸猫'],r:['伺候主子的同时也动起来了','宠物在乎的不是你有多少钱,是你在不在']},
-      {kw:['花','多肉','养花','绿植','盆栽','花园','种菜'],r:['养花的人和植物一起生长','绿植用生长回应你的照顾']},
-      {kw:['旅行','自驾','出游','攻略','酒店','机票'],r:['世界是一本书,不旅行只读了一页','做攻略也是学习,地理历史美食全学了']},
-      {kw:['装修','搬家','收纳','整理','断舍离'],r:['家是待最久的地方,花时间打理值得','断舍离的不只是物品,还有心里的杂乱']},
-      {kw:['追剧','看剧','综艺','纪录片','b站','豆瓣'],r:['好片子也是养分,故事里藏着别人的人生','好的故事会悄悄改变你看世界的方式']},
-      {kw:['聚会','朋友','饭局','聚餐','闺蜜','社交'],r:['维持友情也是投资,比股票稳','成年人的友谊靠经营,今天又在给感情账户充值']},
-      {kw:['加班','出差','项目','汇报','开会','工作'],r:['工作也是学习,实战中学的最扎实','忙完工作还能打卡,自律已刻进DNA']},
-      {kw:['公益','志愿者','环保','捐赠'],r:['给别人带去什么,自己得到的更多','善良锻炼的是心灵']},
-      {kw:['咖啡','手冲','拉花','品酒'],r:['生活需要仪式感,冲杯好咖啡的十分钟是给自己的礼物','品味是一点一点积累的']},
+      {kw:['英语','单词','语法','阅读','听力','口语','作文','翻译','english'],r:['英语是个慢功夫，今天这步走得很稳','语言这东西，每天碰一点比周末猛攻有效得多','学语言的快乐：有一天突然发现听懂了']},
+      {kw:['书','看书','读','页','章','小说','文学','历史','哲学','传记'],r:['阅读是最低成本的旅行，今天你又出发了','一本书、半小时，比刷手机充实太多']},
+      {kw:['考试','复习','备考','考证','职称'],r:['成年人主动学习，比学生时代的被动用功酷多了','不是为了分数，是为了那个更好的自己']},
+      {kw:['课','上课','听课','网课','教程','课程','得到','樊登','喜马拉雅'],r:['保持学习的状态，本身就是一种能力','听课也是学习——耳朵在输入，大脑在更新']},
+      {kw:['笔记','整理','思维导图','总结','复盘'],r:['会整理的人，学一遍顶别人三遍','整理笔记=给大脑做收纳']},
+      {kw:['代码','编程','python','java','程序'],r:['写代码的人，逻辑和耐心都差不了','一行行代码，构建的是另一个世界']},
+      {kw:['播客','听书','音频','电台'],r:['耳朵学习法——通勤时间也不浪费','听进去的东西，某天会不经意冒出来帮你']},
+      {kw:['纪录片','电影','剧','ted','演讲'],r:['好片子也是学习。视角打开了，比记住知识点更重要','看世界的方式不止一种']},
+      {kw:['画画','绘画','素描','水彩','书法','练字','手账'],r:['拿起笔就是另一种表达。创作让人安静','手的记忆比大脑更持久']},
+      {kw:['乐器','钢琴','吉他','弹琴','练琴','小提琴','古筝','音乐'],r:['音乐是大脑的体操，手指的记忆比想象中更强大','练琴的人，耐心和毅力都是一流的']},
+      {kw:['博物馆','看展','展览','美术馆','画廊'],r:['逛博物馆是最好的通识教育——站在时间面前，人会变得谦虚','看展的人，眼睛里装着另一个世界']},
+      {kw:['写作','日记','写东西','公众号','文章','随笔'],r:['把想法写成文字，是对思考的二次加工','写作不是为了给别人看——是给自己整理思绪']},
+      {kw:['冥想','正念','静坐','打坐'],r:['冥想不是发呆，是给大脑做深度清洁','安静下来的十分钟，比忙忙碌碌一小时还有效']},
+      {kw:['摄影','拍照','扫街'],r:['摄影是发现美的训练——你看世界的角度会不一样','按下快门的瞬间，是跟这个世界的对话']},
+      {kw:['做菜','做饭','烘焙','料理','下厨'],r:['厨房里的创造力，比办公室还多','做饭是最高级的正念']},
+      {kw:['投资','理财','股票','基金','财报','经济学'],r:['理财也是学习——为未来铺的每一块砖都算数','搞懂钱的规律，是成年人最重要的功课之一']},
+      {kw:['育儿','亲子','孩子','带娃','陪娃','绘本','启蒙'],r:['最好的教育是陪伴。今天又多陪了一程','育儿也是育己——孩子让你成为更好的人']},
+      {kw:['养生','中医','艾灸','喝茶','茶道'],r:['会养的人，都在默默变好','三十岁以后，养生不是选项，是责任']},
+      {kw:['宠物','猫','狗','猫咪','狗狗','遛狗','撸猫'],r:['伺候主子的同时也动起来了','宠物在乎的不是你有多少钱，是你在不在']},
+      {kw:['花','多肉','养花','绿植','盆栽','花园'],r:['养花的人和植物一起生长','绿植用生长回应你的照顾']},
+      {kw:['旅行','自驾','出游','攻略','酒店','机票'],r:['世界是一本书，不旅行只读了一页','做攻略也是学习——地理历史美食全学了']},
+      {kw:['装修','搬家','收纳','整理','断舍离'],r:['家是待最久的地方，花时间打理值得','断舍离的不只是物品，还有心里的杂乱']},
+      {kw:['追剧','看剧','综艺','b站','豆瓣'],r:['好片子也是养分——故事里藏着别人的人生','好的故事会悄悄改变你看世界的方式']},
+      {kw:['聚会','朋友','饭局','聚餐','闺蜜','社交'],r:['维持友情也是投资——比股票稳','成年人的友谊靠经营']},
+      {kw:['加班','出差','项目','汇报','开会','工作'],r:['工作也是学习——实战中学的最扎实','忙完工作还能打卡，自律已刻进DNA']},
+      {kw:['公益','志愿者','环保','捐赠'],r:['给别人带去什么，自己得到的更多','善良锻炼的是心灵']},
+      {kw:['咖啡','手冲','拉花','品酒'],r:['生活需要仪式感——冲杯好咖啡的十分钟是给自己的礼物','品味是一点一点积累的']},
     ],
     exercise:[
-      {kw:'跑 步 公里 km 配速 慢跑 跑步 晨跑 夜跑'.split(' '),r:['跑步的多巴胺仅次于恋爱！今天又赚到了 🏃','每一步都不是白跑的——变成体力、心情、和体检单上的好数字']},
-      {kw:'瑜伽 拉伸 柔韧 冥想 呼吸 普拉提'.split(' '),r:['瑜伽人的从容，是那种"我不急但我一直在"的优雅 🧘','拉伸的不只是身体，还有今天一整天积累的紧张']},
-      {kw:'跳绳'.split(' '),r:['跳绳是性价比最高的运动——一根绳，全身燃 🪢','10分钟跳绳 = 半小时慢跑，今天你又事半功倍了']},
-      {kw:'游泳 游 泳池'.split(' '),r:['游泳是唯一不会出汗的运动——但消耗一点不少 🏊','在水里的时光，世界都安静了']},
-      {kw:'健身 力量 举 哑铃 器械 深蹲 俯卧撑 卧推 硬拉 练'.split(' '),r:['铁片不会辜负你。今天练的每一组都在塑造更好的自己 💪','肌肉酸痛的第二天，就是成长发生的时刻']},
-      {kw:'走路 散步 步 遛 逛 溜达 逛公园'.split(' '),r:['走路是最被低估的运动。日行万步的人，身体不会差 🚶','散步的哲学：慢下来，才能看见平时错过的风景']},
-      {kw:'骑车 单车 骑行 自行车 动感单车'.split(' '),r:['风从耳边过，自由从心里来。骑起来！🚲','两个轮子带你去的地方，四个轮子永远到不了']},
-      {kw:'跳操 操 hiit tabata 有氧 燃脂 跳舞 舞蹈'.split(' '),r:['成年人能挤出时间跳操，本身就是一种胜利 🔥','跟着音乐流汗，时间过得比刷手机快']},
-      {kw:'爬山 登山 徒步 户外 郊游 踏青'.split(' '),r:['山就在那里——你去了，它就矮了一截 ⛰️','户外是最好的健身房，还不用交会费']},
-      {kw:'篮球 足球 网球 羽毛球 乒乓 壁球 打球'.split(' '),r:['球类运动的快乐：专注、出汗、什么烦心事都忘了 🏀','跟球较劲的过程，其实是在跟自己较劲']},
-      {kw:'拳击 搏击 泰拳 格斗 散打'.split(' '),r:['打拳是最好的解压——沙袋不会还嘴，但会让你很累 🥊','每个出拳的人都在打碎今天的压力']},
-      {kw:'带娃 遛娃 抱娃 陪娃 遛孩子'.split(' '),r:['带娃是最高强度的有氧运动——懂的都懂 👶','今天运动量够不够？看看手腕上的娃就知道了 😂']},
-      {kw:'家务 打扫 拖地 擦 收拾 大扫除'.split(' '),r:['谁说家务不是运动？拖完地谁累谁知道 🧹','又干净了又消耗了——一举两得的运动方式']},
-      {kw:'逛街 逛商场 购物'.split(' '),r:['逛街也是运动——走了一万步还不算？🛍️','购物+运动，完美组合（就是钱包可能不太高兴）']},
-      {kw:'滑板 冲浪 滑雪 攀岩 蹦床 飞盘'.split(' '),r:['会玩的人永远不会老！这项运动听起来就很酷 🤙','成年人还能找到新爱好，这本身就是一种生命力']},
-      {kw:['拉伸','拉筋','开肩','松解','泡沫轴'],r:['会拉伸的人，身体比同龄人年轻十岁 🤸','那些酸痛的部位，谢谢你今天照顾了它们']},
-      {kw:['爬楼','上楼','楼梯'],r:['不坐电梯爬楼梯——每一个看似微小的选择都在塑造你 🏢','爬楼的消耗比想象中大，今天腿在谢谢你']},
-      {kw:['广场舞','太极','八段锦','五禽戏','气功'],r:['传统养生功法是老祖宗的智慧——温和但持久 ☯️','国潮养生！二十年后你会感谢现在的自己']},
-      {kw:['划船','皮划艇','桨板','sup'],r:['水上运动的人，心胸跟水面一样开阔 🛶','划船的节奏感——用力、放松、用力、放松，就是人生']},
+      {kw:['跑','步','公里','km','配速','慢跑','晨跑','夜跑'],r:['跑步的多巴胺仅次于恋爱！今天又赚到了','每一步都不是白跑的——变成体力、心情和体检单上的好数字']},
+      {kw:['瑜伽','拉伸','柔韧','冥想','普拉提'],r:['瑜伽人的从容，是那种"我不急但我一直在"的优雅','拉伸的不只是身体，还有今天一整天积累的紧张']},
+      {kw:['跳绳'],r:['跳绳是性价比最高的运动——一根绳，全身燃','10分钟跳绳=半小时慢跑，今天又事半功倍了']},
+      {kw:['游泳','游','泳池'],r:['游泳是唯一不会出汗的运动——但消耗一点不少','在水里的时光，世界都安静了']},
+      {kw:['健身','力量','举','哑铃','器械','深蹲','俯卧撑','卧推','硬拉'],r:['铁片不会辜负你。今天练的每一组都在塑造更好的自己','肌肉酸痛的第二天，就是成长发生的时刻']},
+      {kw:['走路','散步','步','遛','逛','溜达'],r:['走路是最被低估的运动。日行万步的人，身体不会差','散步的哲学：慢下来，才能看见平时错过的风景']},
+      {kw:['骑车','单车','骑行','自行车','动感单车'],r:['风从耳边过，自由从心里来。骑起来！','两个轮子带你去的地方，四个轮子永远到不了']},
+      {kw:['跳操','操','hiit','tabata','有氧','燃脂','跳舞'],r:['成年人能挤出时间跳操，本身就是一种胜利','跟着音乐流汗，时间过得比刷手机快']},
+      {kw:['爬山','登山','徒步','户外','郊游','踏青'],r:['山就在那里——你去了，它就矮了一截','户外是最好的健身房，还不用交会费']},
+      {kw:['篮球','足球','网球','羽毛球','乒乓','壁球'],r:['球类运动的快乐：专注、出汗、什么烦心事都忘了','跟球较劲的过程，其实是在跟自己较劲']},
+      {kw:['拳击','搏击','泰拳','格斗'],r:['打拳是最好的解压——沙袋不会还嘴，但会让你很累','每个出拳的人都在打碎今天的压力']},
+      {kw:['带娃','遛娃','抱娃','陪娃'],r:['带娃是最高强度的有氧运动——懂的都懂','今天运动量够不够？看看手腕上的娃就知道了']},
+      {kw:['家务','打扫','拖地','擦','收拾','大扫除'],r:['谁说家务不是运动？拖完地谁累谁知道','又干净了又消耗了——一举两得的运动方式']},
+      {kw:['逛街','逛商场','购物'],r:['逛街也是运动——走了一万步还不算？','购物+运动，完美组合（就是钱包可能不太高兴）']},
+      {kw:['滑板','冲浪','滑雪','攀岩','蹦床','飞盘'],r:['会玩的人永远不会老！这项运动听起来就很酷','成年人还能找到新爱好，这本身就是一种生命力']},
+      {kw:['拉伸','拉筋','开肩','泡沫轴'],r:['会拉伸的人，身体比同龄人年轻十岁','那些酸痛的部位，谢谢你今天照顾了它们']},
+      {kw:['爬楼','上楼','楼梯'],r:['不坐电梯爬楼梯——每一个微小选择都在塑造你','爬楼的消耗比想象中大，今天腿在谢谢你']},
+      {kw:['广场舞','太极','八段锦','五禽戏','气功'],r:['传统养生功法是老祖宗的智慧——温和但持久','国潮养生！二十年后你会感谢现在的自己']},
+      {kw:['划船','皮划艇','桨板'],r:['水上运动的人，心胸跟水面一样开阔','划船的节奏感——用力、放松、用力、放松，就是人生']},
+      {kw:['心跳','躺着','呼吸','睡觉','看','想'],r:['哈哈，如果这算运动的话——心态第一！','能承认自己没动，也是一种坦诚😂']},
     ]
   };
-
   const list=reactions[type]||[];
-  // Try keyword match
-  for(let item of list){
-    if(item.kw.some(k=>n.includes(k))){
-      const seed=hashStr(note+type);
-      return item.r[seed%item.r.length];
-    }
-  }
-
-  // No keyword match → smart fallback: extract first meaningful phrase from note
-  // Remove common words and punctuation, grab first 2-4 chars as a hook
-  const cleaned=note.replace(/[，,。.!！？?、\s~～—\-…]+/g,' ').replace(/(今天|了|的|也|很|都|是|在|和|与|吧|呢|啊|哦|哈|嗯)/g,'').trim();
-  const words=cleaned.split(' ').filter(w=>w.length>=2);
-  const hook=words.length>0?words[0].slice(0,6):note.slice(0,6);
-
+  for(let item of list){if(item.kw.some(k=>n.includes(k))){const seed=hashStr(note+type);return item.r[seed%item.r.length]}}
+  // Fallback
+  const cleaned=note.replace(/[，,。.!！？?、\s~～—\-…]+/g,' ').replace(/(今天|了|的|也|很|都|是|在|和|与|吧|呢|啊|哦|哈|嗯|一个|一下|什么|怎么|这个|那个)/g,' ').trim();
+  const words=cleaned.split(/[\s]+/).filter(w=>w.length>=2&&!/^[a-zA-Z0-9]+$/.test(w));
+  const hook=words.length>0?words[0].slice(0,8):'';
   if(!hook||hook.length<2)return null;
-
-  const fallbacks={
-    study:[
-      `看到你提到"${hook}"——学习就是由这些具体的小事组成的 📝`,
-      `"${hook}"——有意思。学什么都不白学，总有一天会连起来 ✨`,
-      `了解"${hook}"这类东西，本身就是一种修养 🌿`,
-      `在学"${hook}"吗？成年人还能静下心来学东西，已经很厉害了 👏`,
-    ],
-    exercise:[
-      `"${hook}"——不管是什么形式，动了就是赢了 🎯`,
-      `今天选择了"${hook}"这种方式来动一动，真好 💪`,
-      `用自己的方式保持运动——"${hook}"听起来不错 🏅`,
-      `没有标准答案的运动方式，"${hook}"就是你的答案 🙂`,
-    ]
-  };
+  const fallbacks={study:['看到你提到"'+hook+'"——学习就是由这些具体的小事组成的','"'+hook+'"——有意思。学什么都不白学'],exercise:['"'+hook+'"——不管是什么形式，动了就是赢了','用自己的方式保持运动——"'+hook+'"听起来不错']};
   const pool=fallbacks[type]||fallbacks.study;
-  return pool[hashStr(note+type+'fallback')%pool.length];
+  return pool[hashStr(note+type+'fb')%pool.length];
 }
 
-
-
-function generateEncourageMini(data, dateStr, person) {
-  const existing = getPersonCheckin(data, person, dateStr);
-  if (!existing) return '';
-  const total = (existing.study||0) + (existing.exercise||0);
-  if (total === 0) return '';
-  const avatar = AVATARS[person] || '👤';
-  // Check shared data for AI reply (synced via GitHub)
-  if (existing._aiReply) {
-    const shortAI = existing._aiReply.length>40 ? existing._aiReply.slice(0,40)+'...' : existing._aiReply;
-    return '<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;padding:4px 0;border-bottom:1px solid #f5f5f5;"><span style="font-size:16px;">'+avatar+'</span><span><strong>'+person+'</strong> '+total.toFixed(1)+'分'+'<br><span style="color:#5c4d38;">'+shortAI+'</span></span></div>';
-  }
-  // Check local AI cache
-  const aiCache = JSON.parse(localStorage.getItem('wuren_ai_cache')||'{}');
-  const aiEntry = aiCache[person+'|'+dateStr];
-  if (aiEntry && aiEntry.reply && aiEntry.time && (Date.now() - aiEntry.time < 86400000)) {
-    const shortAI = aiEntry.reply.length>40 ? aiEntry.reply.slice(0,40)+'...' : aiEntry.reply;
-    return '<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;padding:4px 0;border-bottom:1px solid #f5f5f5;"><span style="font-size:16px;">'+avatar+'</span><span><strong>'+person+'</strong> '+total.toFixed(1)+'分'+'<br><span style="color:#5c4d38;">'+shortAI+'</span></span></div>';
-  }
-  // Fallback to keyword
-  const sReaction = (existing.study||0)>0 ? noteReaction(existing.sNote||'','study') : null;
-  const eReaction = (existing.exercise||0)>0 ? noteReaction(existing.eNote||'','exercise') : null;
-  const reaction = sReaction || eReaction || '';
-  const shortReaction = reaction ? (reaction.includes('。')?reaction.split('。')[0]:reaction.includes('！')?reaction.split('！')[0]:reaction.slice(0,30)) : '';
-  if (!shortReaction && !total) return '';
-  return '<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:4px;"><span style="font-size:16px;">'+avatar+'</span><span><strong>'+person+'</strong> '+total.toFixed(1)+'分'+'<br>'+(shortReaction||'今天也打卡了')+'</span></div>';
-}
-
-function generateEncourage(data, dateStr, currentUser) {
+function generateEncourage(data,dateStr,currentUser){
   const d=new Date(dateStr+'T00:00:00');
-  const todayStr=fmtDate(new Date());
-  const isToday=(dateStr===todayStr);
   const hour=new Date().getHours();
-  const timeGreetings={early:['☀️ 早安呀','🌄 清晨好','🐦 早起的鸟儿有虫吃'],morning:['🌤️ 上午好','☕ 咖啡时间到','💼 元气满满的上午'],noon:['🌞 中午好','🍜 午饭吃好了吗','☀️ 午安'],afternoon:['🌤️ 下午好','🍵 下午茶时间','🌿 午后时光'],evening:['🌅 傍晚好','🌇 一天快结束了','🍃 晚间好'],night:['🌙 夜深了','🌟 晚上的时光最安静','🦉 夜猫子模式']};
+  const greetings={early:['早安呀','清晨好'],morning:['上午好','咖啡时间'],noon:['中午好','午安'],afternoon:['下午好','午后时光'],evening:['傍晚好'],night:['夜深了','晚间好']};
   let tgKey=hour<7?'early':hour<10?'morning':hour<13?'noon':hour<17?'afternoon':hour<20?'evening':'night';
-  const greetings=timeGreetings[tgKey];
-  const greeting=greetings[hashStr(currentUser+dateStr)%greetings.length];
+  const gs=greetings[tgKey];
+  const greeting=gs[hashStr(currentUser+dateStr)%gs.length];
 
-  if(d.getDay()===0)return '<div class="greeting">'+greeting+'，'+(currentUser||'朋友')+' 🌿</div><div class="body">周日，不打卡的日子。<br>一周的坚持值得奖励自己——泡杯好喝的、散个步、无所事事一会儿。<br><strong>会休息的人，才能跑更远的路。</strong></div><div class="humor">今天唯一的任务：让自己舒服 😌</div>';
-  if(!currentUser)return '<div class="greeting">'+greeting+'！</div><div class="body">👆 先选一下你是谁，然后就能开始打卡啦~<br>今天的你，一定会比昨天更接近想要的自己。</div>';
+  if(d.getDay()===0)return '<div class="greeting">'+greeting+'，'+currentUser+'</div><div class="body">周日不打卡。一周的坚持值得奖励自己。<br><strong>会休息的人，才能跑更远的路。</strong></div><div class="humor">今天唯一的任务：让自己舒服</div>';
+  if(!currentUser)return '<div class="greeting">'+greeting+'！</div><div class="body">选一下你是谁，然后开始打卡吧~</div>';
 
   const existing=getPersonCheckin(data,currentUser,dateStr);
   const streak=countStreak(data,currentUser);
   const weekDone=countWeeklyDone(data,currentUser);
   const dayOfWeek=d.getDay()||7;
 
-  if(existing) {
+  if(existing){
     const total=(existing.study||0)+(existing.exercise||0);
-    const st=existing.study||0, et=existing.exercise||0;
-    const sNote=existing.sNote||'', eNote=existing.eNote||'';
-// AI reply - check shared data first (synced via GitHub), then local cache
-    if (existing._aiReply) {
-      const prefix = greeting + '，'+currentUser+'！';
-      const streakExtra = streak>=7 ? ' 🔥连续'+streak+'天！' : streak>=3 ? ' ⭐连续'+streak+'天' : '';
-      return '<div class="greeting">'+prefix+'</div><div class="body">'+existing._aiReply+streakExtra+'</div>';
-    }
-    const aiCache = JSON.parse(localStorage.getItem('wuren_ai_cache')||'{}');
-    const aiEntry = aiCache[currentUser+'|'+dateStr];
-    if (aiEntry && aiEntry.reply && aiEntry.time && (Date.now() - aiEntry.time < 3600000)) {
-      const prefix = greeting + '，'+currentUser+'！';
-      const streakExtra = streak>=7 ? ' 🔥连续'+streak+'天！' : streak>=3 ? ' ⭐连续'+streak+'天' : '';
-      return '<div class="greeting">'+prefix+'</div><div class="body">'+aiEntry.reply+streakExtra+'</div>';
-    }
+    const st=existing.study||0,et=existing.exercise||0;
+    const sNote=existing.sNote||'',eNote=existing.eNote||'';
+
+    // AI reply from shared data
+    if(existing._ai){return '<div class="greeting">'+greeting+'，'+currentUser+'！</div><div class="body">'+existing._ai+'</div>'}
+
     const sReaction=st>0?noteReaction(sNote,'study'):null;
     const eReaction=et>0?noteReaction(eNote,'exercise'):null;
     const seed=hashStr(currentUser+dateStr);
-    let parts=[], humor='';
+    let parts=[],humor='';
 
-    // Score-based commentary - varied per person+date
-    if(total>=3.5){
-      const p=[
-        ['<strong>'+total.toFixed(1)+'分！满分战神！</strong>今天你属于"让人羡慕的自律人"级别 👑',(st>0&&et>0?'学习和运动双拉满，今天的自律额度已用满':'专注一项做到极致，也很酷。'),'今天过后，你这周的柱状图又要多一根高柱了~'],
-        ['<strong>'+total.toFixed(1)+'分</strong>，今日MVP就是你 🏆',(st>0?'脑子转得飞快':'')+(st>0&&et>0?'，':'')+(et>0?'身体也在线':''),'这状态，明天继续保持的话，这周纪录要破了。'],
-        ['拿下<strong>'+total.toFixed(1)+'分</strong>，今天简直是开挂模式 🚀','效率和执行力同时在线的一天。','这种日子不常有，但每有一次都值得截图留念。']
-      ]; parts=p[seed%3];
-    } else if(total>=2){
-      const p=[
-        ['<strong>'+total.toFixed(1)+'分</strong>，相当扎实的一天！','两小时的有效投入，一年下来就是730个小时——想想就可怕。','今天比昨天进步了一点点，这就够了。'],
-        ['<strong>'+total.toFixed(1)+'分</strong>入账 💰 这是给自己的时间投资。',(st>et?'今天脑袋转得多':et>st?'今天是行动的巨人':'文韬武略的一天')],
-        ['稳稳的<strong>'+total.toFixed(1)+'分</strong>。','不是每一分钟都要用来拼命——稳稳地走，比冲一下然后躺三天强。']
-      ]; parts=p[seed%3];
-    } else if(total>=1){
-      const p=[
-        ['<strong>'+total.toFixed(1)+'分</strong>，小步快跑 ✨','重要的不是今天拿了多少分，是你又一次选择了行动。','打卡这件事，最难的是第一次，第二难的是每天。你已经在"每天"了。'],
-        ['<strong>'+total.toFixed(1)+'分</strong>——轻量但有效。','就像吃一块巧克力不会胖，但每天一块就会——积累就是这样悄悄发生的（好的方面！）🍫'],
-        ['<strong>'+total.toFixed(1)+'分</strong>。忙了一天还能抽出时间来打卡，已经比大多数人厉害了。','成年人的坚持，都是在缝隙里挤出来的。你做到了。']
-      ]; parts=p[seed%3];
-    } else {
-      parts=['今天也打卡了，哪怕只是一小步，也是往前的方向 🌱','零也是数字，但打卡这件事本身就是一种态度。你在。'];
-      humor='今天打卡的意义：告诉明天的自己——你看，我连这么小的日子都没放弃 😌';
-    }
+    if(total>=3.5){parts=['<strong>'+total.toFixed(1)+'分！</strong>今天属于让人羡慕的自律人级别',st>0&&et>0?'学习和运动双拉满，自律额度已用满':'专注一项做到极致']}
+    else if(total>=2){parts=['<strong>'+total.toFixed(1)+'分</strong>，扎实的一天！','两小时的有效投入，一年就是730小时']}
+    else if(total>=1){parts=['<strong>'+total.toFixed(1)+'分</strong>，小步快跑','重要的不是拿多少分，是又一次选择了行动']}
+    else{parts=['今天也打卡了，哪怕只是一小步'];humor='告诉明天的自己——你看，我连这么小的日子都没放弃'}
 
-    // Note-specific reactions - the KEY personalization
-    if(sReaction) parts.push(sReaction);
-    if(eReaction) parts.push(eReaction);
-    if(!sReaction&&!eReaction&&(st>0||et>0)) { if(st>0&&!sNote) parts.push('学习打卡了但没写备注——下次分享一句呗，我想夸得更准一点 😉'); else if(et>0&&!eNote) parts.push('运动打卡了但没写备注——说说做了什么呗，让我为你欢呼 🎉'); }
+    if(sReaction)parts.push(sReaction);
+    if(eReaction)parts.push(eReaction);
+    if(streak>=14)parts.push('连续<strong>'+streak+'</strong>天！节奏刻进肌肉记忆了吧？');
+    else if(streak>=7)parts.push('连续<strong>'+streak+'</strong>天！这就是"靠谱"两个字的最好解释');
+    else if(streak>=3)parts.push('连续<strong>'+streak+'</strong>天了，势头在起来');
 
-    // Streak
-    if(streak>=30) parts.push('🔥 连续 <strong>'+streak+'</strong> 天！整整一个月以上的坚持——你不是在打卡，你是在重新定义自己。');
-    else if(streak>=14) parts.push('⚡ 连续 <strong>'+streak+'</strong> 天！两周以上的节奏已经刻进肌肉记忆了吧？');
-    else if(streak>=7) parts.push('⭐ 连续 <strong>'+streak+'</strong> 天达成！一周全勤，这就是"靠谱"两个字的最好解释。');
-    else if(streak>=3) parts.push('✨ 连续 <strong>'+streak+'</strong> 天了，势头在起来。明天继续就快一周了！');
+    if(!humor){humor=['世间万物都会背叛你，但每天0.5分的积累不会','打卡就像种树——每天浇一点水，一年后回头看，一片森林','三十岁以后的坚持，是给自己的交代'][seed%3]}
 
-    // Day-specific
-    if(dayOfWeek===6) parts.push('📌 周六都能打卡的人——周日的休息你配得上，甚至值得躺一整天。');
-    if(dayOfWeek===1&&total>=2) parts.push('周一就这么猛，这周的基调被你定下来了。剩下的日子请继续保持！');
-    if(weekDone===5&&dayOfWeek===6) parts.push('🏆 今天打完，本周就是全勤！最后一天冲一下，荣誉在望！');
-
-    // Peers
-    if(isToday){
-      let doneList=[]; PERSONS.forEach(p=>{if(p!==currentUser&&getPersonCheckin(data,p,dateStr))doneList.push(p);});
-      if(doneList.length>=4) parts.push('今天五仁全员到齐！这是最好的状态——互相看见，互相托着。');
-      else if(doneList.length>=2) parts.push(doneList.join('、')+' 今天也打卡了，你们在互相照亮 🌟');
-      else if(doneList.length===1) parts.push(doneList[0]+' 今天也打卡了——你俩是今天的行动派双人组。');
-      else parts.push('你是今天第一个打卡的！门开了，等其他人跟上~ 🚪');
-    }
-
-    if(!humor){
-      const humors=[
-        '生活小知识：每打卡一次，身上的"优秀"标签就会亮一下 💡',
-        '三十岁以后的坚持，不是为了给别人看，是给自己的交代。',
-        '问：都这岁数了还学什么？答：正因为这岁数了，才更要学给自己看。',
-        '打卡不是为了跟谁比——是忙碌生活里，给自己留的一个小小锚点',
-        '大脑：该休息了。你：不，再学半小时。大脑：好吧但我要记下来，下次翻旧账。',
-        st>et?'今天学习的分数比运动多，大脑表示很满意，身体表示：明天到我了 💤':'今天运动拉满！肌肉在生长，大脑在喘气，都很忙 💪',
-        '世间万物都会背叛你，但每天0.5分的积累不会。',
-        '打卡就像种树——每天浇一点水，一年后回头看，嚯，一片森林。'
-      ];
-      humor=humors[seed%humors.length];
-    }
     return '<div class="greeting">'+greeting+'，'+currentUser+'！</div><div class="body">'+parts.join('<br>')+'</div><div class="humor">'+humor+'</div>';
   }
 
-  // ===== NOT YET CHECKED IN =====
-  let tips=[], humor='';
-  const seed2=hashStr(currentUser+dateStr+'pre');
+  // Not yet checked in
+  let tips=[],humor='';
+  const s2=hashStr(currentUser+dateStr+'pre');
+  if(dayOfWeek===1){tips=['周一是最需要勇气的一天——你敢开始，这周就赢了一半','新的一周，给自己一个小目标'];humor='周一：一周中最被误解的一天'}
+  else if(dayOfWeek===5||dayOfWeek===6){tips=['周末的诱惑很大，但打开这个页面本身就已经赢了第一步','周五六的每一分都有双倍含金量'];humor='周五：身体在工位，灵魂已经在周末。但你还记得打开打卡页面——这就是纪律'}
+  else{tips=['打卡不是考试，不需要每次都满分。来了就是胜利','很多人高估一天能做的事，低估一百天能积累的事'];humor='拖延症的本质是——你不知道开始之后有多爽'}
 
-  if(dayOfWeek===1){
-    const monTips=[['周一是最需要勇气的一天——你敢开始，这周就赢了一半。','给自己一个小目标，不用多，哪怕0.5分，也是破冰。'],['新的一周，blank canvas。你打算在上面画点什么？','研究表明（某个不太严谨的研究），周一打卡的人一周都更顺利。']];
-    tips=monTips[seed2%2];
-    humor='周一：一周中最被误解的一天。其实它挺好的，只是需要你给它一个机会 😅';
-  } else if(dayOfWeek===5||dayOfWeek===6){
-    tips=['周末的诱惑很大（床、手机、外卖），但你打开这个页面本身就已经赢了第一步。','周五六的每一分都有双倍的含金量——因为这时候坚持最难。'];
-    humor='周五：身体在工位，灵魂已经在周末。但你还记得打开打卡页面——这就是纪律 👏';
-  } else {
-    const pool=[
-      ['打卡不是考试，不需要每次都满分。<strong>来了就是胜利。</strong>','选0.5分还是2分不重要，重要的是你在做。'],
-      ['很多人高估一天能做的事，低估了一百天能积累的事。','你现在的每0.5分，都是未来的筹码。'],
-      ['今天累了？那就学半小时、动半小时。<strong>轻量完成也是完成。</strong>','坚持不是每天都全力以赴，是每天都不缺席。'],
-      ['打开这个页面就已经超过了昨天的你——如果昨天没打开的话 😄','开始是最难的部分，你已经完成了最难的部分。'],
-      ['五仁的约定是：可以慢，但不可以停。','你今天花五分钟打个卡，比躺着一动不动强一百倍。']
-    ];
-    tips=pool[seed2%pool.length];
-    humor=['累了一天还要学习？你对自己的要求，决定了你是什么样的人 🧠','拖延症的本质是——你不知道开始之后有多爽。今天试试？','每一滴汗水都是脂肪的眼泪——当然也可能是大脑的眼泪，取决于你学还是动 😂'][seed2%3];
-  }
-
-  if(streak>=14) tips.push('💎 <strong>'+streak+'</strong> 天连续打卡！这个数字太珍贵了，今天千万别让它断掉。');
-  else if(streak>=7) tips.push('⭐ 你已经连续 <strong>'+streak+'</strong> 天了——今天再加一天，让这个数字继续涨。');
-
-  if(isToday){
-    let doneList=[]; PERSONS.forEach(p=>{if(p!==currentUser&&getPersonCheckin(data,p,dateStr))doneList.push(p);});
-    if(doneList.length>=3) tips.push(doneList.length+'位伙伴已经打完了，你是下一个吗？🤔');
-    else if(doneList.length>0) tips.push(doneList.join('、')+' 今天已经打了，在等你呢~');
-  }
-
+  if(streak>=7)tips.push('连续<strong>'+streak+'</strong>天了——今天再加一天！');
   return '<div class="greeting">'+greeting+'，'+currentUser+'！</div><div class="body">'+tips.join('<br><br>')+'</div><div class="humor">'+humor+'</div>';
 }
 
-// ============ RENDER CHECKIN ============
-function renderCheckin(){
-  const data=getLocal(); const checkinDateStr=getCheckinDate();
-  const checkinDate=new Date(checkinDateStr+'T00:00:00'); const today=new Date();
-  const todayStr=fmtDate(today); const monday=getMonday(checkinDate);
-  const sunday=getSunday(monday); const isSun=isSunday(checkinDate);
-  const isToday=(checkinDateStr===todayStr); const currentUser=getCurrentUser();
+function generateMiniEnc(data,dateStr,person){
+  const existing=getPersonCheckin(data,person,dateStr);
+  if(!existing)return'';
+  const total=(existing.study||0)+(existing.exercise||0);
+  if(total===0)return'';
+  const avatar=AVATARS[person]||'👤';
+  if(existing._ai){const s=existing._ai.length>40?existing._ai.slice(0,40)+'...':existing._ai;return'<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;padding:4px 0;border-bottom:1px solid #f5f5f5"><span style="font-size:16px">'+avatar+'</span><span><strong>'+person+'</strong> '+total.toFixed(1)+'分<br><span style="color:#5c4d38">'+s+'</span></span></div>'}
+  const r1=(existing.study||0)>0?noteReaction(existing.sNote||'','study'):null;
+  const r2=(existing.exercise||0)>0?noteReaction(existing.eNote||'','exercise'):null;
+  const r=r1||r2||'';
+  const sr=r?(r.includes('。')?r.split('。')[0]:r.slice(0,30)):'';
+  return'<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:4px"><span style="font-size:16px">'+avatar+'</span><span><strong>'+person+'</strong> '+total.toFixed(1)+'分<br>'+sr+'</span></div>';
+}
 
-  document.getElementById('headerDate').textContent=`${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日 星期${DAYS[today.getDay()===0?6:today.getDay()-1]}`;
-  document.getElementById('dateBadge').textContent=isToday?'':'⚠️ 补打卡';
-  let allEncourage = generateEncourage(data, checkinDateStr, currentUser);
-  // Also generate mini-encouragements for others who checked in today
-  let othersEnc = '';
-  PERSONS.forEach(p => {
-    if (p !== currentUser) {
-      const c = getPersonCheckin(data, p, checkinDateStr);
-      if (c && ((c.study||0)+(c.exercise||0)) > 0) {
-        const miniEnc = generateEncourageMini(data, checkinDateStr, p);
-        if (miniEnc) othersEnc += miniEnc;
-      }
-    }
-  });
-  if (othersEnc) allEncourage += '<div style="margin-top:14px;border-top:1px dashed var(--border);padding-top:10px;"><div style="font-size:11px;color:var(--sub);margin-bottom:6px;">其他伙伴今日打卡</div>' + othersEnc + '</div>';
-  document.getElementById('dailyEncourage').innerHTML = allEncourage;
+function countStreak(data,person){let s=0;const d=new Date();d.setDate(d.getDate()-1);while(d.getFullYear()>=2026){const c=getPersonCheckin(data,person,fmtDate(d));if(!c||((c.study||0)+(c.exercise||0))===0)break;s++;d.setDate(d.getDate()-1)}return s}
+function countWeeklyDone(data,person){const today=new Date();const monday=getMonday(today);let days=0;for(let i=0;i<6;i++){const d=new Date(monday);d.setDate(d.getDate()+i);const c=getPersonCheckin(data,person,fmtDate(d));if(c&&((c.study||0)+(c.exercise||0))>0)days++}return days}
+
+// ===== RENDER =====
+function renderCheckin(){
+  const data=getLocal();const checkinDateStr=getCheckinDate();
+  const checkinDate=new Date(checkinDateStr+'T00:00:00');const today=new Date();
+  const todayStr=fmtDate(today);const monday=getMonday(checkinDate);
+  const sunday=getSunday(monday);const isSun=isSunday(checkinDate);
+  const isToday=(checkinDateStr===todayStr);const currentUser=getCurrentUser();
+
+  document.getElementById('headerDate').textContent=today.getFullYear()+'年'+(today.getMonth()+1)+'月'+today.getDate()+'日 星期'+DAYS[today.getDay()===0?6:today.getDay()-1];
+  document.getElementById('dateBadge').textContent=isToday?'':'补打卡';
 
   let sundayWinners=[];
-  if(isSun){const twoSundaysAgo=new Date(checkinDate);twoSundaysAgo.setDate(twoSundaysAgo.getDate()-14);const predData=data.predictions[fmtDate(twoSundaysAgo)];if(predData&&predData.winners)sundayWinners=predData.winners;}
-  const noticeDiv=document.getElementById('sundayNotice');
-  if(isSun){noticeDiv.innerHTML=sundayWinners.length>0?`<div class="sunday-winner">🌟 周日福利日！中奖者：<strong>${sundayWinners.join('、')}</strong> —— 只有TA们今天可以打卡积分！</div>`:`<div class="sunday-lock">🔒 周日休息日。等待预测中奖者揭晓~<br><span style="font-size:12px;">一周的坚持辛苦了，给自己放个假吧 🌿</span></div>`;}else{noticeDiv.innerHTML='';}
+  if(isSun){const twoSundaysAgo=new Date(checkinDate);twoSundaysAgo.setDate(twoSundaysAgo.getDate()-14);const predData=data.predictions[fmtDate(twoSundaysAgo)];if(predData&&predData.winners)sundayWinners=predData.winners}
 
+  const noticeDiv=document.getElementById('sundayNotice');
+  if(isSun){noticeDiv.innerHTML=sundayWinners.length>0?'<div class="sunday-winner">周日福利！中奖者：<strong>'+sundayWinners.join('、')+'</strong> 可以打卡</div>':'<div class="sunday-lock">周日休息日。等待预测中奖者揭晓~</div>'}else{noticeDiv.innerHTML=''}
+
+  // Main encouragement
+  document.getElementById('dailyEncourage').innerHTML=generateEncourage(data,checkinDateStr,currentUser);
+
+  // Build cards
   let html='';
-  if(!currentUser){html+=`<div style="text-align:center;color:var(--sub);padding:30px;font-size:15px;">👆 请先在上方选择"我是谁"<br><span style="font-size:12px;">选完后就能看到自己的打卡卡片了</span></div>`;}
+  if(!currentUser){html+='<div style="text-align:center;color:var(--sub);padding:30px;font-size:15px">请先在上方选择"我是谁"</div>'}
 
   PERSONS.forEach(person=>{
     const existing=getPersonCheckin(data,person,checkinDateStr);
@@ -667,246 +374,139 @@ function renderCheckin(){
     const cardClass=isMe?'card self':'card';
     const avatar=AVATARS[person]||'👤';
 
-    if(!isMe&&!existing){return;}
-    if(isSun&&!canCheckin&&!existing)return;
+    if(!isMe&&!existing)return;
 
     if(existing){
       const st=existing.study||0,et=existing.exercise||0;
-      html+=`<div class="${cardClass}">
-        <div class="person-name"><span class="person-avatar" style="background:${isMe?'#fff3e8':'#f5f5f5'};">${avatar}</span>${person} ${isMe?'👈':''} <span class="done-badge">✓ 已打卡</span></div>
-        <div style="font-size:14px;display:flex;gap:14px;flex-wrap:wrap;line-height:1.8;">
-          <span>📚 学习 <strong style="color:var(--accent2)">${st}分</strong>${existing.sNote?'<br><span style=\"font-size:12px;color:var(--sub);\">“'+existing.sNote+'”</span>':''}</span>
-          <span>🏃 运动 <strong style="color:var(--accent)">${et}分</strong>${existing.eNote?'<br><span style=\"font-size:12px;color:var(--sub);\">“'+existing.eNote+'”</span>':''}</span>
-        </div>
-        ${isMe?`<div class="btn-row"><button class="btn btn-outline btn-small" onclick="editMyCheckin()">✏️ 修改</button><button class="btn btn-outline btn-small" onclick="deleteMyCheckin()" style="color:#c0392b;border-color:#c0392b;">🗑️ 撤销</button></div>`:''}
-      </div>`;
+      html+='<div class="'+cardClass+'"><div class="person-name"><span class="person-avatar" style="background:'+(isMe?'#fff3e8':'#f5f5f5')+'">'+avatar+'</span>'+person+(isMe?' 👈':'')+' <span class="done-badge">已打卡</span></div><div style="font-size:14px;display:flex;gap:14px;flex-wrap:wrap;line-height:1.8"><span>学习 <strong style="color:var(--accent2)">'+st+'分</strong>'+(existing.sNote?'<br><span style="font-size:12px;color:var(--sub)">"'+existing.sNote+'"</span>':'')+'</span><span>运动 <strong style="color:var(--accent)">'+et+'分</strong>'+(existing.eNote?'<br><span style="font-size:12px;color:var(--sub)">"'+existing.eNote+'"</span>':'')+'</span></div>'+(isMe?'<div class="btn-row"><button class="btn btn-outline btn-small" onclick="editMy()">修改</button><button class="btn btn-outline btn-small" onclick="deleteMy()" style="color:#c0392b;border-color:#c0392b">撤销</button></div>':'')+'</div>';
     }else if(isMe&&canCheckin){
-      html+=`<div class="card self" id="myCard">
-        <div class="person-name"><span class="person-avatar" style="background:#fff3e8;">${avatar}</span>${person} 👈</div>
-        <div class="score-row">
-          <div class="score-block"><div class="label"><span class="dot s"></span>📚 学习 (0-2分)</div><div class="score-btns">${scoreBtns('study')}</div><input class="note-input" id="sNote" placeholder="学了什么？一句话记录就好…"></div>
-        </div>
-        <div class="score-row">
-          <div class="score-block"><div class="label"><span class="dot e"></span>🏃 运动 (0-2分)</div><div class="score-btns">${scoreBtns('exercise')}</div><input class="note-input" id="eNote" placeholder="做了什么运动？跑步？瑜伽？…"></div>
-        </div>
-        <button class="btn btn-primary btn-block" id="btnSave" onclick="saveMyCheckin()" style="margin-top:10px;">💾 保存打卡</button>
-      </div>`;
+      html+='<div class="card self" id="myCard"><div class="person-name"><span class="person-avatar" style="background:#fff3e8">'+avatar+'</span>'+person+' 👈</div><div class="score-row"><div class="score-block"><div class="label"><span class="dot s"></span>学习 (0-2分)</div><div class="score-btns">'+scoreBtns('study')+'</div><input class="note-input" id="sNote" placeholder="学了什么？一句话记录…"></div></div><div class="score-row"><div class="score-block"><div class="label"><span class="dot e"></span>运动 (0-2分)</div><div class="score-btns">'+scoreBtns('exercise')+'</div><input class="note-input" id="eNote" placeholder="做了什么运动？…"></div></div><button class="btn btn-primary btn-block" id="btnSave" onclick="saveMy()" style="margin-top:10px">保存打卡</button></div>';
     }else if(isMe&&!canCheckin){
-      html+=`<div class="card self"><div class="person-name"><span class="person-avatar" style="background:#fff3e8;">${avatar}</span>${person} 👈</div><div style="font-size:13px;color:#c0392b;">⏸️ 今天不是你的打卡日，休息一下~</div></div>`;
+      html+='<div class="card self"><div class="person-name"><span class="person-avatar" style="background:#fff3e8">'+avatar+'</span>'+person+' 👈</div><div style="font-size:13px;color:#c0392b">今天不是你的打卡日</div></div>';
     }
   });
 
-  document.getElementById('checkinArea').innerHTML=html||`<div style="text-align:center;color:var(--sub);padding:20px;">所有人都还没打卡，等待第一位行动派！</div>`;
+  document.getElementById('checkinArea').innerHTML=html||'<div style="text-align:center;color:var(--sub);padding:20px">等待第一位行动派</div>';
 
+  // Add others' encouragement
+  setTimeout(()=>{
+    let othersEnc='';
+    PERSONS.forEach(p=>{if(p!==currentUser){const c=getPersonCheckin(data,p,checkinDateStr);if(c&&((c.study||0)+(c.exercise||0))>0){const mini=generateMiniEnc(data,checkinDateStr,p);if(mini)othersEnc+=mini}}});
+    if(othersEnc){const encDiv=document.getElementById('dailyEncourage');encDiv.innerHTML+='<div style="margin-top:14px;border-top:1px dashed var(--border);padding-top:10px"><div style="font-size:11px;color:var(--sub);margin-bottom:6px">其他伙伴今日打卡</div>'+othersEnc+'</div>'}
+  },500);
 
-  // Restore temp
-  if(window._tmp&&(checkinDateStr===window._tmpDate)){[0,0.5,1,1.5,2].forEach(v=>{const bs=document.getElementById('bs-'+v),be=document.getElementById('be-'+v);if(bs&&window._tmp.study===v)bs.classList.add('sel');if(be&&window._tmp.exercise===v)be.classList.add('sel');});const sn=document.getElementById('sNote'),en=document.getElementById('eNote');if(sn)sn.value=window._tmp.sNote||'';if(en)en.value=window._tmp.eNote||'';}
+  // Restore temp selections
+  if(window._tmp&&(checkinDateStr===window._tmpDate)){[0,0.5,1,1.5,2].forEach(v=>{const bs=document.getElementById('bs-'+v),be=document.getElementById('be-'+v);if(bs&&window._tmp.study===v)bs.classList.add('sel');if(be&&window._tmp.exercise===v)be.classList.add('sel')});const sn=document.getElementById('sNote'),en=document.getElementById('eNote');if(sn)sn.value=window._tmp.sNote||'';if(en)en.value=window._tmp.eNote||''}
 }
 
-function scoreBtns(type){const id=type==='study'?'bs':'be';return[0,0.5,1,1.5,2].map(v=>`<button id="${id}-${v}" onclick="selectScore('${type}',${v})">${v===0?'0':v}</button>`).join('');}
+function scoreBtns(type){const id=type==='study'?'bs':'be';return[0,0.5,1,1.5,2].map(v=>'<button id="'+id+'-'+v+'" onclick="selScore(\''+type+'\','+v+')">'+(v===0?'0':v)+'</button>').join('')}
+function selScore(type,val){if(!window._tmp)window._tmp={study:0,exercise:0,sNote:'',eNote:''};window._tmpDate=getCheckinDate();window._tmp[type]=val;const prefix=type==='study'?'bs':'be';[0,0.5,1,1.5,2].forEach(v=>{const btn=document.getElementById(prefix+'-'+v);if(btn)btn.classList.toggle('sel',v===val)});const btn=document.getElementById('btnSave');if(btn&&btn.classList.contains('btn-saved')){btn.textContent='保存打卡';btn.className='btn btn-primary btn-block'}}
 
-function selectScore(type,val){
-  if(!window._tmp)window._tmp={study:0,exercise:0,sNote:'',eNote:''};window._tmpDate=getCheckinDate();window._tmp[type]=val;
-  const prefix=type==='study'?'bs':'be';[0,0.5,1,1.5,2].forEach(v=>{const btn=document.getElementById(prefix+'-'+v);if(btn)btn.classList.toggle('sel',v===val);});
-  const btn=document.getElementById('btnSave');if(btn&&btn.classList.contains('btn-saved')){btn.textContent='💾 保存打卡';btn.className='btn btn-primary btn-block';}
-}
-
-async function saveMyCheckin(){
-  const currentUser=getCurrentUser();if(!currentUser){toast('请先选择自己');return;}
+async function saveMy(){
+  const currentUser=getCurrentUser();if(!currentUser){toast('请先选择自己');return}
   const checkinDateStr=getCheckinDate();const isSun=isSunday(new Date(checkinDateStr+'T00:00:00'));
-  if(isSun){const d=new Date(checkinDateStr+'T00:00:00');const twoSundaysAgo=new Date(d);twoSundaysAgo.setDate(twoSundaysAgo.getDate()-14);const data=getLocal();const predData=data.predictions[fmtDate(twoSundaysAgo)];const winners=(predData&&predData.winners)?predData.winners:[];if(!winners.includes(currentUser)){toast('❌ 今天周日，你不是中奖者，不能打卡');return;}}
-  if(!window._tmp){toast('请选择分数');return;}
+  if(isSun){const d=new Date(checkinDateStr+'T00:00:00');const twoSundaysAgo=new Date(d);twoSundaysAgo.setDate(twoSundaysAgo.getDate()-14);const data=getLocal();const predData=data.predictions[fmtDate(twoSundaysAgo)];const winners=(predData&&predData.winners)?predData.winners:[];if(!winners.includes(currentUser)){toast('今天周日，不是中奖者，不能打卡');return}}
+  if(!window._tmp){toast('请选择分数');return}
   const data=getLocal();
   const record={study:window._tmp.study||0,sNote:(document.getElementById('sNote')?.value||'').trim(),exercise:window._tmp.exercise||0,eNote:(document.getElementById('eNote')?.value||'').trim()};
-  if(record.study===0&&record.exercise===0){toast('⚠️ 请至少选择一项分数');return;}
+  if(record.study===0&&record.exercise===0){toast('请至少选择一项分数');return}
   if(!data.checkins[currentUser])data.checkins[currentUser]={};
   data.checkins[currentUser][checkinDateStr]=record;
   await saveAndSync(data);window._tmp=null;window._tmpDate=null;
-  const btn=document.getElementById('btnSave');if(btn){btn.textContent='✅ 已保存';btn.className='btn btn-saved btn-block';}
-  toast('✅ 打卡已保存！');setTimeout(()=>{if(btn&&btn.classList.contains('btn-saved')){btn.textContent='💾 保存打卡';btn.className='btn btn-primary btn-block';}},3000);
-  const total = (record.study||0) + (record.exercise||0);
+  const btn=document.getElementById('btnSave');if(btn){btn.textContent='saved';btn.className='btn btn-saved btn-block'}
+  toast('saved!');setTimeout(()=>{if(btn&&btn.classList.contains('btn-saved')){btn.textContent='保存打卡';btn.className='btn btn-primary btn-block'}},3000);
   renderCheckin();
-  // Auto-fire AI in background
-  const _total = (record.study||0) + (record.exercise||0);
-  if (_total > 0) {
-    const _streak = countStreak(data, currentUser);
-    const _weekDone = countWeeklyDone(data, currentUser);
-    const _hour = new Date().getHours();
-    const _timeGreeting = _hour<7?'清晨':_hour<10?'上午':_hour<13?'中午':_hour<17?'下午':_hour<20?'傍晚':'晚上';
-    const _day = new Date(checkinDateStr+'T00:00:00').getDay()||7;
-    callDeepSeek(currentUser, record.study||0, record.sNote||'', record.exercise||0, record.eNote||'', _streak, _weekDone, _day, _timeGreeting).then(async (aiReply) => {
-      if (aiReply) {
-        const sharedData = getLocal();
-        if (sharedData.checkins[currentUser] && sharedData.checkins[currentUser][checkinDateStr]) {
-          sharedData.checkins[currentUser][checkinDateStr]._aiReply = aiReply;
-          sharedData.checkins[currentUser][checkinDateStr]._aiTime = Date.now();
-          saveLocal(sharedData);
-          await pushRemote(sharedData);
-        }
-        const encDiv3 = document.getElementById('dailyEncourage');
-        if (encDiv3) {
-          encDiv3.innerHTML = generateEncourage(sharedData||getLocal(), checkinDateStr, currentUser);
-        }
+
+  // Fire AI in background
+  const total=(record.study||0)+(record.exercise||0);
+  if(total>0){
+    const streak=countStreak(data,currentUser);
+    const weekDone=countWeeklyDone(data,currentUser);
+    const hour=new Date().getHours();
+    const tg=hour<7?'清晨':hour<10?'上午':hour<13?'中午':hour<17?'下午':hour<20?'傍晚':'晚上';
+    const day=new Date(checkinDateStr+'T00:00:00').getDay()||7;
+    callAI(currentUser,record.study||0,record.sNote||'',record.exercise||0,record.eNote||'',streak,weekDone,day,tg).then(async(aiReply)=>{
+      if(aiReply){
+        const d2=getLocal();
+        if(d2.checkins[currentUser]&&d2.checkins[currentUser][checkinDateStr]){d2.checkins[currentUser][checkinDateStr]._ai=aiReply;saveLocal(d2);await pushRemote(d2)}
+        const encDiv=document.getElementById('dailyEncourage');if(encDiv){encDiv.innerHTML=generateEncourage(getLocal(),checkinDateStr,currentUser);setTimeout(()=>renderCheckin(),800)}
       }
     });
   }
 }
 
-function editMyCheckin(){const currentUser=getCurrentUser();const checkinDateStr=getCheckinDate();const data=getLocal();const existing=getPersonCheckin(data,currentUser,checkinDateStr);if(!existing)return;window._tmp={study:existing.study||0,exercise:existing.exercise||0,sNote:existing.sNote||'',eNote:existing.eNote||''};window._tmpDate=checkinDateStr;delete data.checkins[currentUser][checkinDateStr];saveLocal(data);renderCheckin();}
+function editMy(){const cu=getCurrentUser();const ds=getCheckinDate();const data=getLocal();const ex=getPersonCheckin(data,cu,ds);if(!ex)return;window._tmp={study:ex.study||0,exercise:ex.exercise||0,sNote:ex.sNote||'',eNote:ex.eNote||''};window._tmpDate=ds;delete data.checkins[cu][ds];saveLocal(data);renderCheckin()}
 
-async function deleteMyCheckin(){const currentUser=getCurrentUser();const checkinDateStr=getCheckinDate();const data=getLocal();const existing=getPersonCheckin(data,currentUser,checkinDateStr);if(!existing)return;if(!confirm(`确定要撤销 ${currentUser} 在 ${checkinDateStr} 的打卡记录吗？`))return;delete data.checkins[currentUser][checkinDateStr];await saveAndSync(data);window._tmp=null;window._tmpDate=null;toast('🗑️ 已撤销打卡');renderCheckin();}
+async function deleteMy(){const cu=getCurrentUser();const ds=getCheckinDate();const data=getLocal();const ex=getPersonCheckin(data,cu,ds);if(!ex)return;if(!confirm('确定撤销 '+cu+' 在 '+ds+' 的打卡？'))return;delete data.checkins[cu][ds];await saveAndSync(data);window._tmp=null;window._tmpDate=null;toast('已撤销');renderCheckin()}
 
-function renderAll(){renderCheckin();renderWeekly();renderPredict();renderHistory();}
-
-// ============ WEEKLY ============
+// ===== WEEKLY =====
 function renderWeekly(){
   const data=getLocal();const today=new Date();const monday=getMonday(today);const sunday=getSunday(monday);
-  document.getElementById('weekRange').textContent=`📅 ${fmtWeekRange(monday,sunday)}`;
-  let tableHtml='<table class="week-table"><thead><tr><th>姓名</th>';
-  for(let i=0;i<7;i++){const d=new Date(monday);d.setDate(d.getDate()+i);tableHtml+=`<th class="${i===6?'sun-col':''}">${DAYS[i]}<br>${fmtDateShort(d)}</th>`;}
-  tableHtml+='<th>合计</th></tr></thead><tbody>';
+  document.getElementById('weekRange').textContent=fmtWeekRange(monday,sunday);
+  let tbl='<table class="week-table"><thead><tr><th>姓名</th>';
+  for(let i=0;i<7;i++){const d=new Date(monday);d.setDate(d.getDate()+i);tbl+='<th class="'+(i===6?'sun-col':'')+'">'+DAYS[i]+'<br>'+fmtDateShort(d)+'</th>'}tbl+='<th>合计</th></tr></thead><tbody>';
   const totals={};
-  PERSONS.forEach(person=>{tableHtml+=`<tr><td>${AVATARS[person]||''} ${person}</td>`;let pt=0;for(let i=0;i<7;i++){const d=new Date(monday);d.setDate(d.getDate()+i);const c=getPersonCheckin(data,person,fmtDate(d));let cell='-';if(c){const sc=(c.study||0)+(c.exercise||0);cell=sc>0?sc.toFixed(1):'-';pt+=sc;}tableHtml+=`<td class="${i===6?'sun-col':''}${isSameDay(d,today)?' highlight':''}">${cell}</td>`;}tableHtml+=`<td><strong>${pt.toFixed(1)}</strong></td></tr>`;totals[person]=pt;});
-  tableHtml+='</tbody></table>';
-  document.getElementById('weekTable').innerHTML=tableHtml;
+  PERSONS.forEach(person=>{tbl+='<tr><td>'+person+'</td>';let pt=0;for(let i=0;i<7;i++){const d=new Date(monday);d.setDate(d.getDate()+i);const c=getPersonCheckin(data,person,fmtDate(d));let cell='-';if(c){const sc=(c.study||0)+(c.exercise||0);cell=sc>0?sc.toFixed(1):'-';pt+=sc}tbl+='<td class="'+(i===6?'sun-col':'')+(isSameDay(d,today)?' highlight':'')+'">'+cell+'</td>'}tbl+='<td><strong>'+pt.toFixed(1)+'</strong></td></tr>';totals[person]=pt});
+  tbl+='</tbody></table>';document.getElementById('weekTable').innerHTML=tbl;
   const allTotal=Object.values(totals).reduce((a,b)=>a+b,0);
-  let sumHtml=`<div class="total-line">🔥 团队总分：${allTotal.toFixed(1)} 分</div>`;
-  const sorted=[...PERSONS].sort((a,b)=>totals[b]-totals[a]);
-  sorted.forEach((p,i)=>{
-    const t=totals[p];
-    const emoji=i===0?'🥇':i===1?'🥈':i===2?'🥉':t>=8?'🏆':t>=5?'💪':t>=2?'🌱':'💤';
-    sumHtml+=`<div class="person-line">${AVATARS[p]||''} ${p}：<strong>${t.toFixed(1)}分</strong> ${emoji} ${t>=8?'这周太强了！':t>=5?'稳定输出':t>=2?'还在路上':'下周等你爆发'}</div>`;
-  });
-  document.getElementById('weekSummary').innerHTML=sumHtml;
-  const predKey=fmtDate(sunday);const predData=data.predictions[predKey];
-  const resDiv=document.getElementById('lastPredResult');
-  if(predData&&predData.actual!==null&&predData.actual!==undefined){resDiv.innerHTML=`实际总分：<strong>${predData.actual.toFixed(1)}分</strong><br>🏅 中奖者：<strong>${(predData.winners||[]).join('、')||'无'}</strong> 🎉<br><span style="font-size:12px;color:var(--sub);">TA们这周日可以打卡积分！</span>`;}else{resDiv.innerHTML='本周还未结束，周日揭晓结果~';}
+  let sum='<div class="total-line">团队总分：'+allTotal.toFixed(1)+' 分</div>';
+  [...PERSONS].sort((a,b)=>totals[b]-totals[a]).forEach((p,i)=>{const t=totals[p];sum+='<div class="person-line">'+(i===0?'🥇':i===1?'🥈':i===2?'🥉':'')+' '+p+'：<strong>'+t.toFixed(1)+'分</strong> '+(t>=8?'太强':t>=5?'稳定':t>=2?'在路上':'加油')+'</div>'});
+  document.getElementById('weekSummary').innerHTML=sum;
+  const predData=data.predictions[fmtDate(sunday)];
+  document.getElementById('lastPredResult').innerHTML=predData&&predData.actual!=null?'实际：<strong>'+predData.actual.toFixed(1)+'分</strong> 中奖：<strong>'+(predData.winners||[]).join('、')+'</strong>':'本周未结束，周日揭晓~';
 }
 
-// ============ PREDICTIONS ============
+// ===== PREDICTIONS =====
 function renderPredict(){
   const data=getLocal();const today=new Date();const monday=getMonday(today);const sunday=getSunday(monday);
-  const nextMon=new Date(sunday);nextMon.setDate(nextMon.getDate()+1);const nextSun=getSunday(nextMon);
-  const isSun=isSunday(today);
-  document.getElementById('predInfo').innerHTML=isSun?`🗳️ 预测下周（${fmtWeekRange(nextMon,nextSun)}）团队总分<br><span style="font-size:12px;">猜最准的人可获下周周日打卡权。预测保密，揭晓日才公开</span>`:`⏰ 周日开放预测<br><span style="font-size:12px;">猜下周团队总分，最接近的人获得周日打卡权</span>`;
+  const nextMon=new Date(sunday);nextMon.setDate(nextMon.getDate()+1);const nextSun=getSunday(nextMon);const isSun=isSunday(today);
+  document.getElementById('predInfo').innerHTML=isSun?'预测下周（'+fmtWeekRange(nextMon,nextSun)+'）团队总分<br><span style="font-size:12px">最准的人获下周周日打卡权。预测保密</span>':'周日开放预测<br><span style="font-size:12px">猜下周团队总分，最接近的获周日打卡权</span>';
   const predKey=fmtDate(sunday);let existingPreds=(data.predictions[predKey]&&data.predictions[predKey].preds)?data.predictions[predKey].preds:{};
-  let inputs='';PERSONS.forEach(p=>{const val=existingPreds[p]!==undefined?existingPreds[p]:'';inputs+=`<div class="pred-input-row"><span class="name">${AVATARS[p]||''} ${p}</span><input type="number" id="pred-${p}" value="${val}" placeholder="猜总分" step="0.5" min="0" max="40"><span style="font-size:12px;color:var(--sub);">分</span></div>`;});
+  let inputs='';PERSONS.forEach(p=>{const val=existingPreds[p]!==undefined?existingPreds[p]:'';inputs+='<div class="pred-input-row"><span class="name">'+p+'</span><input type="number" id="pred-'+p+'" value="'+val+'" placeholder="猜总分" step="0.5" min="0" max="40"><span style="font-size:12px;color:var(--sub)">分</span></div>'});
   document.getElementById('predInputs').innerHTML=inputs;document.getElementById('predInputs').style.display=isSun?'block':'none';
   document.querySelector('#page-predict .btn-primary').style.display=isSun?'block':'none';
-  let hist='';Object.keys(data.predictions).sort().reverse().forEach(key=>{const pd=data.predictions[key];if(!pd)return;if(pd.actual===null||pd.actual===undefined){return;}hist+=`<div style="margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #f5f0e8;"><div style="font-weight:700;font-size:14px;">📅 ${key}</div><div style="font-size:12px;color:var(--sub);">预测周：${pd.weekStart} 起</div>`;if(pd.preds)Object.keys(pd.preds).forEach(p=>{hist+=`<span style="font-size:13px;">${p}:${pd.preds[p]}分 </span>`;});if(pd.actual!==null&&pd.actual!==undefined){hist+=`<div style="font-size:13px;color:#27ae60;">✅ 实际：${pd.actual.toFixed(1)}分 | 🏅 ${(pd.winners||[]).join('、')||'无'}</div>`;}else{hist+=`<div style="font-size:12px;color:var(--sub);">⏳ 等待揭晓…</div>`;}hist+='</div>';});
-  document.getElementById('predHistory').innerHTML=hist||'<div style="font-size:14px;color:var(--sub);text-align:center;padding:20px;">还没有已揭晓的预测记录<br><span style="font-size:12px;">周日来这里，一起猜下周总分！预测提交后保密，揭晓日才公开~</span></div>';
+  let hist='';Object.keys(data.predictions).sort().reverse().forEach(key=>{const pd=data.predictions[key];if(!pd||pd.actual===null||pd.actual===undefined)return;hist+='<div style="margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #f5f0e8"><div style="font-weight:700;font-size:14px">'+key+'</div><div style="font-size:12px;color:var(--sub)">预测周：'+pd.weekStart+' 起</div>';if(pd.preds)Object.keys(pd.preds).forEach(p=>{hist+=p+':'+pd.preds[p]+'分 '});hist+='<div style="font-size:13px;color:#27ae60">实际：'+pd.actual.toFixed(1)+'分 | 中奖：'+(pd.winners||[]).join('、')+'</div></div>'});
+  document.getElementById('predHistory').innerHTML=hist||'<div style="text-align:center;color:var(--sub);padding:20px">还没有已揭晓的预测<br><span style="font-size:12px">周日来猜下周总分！预测保密，揭晓日才公开</span></div>';
 }
 
 async function savePredictions(){
-  const data=getLocal();const today=new Date();if(!isSunday(today)){toast('只有周日才能提交预测哦~');return;}
+  const data=getLocal();const today=new Date();if(!isSunday(today)){toast('只有周日才能提交预测');return}
   const monday=getMonday(today);const sunday=getSunday(monday);const nextMon=new Date(sunday);nextMon.setDate(nextMon.getDate()+1);const predKey=fmtDate(sunday);
   if(!data.predictions[predKey])data.predictions[predKey]={weekStart:fmtDate(nextMon),preds:{},actual:null,winners:[]};
-  let count=0;PERSONS.forEach(p=>{const inp=document.getElementById('pred-'+p);if(inp&&inp.value!==''){data.predictions[predKey].preds[p]=parseFloat(inp.value)||0;count++;}});
+  let count=0;PERSONS.forEach(p=>{const inp=document.getElementById('pred-'+p);if(inp&&inp.value!==''){data.predictions[predKey].preds[p]=parseFloat(inp.value)||0;count++}});
   const lastSun=new Date(sunday);lastSun.setDate(lastSun.getDate()-7);const lastKey=fmtDate(lastSun);const lastPred=data.predictions[lastKey];
-  if(lastPred&&lastPred.actual===null){const thisMon=new Date(sunday);thisMon.setDate(thisMon.getDate()-6);const actual=getWeekAllTotal(data,thisMon);lastPred.actual=actual;if(lastPred.preds&&Object.keys(lastPred.preds).length>0){let minDiff=Infinity,winners=[];Object.keys(lastPred.preds).forEach(p=>{const diff=Math.abs(lastPred.preds[p]-actual);if(diff<minDiff){minDiff=diff;winners=[p];}else if(diff===minDiff){winners.push(p);}});lastPred.winners=winners;}}
-  await saveAndSync(data);toast(`✅ 已保存 ${count} 位预测！中奖者已揭晓~`);renderPredict();
+  if(lastPred&&lastPred.actual===null){const thisMon=new Date(sunday);thisMon.setDate(thisMon.getDate()-6);const actual=getWeekAllTotal(data,thisMon);lastPred.actual=actual;if(lastPred.preds&&Object.keys(lastPred.preds).length>0){let minDiff=Infinity,winners=[];Object.keys(lastPred.preds).forEach(p=>{const diff=Math.abs(lastPred.preds[p]-actual);if(diff<minDiff){minDiff=diff;winners=[p]}else if(diff===minDiff){winners.push(p)}});lastPred.winners=winners}}
+  await saveAndSync(data);toast('saved '+count+' predictions');renderPredict()
 }
-function getWeekAllTotal(data,monday){let total=0;PERSONS.forEach(p=>{total+=getWeekTotal(data,p,monday);});return total;}
-function getWeekTotal(data,person,monday){let total=0;for(let i=0;i<6;i++){const d=new Date(monday);d.setDate(d.getDate()+i);const c=getPersonCheckin(data,person,fmtDate(d));if(c)total+=(c.study||0)+(c.exercise||0);}const sun=getSunday(monday);const sunStr=fmtDate(sun);const winnerKey=fmtDate(new Date(sun.getTime()-14*86400000));const predData=data.predictions[winnerKey];if(predData&&predData.winners&&predData.winners.includes(person)){const c=getPersonCheckin(data,person,sunStr);if(c)total+=(c.study||0)+(c.exercise||0);}return total;}
+function getWeekAllTotal(data,monday){let total=0;PERSONS.forEach(p=>{total+=getWeekTotal(data,p,monday)});return total}
+function getWeekTotal(data,person,monday){let total=0;for(let i=0;i<6;i++){const d=new Date(monday);d.setDate(d.getDate()+i);const c=getPersonCheckin(data,person,fmtDate(d));if(c)total+=(c.study||0)+(c.exercise||0)}const sun=getSunday(monday);const winnerKey=fmtDate(new Date(sun.getTime()-14*86400000));const predData=data.predictions[winnerKey];if(predData&&predData.winners&&predData.winners.includes(person)){const c=getPersonCheckin(data,person,fmtDate(sun));if(c)total+=(c.study||0)+(c.exercise||0)}return total}
 
-// ============ HISTORY ============
-function renderHistory(){const data=getLocal();let expHtml='';PERSONS.forEach(p=>{expHtml+=`<div style="margin-bottom:8px;"><button class="btn btn-outline btn-small" onclick="exportPerson('${p}')">📥 导出 ${p}</button></div>`;});expHtml+=`<button class="btn btn-outline btn-small" onclick="exportAll()">📥 导出全部汇总</button>`;document.getElementById('exportList').innerHTML=expHtml;const allDates=new Set();PERSONS.forEach(p=>{if(data.checkins[p])Object.keys(data.checkins[p]).forEach(d=>allDates.add(d));});const sorted=[...allDates].sort().reverse().slice(0,30);if(sorted.length===0){document.getElementById('historyOverview').innerHTML='<div style="text-align:center;color:var(--sub);padding:30px;font-size:14px;">📭 还没有打卡记录<br><span style="font-size:12px;">快去打卡吧，第一个记录从这里开始！</span></div>';}else{let tbl='<table class="week-table"><thead><tr><th>日期</th>';PERSONS.forEach(p=>{tbl+=`<th>${p.slice(0,2)}</th>`;});tbl+='<th>日总</th></tr></thead><tbody>';sorted.forEach(dStr=>{tbl+=`<tr><td>${dStr.slice(5)}</td>`;let dt=0;PERSONS.forEach(p=>{const c=getPersonCheckin(data,p,dStr);const sc=c?(c.study||0)+(c.exercise||0):0;dt+=sc;tbl+=`<td>${sc>0?sc.toFixed(1):'-'}</td>`;});tbl+=`<td><strong>${dt.toFixed(1)}</strong></td></tr>`;});tbl+='</tbody></table>';document.getElementById('historyOverview').innerHTML=tbl;}}
-function exportPerson(person){const data=getLocal();const records=data.checkins[person]||{};const dates=Object.keys(records).sort();let txt=`📋 ${person} 打卡记录\n${'═'.repeat(40)}\n\n`;let grand=0;dates.forEach(d=>{const r=records[d];const dObj=new Date(d+'T00:00:00');const dayName=DAYS[dObj.getDay()===0?6:dObj.getDay()-1];const sc=(r.study||0)+(r.exercise||0);grand+=sc;txt+=`📅 ${d} 星期${dayName}\n   学习：${r.study||0}分${r.sNote?' — '+r.sNote:''}\n   运动：${r.exercise||0}分${r.eNote?' — '+r.eNote:''}\n   小计：${sc.toFixed(1)}分\n\n`;});txt+=`${'─'.repeat(40)}\n📊 总计：${grand.toFixed(1)}分 | ${dates.length}天\n导出时间：${new Date().toLocaleString()}\n`;downloadFile(`${person}_打卡记录.txt`,txt);}
-function exportAll(){const data=getLocal();let txt=`📋 五仁打卡汇总\n${'═'.repeat(50)}\n\n`;PERSONS.forEach(p=>{const records=data.checkins[p]||{};const dates=Object.keys(records).sort();let total=0;dates.forEach(d=>{const r=records[d];total+=(r.study||0)+(r.exercise||0);});txt+=`${p}：${total.toFixed(1)}分 | ${dates.length}天\n`;});txt+=`\n导出时间：${new Date().toLocaleString()}\n`;downloadFile('五仁打卡_汇总.txt',txt);}
-function downloadFile(filename, content){
-  const blob=new Blob(['﻿'+content],{type:'text/plain;charset=utf-8'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download=filename;
-  document.body.appendChild(a);a.click();document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  toast(`✅ 已导出：${filename}`);
-}
+// ===== HISTORY =====
+function renderHistory(){const data=getLocal();let exp='';PERSONS.forEach(p=>{exp+='<div style="margin-bottom:8px"><button class="btn btn-outline btn-small" onclick="exportPerson(\''+p+'\')">'+p+'</button></div>'});exp+='<button class="btn btn-outline btn-small" onclick="exportAll()">导出全部</button>';document.getElementById('exportList').innerHTML=exp;const allDates=new Set();PERSONS.forEach(p=>{if(data.checkins[p])Object.keys(data.checkins[p]).forEach(d=>allDates.add(d))});const sorted=[...allDates].sort().reverse().slice(0,30);if(sorted.length===0){document.getElementById('historyOverview').innerHTML='<div style="text-align:center;color:var(--sub);padding:30px;font-size:14px">还没有打卡记录</div>'}else{let tbl='<table class="week-table"><thead><tr><th>日期</th>';PERSONS.forEach(p=>{tbl+='<th>'+p.slice(0,2)+'</th>'});tbl+='<th>日总</th></tr></thead><tbody>';sorted.forEach(dStr=>{tbl+='<tr><td>'+dStr.slice(5)+'</td>';let dt=0;PERSONS.forEach(p=>{const c=getPersonCheckin(data,p,dStr);const sc=c?(c.study||0)+(c.exercise||0):0;dt+=sc;tbl+='<td>'+(sc>0?sc.toFixed(1):'-')+'</td>'});tbl+='<td><strong>'+dt.toFixed(1)+'</strong></td></tr>'});tbl+='</tbody></table>';document.getElementById('historyOverview').innerHTML=tbl}}
+function exportPerson(person){const data=getLocal();const records=data.checkins[person]||{};const dates=Object.keys(records).sort();let txt=person+' 打卡记录\n'+'='.repeat(40)+'\n\n';let grand=0;dates.forEach(d=>{const r=records[d];const dObj=new Date(d+'T00:00:00');const dayName=DAYS[dObj.getDay()===0?6:dObj.getDay()-1];const sc=(r.study||0)+(r.exercise||0);grand+=sc;txt+=d+' 星期'+dayName+'\n  学习：'+(r.study||0)+'分'+(r.sNote?' - '+r.sNote:'')+'\n  运动：'+(r.exercise||0)+'分'+(r.eNote?' - '+r.eNote:'')+'\n  小计：'+sc.toFixed(1)+'分\n\n'});txt+='-'.repeat(40)+'\n总计：'+grand.toFixed(1)+'分 | '+dates.length+'天\n导出：'+new Date().toLocaleString()+'\n';downloadFile(person+'_打卡记录.txt',txt)}
+function exportAll(){const data=getLocal();let txt='五仁打卡汇总\n'+'='.repeat(50)+'\n\n';PERSONS.forEach(p=>{const records=data.checkins[p]||{};const dates=Object.keys(records).sort();let total=0;dates.forEach(d=>{const r=records[d];total+=(r.study||0)+(r.exercise||0)});txt+=p+'：'+total.toFixed(1)+'分 | '+dates.length+'天\n'});txt+='\n导出：'+new Date().toLocaleString()+'\n';downloadFile('五仁打卡_汇总.txt',txt)}
+function downloadFile(filename,content){const blob=new Blob(['﻿'+content],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);toast('已导出：'+filename)}
 
-// ============ TABS ============
-async function generateMissingAIReplies(data, dateStr) {
-  const aiCache = JSON.parse(localStorage.getItem('wuren_ai_cache')||'{}');
-  const hour = new Date().getHours();
-  const timeGreeting = hour<7?'清晨':hour<10?'上午':hour<13?'中午':hour<17?'下午':hour<20?'傍晚':'晚上';
+// ===== TABS =====
+function switchTab(idx){document.querySelectorAll('.page').forEach((p,i)=>p.classList.toggle('active',i===idx));document.querySelectorAll('nav.tabs button').forEach((b,i)=>b.classList.toggle('active',i===idx));if(idx===0)renderCheckin();if(idx===1)renderWeekly();if(idx===2)renderPredict();if(idx===3)renderHistory()}
+function renderAll(){renderCheckin();renderWeekly();renderPredict();renderHistory()}
 
-  for (const person of PERSONS) {
-    const existing = getPersonCheckin(data, person, dateStr);
-    if (!existing || ((existing.study||0)+(existing.exercise||0))===0) continue;
-    if (existing._aiReply) continue; // already has AI reply from shared data
-    if (aiCache[person+'|'+dateStr]) continue; // already cached locally
-
-    const streak = countStreak(data, person);
-    const weekDone = countWeeklyDone(data, person);
-    const day = new Date(dateStr+'T00:00:00').getDay()||7;
-
-    const aiReply = await callDeepSeek(person, existing.study||0, existing.sNote||'', existing.exercise||0, existing.eNote||'', streak, weekDone, day, timeGreeting);
-    if (aiReply) {
-      aiCache[person+'|'+dateStr] = {reply:aiReply, time:Date.now()};
-      localStorage.setItem('wuren_ai_cache', JSON.stringify(aiCache));
-      // Store in shared data and push
-      const sharedData = getLocal();
-      if (sharedData.checkins[person] && sharedData.checkins[person][dateStr]) {
-        sharedData.checkins[person][dateStr]._aiReply = aiReply;
-        sharedData.checkins[person][dateStr]._aiTime = Date.now();
-        saveLocal(sharedData);
-        // Silent push in background
-        pushRemote(sharedData).catch(()=>{});
-      }
-      // Update display
-      const encDiv = document.getElementById('dailyEncourage');
-      if (encDiv && document.getElementById('page-checkin').classList.contains('active')) {
-        encDiv.innerHTML = generateEncourage(getLocal(), dateStr, getCurrentUser());
-      }
-    }
-    await new Promise(r => setTimeout(r, 800));
-  }
-}
-
-function switchTab(idx)
-function switchTab(idx){document.querySelectorAll('.page').forEach((p,i)=>p.classList.toggle('active',i===idx));document.querySelectorAll('nav.tabs button').forEach((b,i)=>b.classList.toggle('active',i===idx));if(idx===0)renderCheckin();if(idx===1)renderWeekly();if(idx===2)renderPredict();if(idx===3)renderHistory();}
-
-// ============ INIT ============
+// ===== VERSION CHECK =====
 async function checkVersion(){
   try{
-    // Use API (more reliable in China than raw.githubusercontent.com)
-    const resp=await fetch(`https://api.github.com/repos/${REPO}/contents/version.json?t=${Date.now()}`,{
-      headers:{'Authorization':'token '+GITHUB_TOKEN,'Accept':'application/vnd.github.v3+json'},
-      cache:'no-cache'
-    });
-    if(resp.ok){
-      const json=await resp.json();
-      const remoteVer=JSON.parse(decodeURIComponent(escape(atob(json.content.replace(/\s/g,''))))).version;
-      const storedVer=parseInt(localStorage.getItem('wuren_ver')||'0');
-      if(remoteVer>storedVer){
-        const banner=document.createElement('div');
-        banner.id='verBanner';
-        banner.style.cssText='position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:300;background:#f0883e;color:#fff;padding:10px 20px;border-radius:0 0 16px 16px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);animation:bounce 0.5s ease;';
-        banner.textContent='🆕 有新版本！点此刷新 →';
-        banner.onclick=()=>{
-          localStorage.setItem('wuren_ver',String(remoteVer));
-          // Aggressively clear all caches
-          if('serviceWorker'in navigator){
-            navigator.serviceWorker.getRegistrations().then(regs=>regs.forEach(r=>r.unregister()));
-          }
-          if('caches'in window){
-            caches.keys().then(keys=>keys.forEach(k=>caches.delete(k)));
-          }
-          banner.textContent='✅ 已更新！';banner.style.background='#55a392';
-          setTimeout(()=>location.reload(true),200);
-        };
-        document.body.appendChild(banner);
-        setTimeout(()=>{const b=document.getElementById('verBanner');if(b)b.remove();},20000);
-      }
-    }
+    const resp=await fetch('https://api.github.com/repos/'+REPO+'/contents/version.json?t='+Date.now(),{headers:{Authorization:'token '+TK,Accept:'application/vnd.github.v3+json'},cache:'no-cache'});
+    if(resp.ok){const json=await resp.json();const rv=JSON.parse(decodeURIComponent(escape(atob(json.content.replace(/\s/g,''))))).version;const lv=parseInt(localStorage.getItem('wuren_ver')||'0');if(rv>lv){const b=document.createElement('div');b.id='verBanner';b.style.cssText='position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:300;background:#f0883e;color:#fff;padding:10px 20px;border-radius:0 0 16px 16px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);animation:bounce 0.5s ease';b.textContent='New version! Click to update';b.onclick=()=>{localStorage.setItem('wuren_ver',String(rv));if('serviceWorker'in navigator){navigator.serviceWorker.getRegistrations().then(regs=>regs.forEach(r=>r.unregister()))}if('caches'in window){caches.keys().then(keys=>keys.forEach(k=>caches.delete(k)))}b.textContent='Updated!';b.style.background='#55a392';setTimeout(()=>location.reload(true),200)};document.body.appendChild(b);setTimeout(()=>{const vb=document.getElementById('verBanner');if(vb)vb.remove()},30000)}else{localStorage.setItem('wuren_ver',String(rv))}}
   }catch(e){}
 }
 
+// ===== INIT =====
 async function init(){
-  const sel=document.getElementById('currentUser');sel.innerHTML='<option value="">选择自己</option>'+PERSONS.map(p=>`<option value="${p}">${AVATARS[p]||''} ${p}</option>`).join('');
+  const sel=document.getElementById('currentUser');sel.innerHTML='<option value="">选择自己</option>'+PERSONS.map(p=>'<option value="'+p+'">'+p+'</option>').join('');
   const saved=localStorage.getItem('wuren_me');if(saved&&PERSONS.includes(saved))sel.value=saved;
   document.getElementById('checkinDate').value=fmtDate(new Date());
   await syncNow(true);renderAll();
-  checkVersion(); // Check for updates in background
-  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
+  checkVersion();
+  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{})}
 }
 init();
 </script>
