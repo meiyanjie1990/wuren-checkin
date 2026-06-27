@@ -17,8 +17,8 @@
 :root {
   --parchment:#F7F3EC; --paper:#FEFCF8;
   --ink:#2C2416; --sepia:#8B7355; --faded:#B8A88A;
-  --sage:#7A9B7C; --moss:#5C724A; --dried-rose:#C07060;
-  --thread:#D4C9B2; --line:#E8E2D6;
+  --sage:#7A9B7C; --moss:#5C724A; --rose:#C07060;
+  --thread:#D4C9B2;
 }
 
 *{margin:0;padding:0;box-sizing:border-box}
@@ -26,30 +26,29 @@ body{
   font-family:'Inter',-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
   background:var(--parchment);color:var(--ink);
   min-height:100vh;padding-bottom:80px;
-  -webkit-font-smoothing:antialiased;
-  -webkit-tap-highlight-color:transparent;
+  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;
 }
 
-/* Herbarium silhouettes */
-body::before{
-  content:'🌿';position:fixed;top:8%;right:5%;font-size:80px;opacity:0.03;transform:rotate(-15deg);pointer-events:none;z-index:0;
-}
-body::after{
-  content:'🍂';position:fixed;bottom:12%;left:3%;font-size:100px;opacity:0.025;transform:rotate(10deg);pointer-events:none;z-index:0;
-}
+body::before{content:'🌿';position:fixed;top:6%;right:3%;font-size:60px;opacity:0.03;transform:rotate(-15deg);pointer-events:none;z-index:0}
+body::after{content:'🍂';position:fixed;bottom:8%;left:2%;font-size:80px;opacity:0.02;transform:rotate(12deg);pointer-events:none;z-index:0}
 
 header{
   background:rgba(247,243,236,0.9);backdrop-filter:blur(12px);
-  padding:16px 20px 12px;text-align:center;
+  padding:28px 20px 14px;text-align:center;
   position:sticky;top:0;z-index:10;border-bottom:1px solid var(--thread);
 }
-header h1{font-family:'EB Garamond',serif;font-size:28px;font-weight:600;letter-spacing:-0.3px}
-header .date{font-size:11px;color:var(--sepia);margin-top:2px;font-style:italic}
+header h1{font-family:'EB Garamond',serif;font-size:30px;font-weight:600;letter-spacing:-0.3px;margin-bottom:6px}
+header .date{font-size:12px;color:var(--sepia);font-style:italic}
 .user-bar{margin-top:8px;display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap}
 .user-bar select{
   padding:6px 12px;border:1px solid var(--thread);background:var(--paper);
-  font-size:14px;font-family:inherit;color:var(--ink);cursor:pointer;outline:none;
+  border-radius:10px;font-size:14px;font-family:inherit;color:var(--ink);cursor:pointer;outline:none;
 }
+.streak-badge{
+  font-size:10px;color:var(--sage);font-weight:600;
+  background:rgba(122,155,124,0.08);padding:3px 12px;border-radius:10px;
+}
+
 nav.tabs{
   display:flex;position:fixed;bottom:0;left:0;right:0;
   background:rgba(247,243,236,0.92);backdrop-filter:blur(12px);
@@ -64,77 +63,78 @@ nav.tabs button{
 }
 nav.tabs button .ico{font-size:18px}
 nav.tabs button.active{color:var(--sage)}
+
 .page{display:none;padding:14px 18px}
 .page.active{display:block;animation:fadeIn 0.25s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-8px)}}
 
 .card{
-  background:var(--paper);padding:16px;margin-bottom:10px;
-  border:1px solid var(--thread);box-shadow:0 1px 2px rgba(44,36,22,0.03);
+  background:var(--paper);border:1px solid var(--thread);
+  border-radius:18px;padding:18px;margin-bottom:10px;
 }
-.card.self{border:1px solid var(--sage);background:linear-gradient(180deg,rgba(122,155,124,0.04),var(--paper) 30%)}
-.card.self::before{
-  content:'今日标本';position:absolute;top:-9px;left:16px;
-  font-size:9px;text-transform:uppercase;letter-spacing:2px;
-  color:var(--sage);background:var(--parchment);padding:0 8px;
+.card.self{
+  border:1px solid var(--sage);
+  background:linear-gradient(180deg,rgba(122,155,124,0.04),var(--paper) 30%);
 }
 .card h3{font-family:'EB Garamond',serif;font-size:17px;font-weight:600;margin-bottom:10px}
+
 .person-name{font-size:15px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.person-avatar{width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:16px}
+.person-avatar{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:14px}
 
 .score-row{display:flex;gap:10px;margin-bottom:8px}
 .score-block{flex:1}
 .score-block .label{font-size:11px;color:var(--sepia);margin-bottom:5px;font-weight:500}
 .score-block .label .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle}
 .score-block .label .dot.s{background:var(--sage)}
-.score-block .label .dot.e{background:var(--dried-rose)}
+.score-block .label .dot.e{background:var(--rose)}
 .score-btns{display:flex;gap:4px}
 .score-btns button{
   flex:1;min-width:36px;padding:12px 3px;border:1px solid var(--thread);
-  background:var(--paper);font-family:'EB Garamond',serif;font-size:16px;font-weight:500;
+  border-radius:10px;background:var(--paper);
+  font-family:'EB Garamond',serif;font-size:16px;font-weight:500;
   color:var(--ink);cursor:pointer;transition:all 0.15s;
 }
 .score-btns button:hover{border-color:var(--sage)}
 .score-btns button.sel{background:var(--sage);border-color:var(--sage);color:#FFF}
 
 .note-input{
-  width:100%;padding:12px;border:1px solid var(--thread);font-size:13px;
-  margin-top:6px;font-family:inherit;resize:vertical;height:60px;
+  width:100%;padding:12px;border:1px solid var(--thread);border-radius:12px;
+  font-size:13px;margin-top:6px;font-family:inherit;resize:vertical;height:60px;
   background:var(--paper);color:var(--ink);outline:none;font-style:italic;
 }
 .note-input:focus{border-color:var(--sage)}
 .note-input::placeholder{color:var(--faded);font-style:italic}
 
 .done-badge{display:inline-block;color:var(--sage);font-size:10px;padding:2px 8px;font-weight:500;border-bottom:1px solid var(--sage)}
-.sunday-lock{text-align:center;color:var(--dried-rose);font-size:13px;padding:12px;background:rgba(192,112,96,0.06);margin:10px 0;line-height:1.6}
-.sunday-winner{text-align:center;color:var(--sage);font-size:13px;padding:12px;background:rgba(122,155,124,0.06);margin:10px 0;line-height:1.6}
+.sunday-lock{text-align:center;color:var(--rose);font-size:13px;padding:12px;background:rgba(192,112,96,0.06);border-radius:14px;margin:10px 0;line-height:1.6}
+.sunday-winner{text-align:center;color:var(--sage);font-size:13px;padding:12px;background:rgba(122,155,124,0.06);border-radius:14px;margin:10px 0;line-height:1.6}
 
 .week-table{width:100%;border-collapse:collapse;font-size:12px}
 .week-table th,.week-table td{padding:6px 3px;text-align:center;border-bottom:1px dotted var(--thread)}
 .week-table th{font-weight:600;font-size:11px;color:var(--sepia);font-family:'EB Garamond',serif}
 .week-table td:first-child{text-align:left;font-weight:500}
-.week-table .sun-col{color:var(--dried-rose)}
-.week-table .highlight{background:rgba(122,155,124,0.06);font-weight:600}
+.week-table .sun-col{color:var(--rose)}
+.week-table .highlight{background:rgba(122,155,124,0.06);font-weight:600;border-radius:6px}
 
-.btn{display:inline-block;padding:10px 20px;border:none;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;letter-spacing:0.5px;transition:all 0.15s}
+.btn{display:inline-block;padding:12px 22px;border:none;border-radius:14px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s}
 .btn-primary{background:var(--sage);color:#FFF;width:100%}
 .btn-primary:hover{background:var(--moss)}
 .btn-saved{background:var(--sepia)!important;color:#FFF!important;pointer-events:none}
-.btn-outline{background:transparent;border:1px solid var(--thread);color:var(--sepia)}
+.btn-outline{background:transparent;border:1px solid var(--thread);color:var(--sepia);border-radius:12px}
 .btn-outline:hover{border-color:var(--sage);color:var(--sage)}
-.btn-small{padding:6px 14px;font-size:12px}
+.btn-small{padding:6px 14px;font-size:12px;border-radius:10px}
 .btn-block{display:block;width:100%}
 .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 
 .encourage-box{
   background:var(--paper);border:1px solid var(--thread);
-  padding:16px 18px;margin:12px 0;font-size:14px;line-height:1.8;
-  box-shadow:0 1px 2px rgba(44,36,22,0.03);
+  border-radius:22px;padding:20px;margin:12px 0;font-size:14px;line-height:1.8;
+  text-align:center;
 }
-.encourage-box .greeting{font-family:'EB Garamond',serif;font-size:20px;font-weight:600;margin-bottom:6px}
+.encourage-box .greeting{font-family:'EB Garamond',serif;font-size:20px;font-weight:600;margin-bottom:8px}
 .encourage-box .body{color:#3D3528}
-.encourage-box .humor{color:var(--sepia);font-style:italic;margin-top:6px;font-size:13px}
+.encourage-box .humor{color:var(--sepia);font-style:italic;margin-top:8px;font-size:13px}
 
 .summary-card{margin-top:10px}
 .summary-card .person-line{padding:6px 0;border-bottom:1px dotted var(--thread);font-size:13px}
@@ -142,19 +142,19 @@ nav.tabs button.active{color:var(--sage)}
 
 .pred-input-row{display:flex;align-items:center;gap:10px;margin:6px 0}
 .pred-input-row input{
-  width:70px;padding:9px;border:1px solid var(--thread);font-size:15px;
-  text-align:center;font-family:'EB Garamond',serif;font-weight:500;background:var(--paper);
+  width:70px;padding:9px;border:1px solid var(--thread);border-radius:10px;
+  font-size:15px;text-align:center;font-family:'EB Garamond',serif;font-weight:500;background:var(--paper);
 }
 .pred-input-row .name{flex:1;font-size:14px;font-weight:500}
 
 .toast{
   position:fixed;top:20px;left:50%;transform:translateX(-50%);
-  background:var(--ink);color:var(--paper);padding:12px 24px;border-radius:2px;
+  background:var(--ink);color:var(--paper);padding:12px 24px;border-radius:20px;
   font-size:13px;z-index:200;opacity:0;transition:opacity 0.3s;pointer-events:none;
 }
 .toast.show{opacity:1}
 .sync-bar{font-size:10px;color:var(--faded);text-align:center;margin-top:5px;min-height:14px}
-.ai-tag{font-size:9px;color:var(--sepia);border:1px solid var(--thread);padding:1px 6px;margin-left:4px;vertical-align:middle;font-weight:500}
+.ai-tag{font-size:9px;color:var(--sepia);border:1px solid var(--thread);border-radius:6px;padding:1px 6px;margin-left:4px;vertical-align:middle;font-weight:500}
 .other-ai{font-size:12px;color:var(--sepia);line-height:1.6;font-style:italic}
 
 @media(min-width:600px){
@@ -166,13 +166,13 @@ nav.tabs button.active{color:var(--sage)}
 <body>
 
 <header>
-<h1>五仁打卡 <span style="font-size:10px;color:var(--faded);font-family:'Inter',sans-serif">v36</span></h1>
+<h1>五仁打卡 <span style="font-size:10px;color:var(--faded);font-family:'Inter',sans-serif">v37</span></h1>
 <div class="date" id="headerDate"></div>
 <div class="user-bar">
-<span style="font-size:12px;color:var(--sepia);font-style:italic">👤 我是</span>
+<span style="font-size:12px;color:var(--sepia);font-style:italic">👤</span>
 <select id="currentUser" onchange="onUserSwitch()"><option value="">选择自己</option></select>
+<span class="streak-badge" id="streakBadge"></span>
 </div>
-<div class="sync-bar" id="syncBar"></div>
 </header>
 <div class="toast" id="toast"></div>
 
@@ -180,8 +180,8 @@ nav.tabs button.active{color:var(--sage)}
 <div class="encourage-box" id="dailyEncourage"></div>
 <div id="sundayNotice"></div>
 <div style="text-align:center;margin-bottom:10px;font-size:12px;color:var(--sepia);font-style:italic">
-📅 <input type="date" id="checkinDate" onchange="renderCheckin()" style="padding:6px 10px;border:1px solid var(--thread);font-family:inherit;font-size:12px;background:var(--paper);color:var(--ink)">
-<span id="dateBadge" style="font-size:10px;color:var(--dried-rose);font-weight:600;margin-left:6px"></span>
+📅 <input type="date" id="checkinDate" onchange="renderCheckin()" style="padding:6px 10px;border:1px solid var(--thread);border-radius:8px;font-family:inherit;font-size:12px;background:var(--paper);color:var(--ink)">
+<span id="dateBadge" style="font-size:10px;color:var(--rose);font-weight:600;margin-left:6px"></span>
 </div>
 <div id="checkinArea"></div></div>
 
@@ -403,7 +403,7 @@ function renderCheckin(){
   var nd=document.getElementById('sundayNotice');
   nd.innerHTML=isS?(sw.length>0?'<div class="sunday-winner">周日福利！中奖者：<strong>'+sw.join('、')+'</strong> 可以打卡</div>':'<div class="sunday-lock">周日休息日。等待预测中奖者揭晓~</div>'):'';
 
-  document.getElementById('dailyEncourage').innerHTML=genEnc(data,ds,user);
+  document.getElementById('dailyEncourage').innerHTML=genEnc(data,ds,user);var sb=document.getElementById('streakBadge');if(sb){var strk=countStreak(data,user);if(strk>=3)sb.textContent='连续'+strk+'天';else sb.textContent='';}
 
   var html='';
   if(!user)html+='<div style="text-align:center;color:var(--sub);padding:30px">请先选择我是谁</div>';
