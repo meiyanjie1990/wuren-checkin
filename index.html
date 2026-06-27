@@ -329,7 +329,19 @@ async function pushRemote(data){
 async function syncNow(silent){
   const bar=document.getElementById('syncBar');if(bar)bar.textContent='⏳ 同步中…';
   const remote=await fetchRemoteData();
-  if(remote){saveLocal(remote);if(bar)bar.textContent='☁️ 已同步';if(!silent){renderAll();toast('✅ 数据已同步');}setTimeout(()=>{if(bar)bar.textContent='';},3000);return true;}
+  if(remote){
+    // Merge: keep local AI replies that remote doesn't have
+    const local = getLocal();
+    if(local.checkins) for(const p in local.checkins) for(const d in local.checkins[p]) {
+      const le = local.checkins[p][d], re = remote.checkins?.[p]?.[d];
+      if(le && le._aiReply && re && !re._aiReply) {
+        if(!remote.checkins[p]) remote.checkins[p] = {};
+        if(!remote.checkins[p][d]) remote.checkins[p][d] = {};
+        remote.checkins[p][d]._aiReply = le._aiReply;
+        remote.checkins[p][d]._aiTime = le._aiTime;
+      }
+    }
+    saveLocal(remote);if(bar)bar.textContent='☁️ 已同步';if(!silent){renderAll();toast('✅ 数据已同步');}setTimeout(()=>{if(bar)bar.textContent='';},3000);return true;}
   else{if(bar)bar.textContent='⚠️ 离线模式';if(!silent)toast('⚠️ 无法连接云端，使用本地数据');setTimeout(()=>{if(bar)bar.textContent='';},4000);return false;}
 }
 async function saveAndSync(data){saveLocal(data);const ok=await pushRemote(data);const bar=document.getElementById('syncBar');if(ok){if(bar)bar.textContent='☁️ 已同步';setTimeout(()=>{if(bar)bar.textContent='';},3000);}else{if(bar)bar.textContent='⚠️ 已存本地，联网后自动同步';setTimeout(()=>{if(bar)bar.textContent='';},5000);}return ok;}
@@ -811,6 +823,45 @@ function downloadFile(filename, content){
 }
 
 // ============ TABS ============
+async function generateMissingAIReplies(data, dateStr) {
+  const aiCache = JSON.parse(localStorage.getItem('wuren_ai_cache')||'{}');
+  const hour = new Date().getHours();
+  const timeGreeting = hour<7?'清晨':hour<10?'上午':hour<13?'中午':hour<17?'下午':hour<20?'傍晚':'晚上';
+
+  for (const person of PERSONS) {
+    const existing = getPersonCheckin(data, person, dateStr);
+    if (!existing || ((existing.study||0)+(existing.exercise||0))===0) continue;
+    if (existing._aiReply) continue; // already has AI reply from shared data
+    if (aiCache[person+'|'+dateStr]) continue; // already cached locally
+
+    const streak = countStreak(data, person);
+    const weekDone = countWeeklyDone(data, person);
+    const day = new Date(dateStr+'T00:00:00').getDay()||7;
+
+    const aiReply = await callDeepSeek(person, existing.study||0, existing.sNote||'', existing.exercise||0, existing.eNote||'', streak, weekDone, day, timeGreeting);
+    if (aiReply) {
+      aiCache[person+'|'+dateStr] = {reply:aiReply, time:Date.now()};
+      localStorage.setItem('wuren_ai_cache', JSON.stringify(aiCache));
+      // Store in shared data and push
+      const sharedData = getLocal();
+      if (sharedData.checkins[person] && sharedData.checkins[person][dateStr]) {
+        sharedData.checkins[person][dateStr]._aiReply = aiReply;
+        sharedData.checkins[person][dateStr]._aiTime = Date.now();
+        saveLocal(sharedData);
+        // Silent push in background
+        pushRemote(sharedData).catch(()=>{});
+      }
+      // Update display
+      const encDiv = document.getElementById('dailyEncourage');
+      if (encDiv && document.getElementById('page-checkin').classList.contains('active')) {
+        encDiv.innerHTML = generateEncourage(getLocal(), dateStr, getCurrentUser());
+      }
+    }
+    await new Promise(r => setTimeout(r, 800));
+  }
+}
+
+function switchTab(idx)
 function switchTab(idx){document.querySelectorAll('.page').forEach((p,i)=>p.classList.toggle('active',i===idx));document.querySelectorAll('nav.tabs button').forEach((b,i)=>b.classList.toggle('active',i===idx));if(idx===0)renderCheckin();if(idx===1)renderWeekly();if(idx===2)renderPredict();if(idx===3)renderHistory();}
 
 // ============ INIT ============
