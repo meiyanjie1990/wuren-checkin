@@ -186,11 +186,8 @@ async function syncNow(silent){
   fillMissingAI(dateStr);
   setTimeout(()=>{if(bar)bar.textContent=''},4000);return false}
 }
-async function saveAndSync(data){saveLocal(data);const ok=await pushRemote(data);const bar=document.getElementById('syncBar');if(ok){bar.textContent='OK';// Auto-generate AI for anyone without it
-  fillMissingAI(dateStr);
-  setTimeout(()=>{bar.textContent=''},3000)}else{bar.textContent='saved locally';// Auto-generate AI for anyone without it
-  fillMissingAI(dateStr);
-  setTimeout(()=>{bar.textContent=''},5000)};return ok}
+async function saveAndSync(data){saveLocal(data);const ok=await pushRemote(data);const bar=document.getElementById('syncBar');if(ok){bar.textContent='OK';setTimeout(()=>{bar.textContent=''},3000)}else{bar.textContent='saved locally';setTimeout(()=>{bar.textContent=''},5000)};return ok}
+
 function onUserSwitch(){const user=getCurrentUser();if(user){localStorage.setItem('wuren_me',user);toast(user+'!')}renderCheckin()}
 
 // ===== AI (DeepSeek) =====
@@ -262,10 +259,12 @@ function renderCheckin(){
   document.getElementById('checkinArea').innerHTML=html||'<div style="text-align:center;color:var(--sub);padding:20px">等待第一位行动派</div>';
 
   // Add others' encouragement
-  // Auto-generate AI for anyone without it
-  fillMissingAI(dateStr);
   setTimeout(()=>{
+    // Auto-generate AI for anyone without it
+    fillMissingAI(checkinDateStr);
     let othersEnc='';
+    // Auto-generate AI for anyone without it
+    fillMissingAI(checkinDateStr);
     PERSONS.forEach(p=>{if(p!==currentUser){const c=getPersonCheckin(data,p,checkinDateStr);if(c&&((c.study||0)+(c.exercise||0))>0){const mini=generateMiniEnc(data,checkinDateStr,p);if(mini)othersEnc+=mini}}});
     if(othersEnc){const encDiv=document.getElementById('dailyEncourage');encDiv.innerHTML+='<div style="margin-top:14px;border-top:1px dashed var(--border);padding-top:10px"><div style="font-size:11px;color:var(--sub);margin-bottom:6px">其他伙伴今日打卡</div>'+othersEnc+'</div>'}
   },500);
