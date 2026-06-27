@@ -188,159 +188,24 @@ function onUserSwitch(){const user=getCurrentUser();if(user){localStorage.setIte
 // ===== AI (DeepSeek) =====
 async function callAI(personName,studyScore,studyNote,exerciseScore,exerciseNote,streak,weekDone,dayOfWeek,timeGreeting){
   const parts=[];
-  if(studyScore>0)parts.push('学习'+studyScore+'分'+(studyNote?'，内容：'+studyNote:''));
-  if(exerciseScore>0)parts.push('运动'+exerciseScore+'分'+(exerciseNote?'，内容：'+exerciseNote:''));
+  if(studyScore>0)parts.push('学习'+studyScore+'分'+(studyNote?'：'+studyNote:''));
+  if(exerciseScore>0)parts.push('运动'+exerciseScore+'分'+(exerciseNote?'：'+exerciseNote:''));
   if(parts.length===0)return null;
-  const prompt='你是一个打卡App里的鼓励助手，给30-40岁的自律成年人写温暖的打卡反馈。口语化，像朋友之间。40-60字，轻松自然，可以有一点冷幽默。直接给回复。\n时间：'+timeGreeting+'\n用户：'+personName+'\n'+parts.join('；')+'\n连续打卡：'+streak+'天\n本周已打卡：'+weekDone+'天\n根据ta写的内容给定制反馈，回应ta具体做了什么。';
+  const prompt='给30-40岁自律成年人写鼓励。口语化带点损友式冷幽默。要具体回应ta做的事。50-80字。直接回复。
+时间：'+timeGreeting+'
+用户：'+personName+'
+'+parts.join('；')+'
+连续：'+streak+'天 本周：'+weekDone+'天';
   try{
-    const resp=await fetch('https://api.deepseek.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+DS_KEY},body:JSON.stringify({model:'deepseek-chat',messages:[{role:'user',content:prompt}],max_tokens:150,temperature:0.9}),signal:(()=>{const c=new AbortController();setTimeout(()=>c.abort(),8000);return c.signal})()});
-    if(!resp.ok)return null;
+    const resp=await fetch('https://api.deepseek.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+DS_KEY},body:JSON.stringify({model:'deepseek-chat',messages:[{role:'user',content:prompt}],max_tokens:180,temperature:0.95})});
+    if(!resp.ok){console.log('AI status:',resp.status);return null}
     const data=await resp.json();
     const reply=data.choices?.[0]?.message?.content?.trim();
     return (reply&&reply.length>2)?reply:null;
-  }catch(e){return null}
+  }catch(e){console.log('AI err:',e.message);return null}
 }
 
-// ===== ENCOURAGEMENT =====
-function noteReaction(note,type){
-  if(!note||note.trim()==='')return null;
-  const n=note.toLowerCase();
-  const reactions={
-    study:[
-      {kw:['英语','单词','语法','阅读','听力','口语','作文','翻译','english'],r:['英语是个慢功夫，今天这步走得很稳','语言这东西，每天碰一点比周末猛攻有效得多','学语言的快乐：有一天突然发现听懂了']},
-      {kw:['书','看书','读','页','章','小说','文学','历史','哲学','传记'],r:['阅读是最低成本的旅行，今天你又出发了','一本书、半小时，比刷手机充实太多']},
-      {kw:['考试','复习','备考','考证','职称'],r:['成年人主动学习，比学生时代的被动用功酷多了','不是为了分数，是为了那个更好的自己']},
-      {kw:['课','上课','听课','网课','教程','课程','得到','樊登','喜马拉雅'],r:['保持学习的状态，本身就是一种能力','听课也是学习——耳朵在输入，大脑在更新']},
-      {kw:['笔记','整理','思维导图','总结','复盘'],r:['会整理的人，学一遍顶别人三遍','整理笔记=给大脑做收纳']},
-      {kw:['代码','编程','python','java','程序'],r:['写代码的人，逻辑和耐心都差不了','一行行代码，构建的是另一个世界']},
-      {kw:['播客','听书','音频','电台'],r:['耳朵学习法——通勤时间也不浪费','听进去的东西，某天会不经意冒出来帮你']},
-      {kw:['纪录片','电影','剧','ted','演讲'],r:['好片子也是学习。视角打开了，比记住知识点更重要','看世界的方式不止一种']},
-      {kw:['画画','绘画','素描','水彩','书法','练字','手账'],r:['拿起笔就是另一种表达。创作让人安静','手的记忆比大脑更持久']},
-      {kw:['乐器','钢琴','吉他','弹琴','练琴','小提琴','古筝','音乐'],r:['音乐是大脑的体操，手指的记忆比想象中更强大','练琴的人，耐心和毅力都是一流的']},
-      {kw:['博物馆','看展','展览','美术馆','画廊'],r:['逛博物馆是最好的通识教育——站在时间面前，人会变得谦虚','看展的人，眼睛里装着另一个世界']},
-      {kw:['写作','日记','写东西','公众号','文章','随笔'],r:['把想法写成文字，是对思考的二次加工','写作不是为了给别人看——是给自己整理思绪']},
-      {kw:['冥想','正念','静坐','打坐'],r:['冥想不是发呆，是给大脑做深度清洁','安静下来的十分钟，比忙忙碌碌一小时还有效']},
-      {kw:['摄影','拍照','扫街'],r:['摄影是发现美的训练——你看世界的角度会不一样','按下快门的瞬间，是跟这个世界的对话']},
-      {kw:['做菜','做饭','烘焙','料理','下厨'],r:['厨房里的创造力，比办公室还多','做饭是最高级的正念']},
-      {kw:['投资','理财','股票','基金','财报','经济学'],r:['理财也是学习——为未来铺的每一块砖都算数','搞懂钱的规律，是成年人最重要的功课之一']},
-      {kw:['育儿','亲子','孩子','带娃','陪娃','绘本','启蒙'],r:['最好的教育是陪伴。今天又多陪了一程','育儿也是育己——孩子让你成为更好的人']},
-      {kw:['养生','中医','艾灸','喝茶','茶道'],r:['会养的人，都在默默变好','三十岁以后，养生不是选项，是责任']},
-      {kw:['宠物','猫','狗','猫咪','狗狗','遛狗','撸猫'],r:['伺候主子的同时也动起来了','宠物在乎的不是你有多少钱，是你在不在']},
-      {kw:['花','多肉','养花','绿植','盆栽','花园'],r:['养花的人和植物一起生长','绿植用生长回应你的照顾']},
-      {kw:['旅行','自驾','出游','攻略','酒店','机票'],r:['世界是一本书，不旅行只读了一页','做攻略也是学习——地理历史美食全学了']},
-      {kw:['装修','搬家','收纳','整理','断舍离'],r:['家是待最久的地方，花时间打理值得','断舍离的不只是物品，还有心里的杂乱']},
-      {kw:['追剧','看剧','综艺','b站','豆瓣'],r:['好片子也是养分——故事里藏着别人的人生','好的故事会悄悄改变你看世界的方式']},
-      {kw:['聚会','朋友','饭局','聚餐','闺蜜','社交'],r:['维持友情也是投资——比股票稳','成年人的友谊靠经营']},
-      {kw:['加班','出差','项目','汇报','开会','工作'],r:['工作也是学习——实战中学的最扎实','忙完工作还能打卡，自律已刻进DNA']},
-      {kw:['公益','志愿者','环保','捐赠'],r:['给别人带去什么，自己得到的更多','善良锻炼的是心灵']},
-      {kw:['咖啡','手冲','拉花','品酒'],r:['生活需要仪式感——冲杯好咖啡的十分钟是给自己的礼物','品味是一点一点积累的']},
-    ],
-    exercise:[
-      {kw:['跑','步','公里','km','配速','慢跑','晨跑','夜跑'],r:['跑步的多巴胺仅次于恋爱！今天又赚到了','每一步都不是白跑的——变成体力、心情和体检单上的好数字']},
-      {kw:['瑜伽','拉伸','柔韧','冥想','普拉提'],r:['瑜伽人的从容，是那种"我不急但我一直在"的优雅','拉伸的不只是身体，还有今天一整天积累的紧张']},
-      {kw:['跳绳'],r:['跳绳是性价比最高的运动——一根绳，全身燃','10分钟跳绳=半小时慢跑，今天又事半功倍了']},
-      {kw:['游泳','游','泳池'],r:['游泳是唯一不会出汗的运动——但消耗一点不少','在水里的时光，世界都安静了']},
-      {kw:['健身','力量','举','哑铃','器械','深蹲','俯卧撑','卧推','硬拉'],r:['铁片不会辜负你。今天练的每一组都在塑造更好的自己','肌肉酸痛的第二天，就是成长发生的时刻']},
-      {kw:['走路','散步','步','遛','逛','溜达'],r:['走路是最被低估的运动。日行万步的人，身体不会差','散步的哲学：慢下来，才能看见平时错过的风景']},
-      {kw:['骑车','单车','骑行','自行车','动感单车'],r:['风从耳边过，自由从心里来。骑起来！','两个轮子带你去的地方，四个轮子永远到不了']},
-      {kw:['跳操','操','hiit','tabata','有氧','燃脂','跳舞'],r:['成年人能挤出时间跳操，本身就是一种胜利','跟着音乐流汗，时间过得比刷手机快']},
-      {kw:['爬山','登山','徒步','户外','郊游','踏青'],r:['山就在那里——你去了，它就矮了一截','户外是最好的健身房，还不用交会费']},
-      {kw:['篮球','足球','网球','羽毛球','乒乓','壁球'],r:['球类运动的快乐：专注、出汗、什么烦心事都忘了','跟球较劲的过程，其实是在跟自己较劲']},
-      {kw:['拳击','搏击','泰拳','格斗'],r:['打拳是最好的解压——沙袋不会还嘴，但会让你很累','每个出拳的人都在打碎今天的压力']},
-      {kw:['带娃','遛娃','抱娃','陪娃'],r:['带娃是最高强度的有氧运动——懂的都懂','今天运动量够不够？看看手腕上的娃就知道了']},
-      {kw:['家务','打扫','拖地','擦','收拾','大扫除'],r:['谁说家务不是运动？拖完地谁累谁知道','又干净了又消耗了——一举两得的运动方式']},
-      {kw:['逛街','逛商场','购物'],r:['逛街也是运动——走了一万步还不算？','购物+运动，完美组合（就是钱包可能不太高兴）']},
-      {kw:['滑板','冲浪','滑雪','攀岩','蹦床','飞盘'],r:['会玩的人永远不会老！这项运动听起来就很酷','成年人还能找到新爱好，这本身就是一种生命力']},
-      {kw:['拉伸','拉筋','开肩','泡沫轴'],r:['会拉伸的人，身体比同龄人年轻十岁','那些酸痛的部位，谢谢你今天照顾了它们']},
-      {kw:['爬楼','上楼','楼梯'],r:['不坐电梯爬楼梯——每一个微小选择都在塑造你','爬楼的消耗比想象中大，今天腿在谢谢你']},
-      {kw:['广场舞','太极','八段锦','五禽戏','气功'],r:['传统养生功法是老祖宗的智慧——温和但持久','国潮养生！二十年后你会感谢现在的自己']},
-      {kw:['划船','皮划艇','桨板'],r:['水上运动的人，心胸跟水面一样开阔','划船的节奏感——用力、放松、用力、放松，就是人生']},
-      {kw:['心跳','躺着','呼吸','睡觉','看','想'],r:['哈哈，如果这算运动的话——心态第一！','能承认自己没动，也是一种坦诚😂']},
-    ]
-  };
-  const list=reactions[type]||[];
-  for(let item of list){if(item.kw.some(k=>n.includes(k))){const seed=hashStr(note+type);return item.r[seed%item.r.length]}}
-  // Fallback
-  const cleaned=note.replace(/[，,。.!！？?、\s~～—\-…]+/g,' ').replace(/(今天|了|的|也|很|都|是|在|和|与|吧|呢|啊|哦|哈|嗯|一个|一下|什么|怎么|这个|那个)/g,' ').trim();
-  const words=cleaned.split(/[\s]+/).filter(w=>w.length>=2&&!/^[a-zA-Z0-9]+$/.test(w));
-  const hook=words.length>0?words[0].slice(0,8):'';
-  if(!hook||hook.length<2)return null;
-  const fallbacks={study:['看到你提到"'+hook+'"——学习就是由这些具体的小事组成的','"'+hook+'"——有意思。学什么都不白学'],exercise:['"'+hook+'"——不管是什么形式，动了就是赢了','用自己的方式保持运动——"'+hook+'"听起来不错']};
-  const pool=fallbacks[type]||fallbacks.study;
-  return pool[hashStr(note+type+'fb')%pool.length];
-}
-
-function generateEncourage(data,dateStr,currentUser){
-  const d=new Date(dateStr+'T00:00:00');
-  const hour=new Date().getHours();
-  const greetings={early:['早安呀','清晨好'],morning:['上午好','咖啡时间'],noon:['中午好','午安'],afternoon:['下午好','午后时光'],evening:['傍晚好'],night:['夜深了','晚间好']};
-  let tgKey=hour<7?'early':hour<10?'morning':hour<13?'noon':hour<17?'afternoon':hour<20?'evening':'night';
-  const gs=greetings[tgKey];
-  const greeting=gs[hashStr(currentUser+dateStr)%gs.length];
-
-  if(d.getDay()===0)return '<div class="greeting">'+greeting+'，'+currentUser+'</div><div class="body">周日不打卡。一周的坚持值得奖励自己。<br><strong>会休息的人，才能跑更远的路。</strong></div><div class="humor">今天唯一的任务：让自己舒服</div>';
-  if(!currentUser)return '<div class="greeting">'+greeting+'！</div><div class="body">选一下你是谁，然后开始打卡吧~</div>';
-
-  const existing=getPersonCheckin(data,currentUser,dateStr);
-  const streak=countStreak(data,currentUser);
-  const weekDone=countWeeklyDone(data,currentUser);
-  const dayOfWeek=d.getDay()||7;
-
-  if(existing){
-    const total=(existing.study||0)+(existing.exercise||0);
-    const st=existing.study||0,et=existing.exercise||0;
-    const sNote=existing.sNote||'',eNote=existing.eNote||'';
-
-    // AI reply from shared data
-    if(existing._ai){return '<div class="greeting">'+greeting+'，'+currentUser+'！ <span style="font-size:10px;background:#f0883e;color:#fff;padding:1px 6px;border-radius:8px;vertical-align:middle">AI</span></div><div class="body">'+existing._ai+'</div>'}
-
-    const sReaction=st>0?noteReaction(sNote,'study'):null;
-    const eReaction=et>0?noteReaction(eNote,'exercise'):null;
-    const seed=hashStr(currentUser+dateStr);
-    let parts=[],humor='';
-
-    if(total>=3.5){parts=['<strong>'+total.toFixed(1)+'分！</strong>今天属于让人羡慕的自律人级别',st>0&&et>0?'学习和运动双拉满，自律额度已用满':'专注一项做到极致']}
-    else if(total>=2){parts=['<strong>'+total.toFixed(1)+'分</strong>，扎实的一天！','两小时的有效投入，一年就是730小时']}
-    else if(total>=1){parts=['<strong>'+total.toFixed(1)+'分</strong>，小步快跑','重要的不是拿多少分，是又一次选择了行动']}
-    else{parts=['今天也打卡了，哪怕只是一小步'];humor='告诉明天的自己——你看，我连这么小的日子都没放弃'}
-
-    if(sReaction)parts.push(sReaction);
-    if(eReaction)parts.push(eReaction);
-    if(streak>=14)parts.push('连续<strong>'+streak+'</strong>天！节奏刻进肌肉记忆了吧？');
-    else if(streak>=7)parts.push('连续<strong>'+streak+'</strong>天！这就是"靠谱"两个字的最好解释');
-    else if(streak>=3)parts.push('连续<strong>'+streak+'</strong>天了，势头在起来');
-
-    if(!humor){humor=['世间万物都会背叛你，但每天0.5分的积累不会','打卡就像种树——每天浇一点水，一年后回头看，一片森林','三十岁以后的坚持，是给自己的交代'][seed%3]}
-
-    return '<div class="greeting">'+greeting+'，'+currentUser+'！</div><div class="body">'+parts.join('<br>')+'</div><div class="humor">'+humor+'</div>';
-  }
-
-  // Not yet checked in
-  let tips=[],humor='';
-  const s2=hashStr(currentUser+dateStr+'pre');
-  if(dayOfWeek===1){tips=['周一是最需要勇气的一天——你敢开始，这周就赢了一半','新的一周，给自己一个小目标'];humor='周一：一周中最被误解的一天'}
-  else if(dayOfWeek===5||dayOfWeek===6){tips=['周末的诱惑很大，但打开这个页面本身就已经赢了第一步','周五六的每一分都有双倍含金量'];humor='周五：身体在工位，灵魂已经在周末。但你还记得打开打卡页面——这就是纪律'}
-  else{tips=['打卡不是考试，不需要每次都满分。来了就是胜利','很多人高估一天能做的事，低估一百天能积累的事'];humor='拖延症的本质是——你不知道开始之后有多爽'}
-
-  if(streak>=7)tips.push('连续<strong>'+streak+'</strong>天了——今天再加一天！');
-  return '<div class="greeting">'+greeting+'，'+currentUser+'！</div><div class="body">'+tips.join('<br><br>')+'</div><div class="humor">'+humor+'</div>';
-}
-
-function generateMiniEnc(data,dateStr,person){
-  const existing=getPersonCheckin(data,person,dateStr);
-  if(!existing)return'';
-  const total=(existing.study||0)+(existing.exercise||0);
-  if(total===0)return'';
-  const avatar=AVATARS[person]||'👤';
-  if(existing._ai){const s=existing._ai.length>40?existing._ai.slice(0,40)+'...':existing._ai;return'<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;padding:4px 0;border-bottom:1px solid #f5f5f5"><span style="font-size:16px">'+avatar+'</span><span><strong>'+person+'</strong> '+total.toFixed(1)+'分 <span style="font-size:9px;background:#e8e8e8;color:#888;padding:1px 4px;border-radius:6px">AI</span><br><span style="color:#5c4d38">'+s+'</span></span></div>'}
-  const r1=(existing.study||0)>0?noteReaction(existing.sNote||'','study'):null;
-  const r2=(existing.exercise||0)>0?noteReaction(existing.eNote||'','exercise'):null;
-  const r=r1||r2||'';
-  const sr=r?(r.includes('。')?r.split('。')[0]:r.slice(0,30)):'';
-  return'<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:4px"><span style="font-size:16px">'+avatar+'</span><span><strong>'+person+'</strong> '+total.toFixed(1)+'分<br>'+sr+'</span></div>';
-}
-
-function countStreak(data,person){let s=0;const d=new Date();d.setDate(d.getDate()-1);while(d.getFullYear()>=2026){const c=getPersonCheckin(data,person,fmtDate(d));if(!c||((c.study||0)+(c.exercise||0))===0)break;s++;d.setDate(d.getDate()-1)}return s}
+function countStreak(data,person)function countStreak(data,person){let s=0;const d=new Date();d.setDate(d.getDate()-1);while(d.getFullYear()>=2026){const c=getPersonCheckin(data,person,fmtDate(d));if(!c||((c.study||0)+(c.exercise||0))===0)break;s++;d.setDate(d.getDate()-1)}return s}
 function countWeeklyDone(data,person){const today=new Date();const monday=getMonday(today);let days=0;for(let i=0;i<6;i++){const d=new Date(monday);d.setDate(d.getDate()+i);const c=getPersonCheckin(data,person,fmtDate(d));if(c&&((c.study||0)+(c.exercise||0))>0)days++}return days}
 
 // ===== RENDER =====
