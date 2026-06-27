@@ -575,23 +575,32 @@ async function checkVersion(){
 }
 
 async function init(){
-  var sel=document.getElementById('currentUser');sel.innerHTML='<option value="">选择自己</option>'+PERSONS.map(function(p){return'<option value="'+p+'">'+p+'</option>'}).join('');
-  var saved=localStorage.getItem('wuren_me');if(saved&&PERSONS.indexOf(saved)>-1){sel.value=saved;var hn=document.getElementById('headerName');var he=document.getElementById('headerEmoji');if(hn)hn.textContent=saved;if(he)he.textContent=AVATARS[saved]||'🥜';}
+  var sel=document.getElementById('currentUser');sel.innerHTML='<option value="">切换成员</option>'+PERSONS.map(function(p){return'<option value="'+p+'">'+p+'</option>'}).join('');
+  var saved=localStorage.getItem('wuren_me');
+  if(saved&&PERSONS.indexOf(saved)>-1){
+    sel.value=saved;
+    document.getElementById('headerName').textContent=saved;
+    document.getElementById('headerEmoji').textContent=AVATARS[saved]||'🥜';
+  }
   document.getElementById('checkinDate').value=fd(new Date());
+  // Render immediately with local data, then sync
+  renderAll();
   await syncNow(true);
   renderAll();
-  // Ensure content shows for pre-selected user
-  setTimeout(function(){
-    if(cu()){
-      document.getElementById('headerName').textContent=cu();
-      document.getElementById('headerEmoji').textContent=AVATARS[cu()]||'🥜';
-      renderCheckin();
-    }
-  },200);
-  setTimeout(function(){
-    if(cu()) renderCheckin();
-  },600);
+  if(cu()){
+    document.getElementById('headerName').textContent=cu();
+    document.getElementById('headerEmoji').textContent=AVATARS[cu()]||'🥜';
+  }
+  await syncNow(true);
+  renderAll();
+  // Force re-render for pre-selected user (mimics what onUserSwitch does)
   checkVersion();
+  if(cu()){
+    document.getElementById('headerName').textContent=cu();
+    document.getElementById('headerEmoji').textContent=AVATARS[cu()]||'🥜';
+    setTimeout(function(){renderCheckin();},100);
+    setTimeout(function(){renderCheckin();},400);
+  }
   if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js').catch(function(){})}
 }
 init();
