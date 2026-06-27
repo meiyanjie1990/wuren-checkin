@@ -692,6 +692,15 @@ async function saveMyCheckin(){
   const btn=document.getElementById('btnSave');if(btn){btn.textContent='✅ 已保存';btn.className='btn btn-saved btn-block';}
   toast('✅ 打卡已保存！');setTimeout(()=>{if(btn&&btn.classList.contains('btn-saved')){btn.textContent='💾 保存打卡';btn.className='btn btn-primary btn-block';}},3000);
   renderCheckin();
+  // Show AI thinking indicator
+  const encDiv = document.getElementById('dailyEncourage');
+  if (encDiv) {
+    const thinking = document.createElement('div');
+    thinking.id = 'aiThinking';
+    thinking.style.cssText = 'font-size:11px;color:var(--sub);margin-top:6px;animation:pulse 1.5s infinite;';
+    thinking.textContent = '🤖 AI正在根据你的分享生成专属回复…';
+    encDiv.appendChild(thinking);
+  }
   // Fire AI enhancement in background
   const total = (record.study||0) + (record.exercise||0);
   if (total > 0) {
