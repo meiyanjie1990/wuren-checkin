@@ -34,19 +34,28 @@ body::after{content:'🍂';position:fixed;bottom:8%;left:2%;font-size:80px;opaci
 
 header{
   background:rgba(247,243,236,0.9);backdrop-filter:blur(12px);
-  padding:28px 20px 14px;text-align:center;
+  padding:22px 20px 8px;
   position:sticky;top:0;z-index:10;border-bottom:1px solid var(--thread);
 }
-header h1{font-family:'EB Garamond',serif;font-size:30px;font-weight:600;letter-spacing:-0.3px;margin-bottom:6px}
-header .date{font-size:12px;color:var(--sepia);font-style:italic}
-.user-bar{margin-top:8px;display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap}
-.user-bar select{
-  padding:6px 12px;border:1px solid var(--thread);background:var(--paper);
-  border-radius:10px;font-size:14px;font-family:inherit;color:var(--ink);cursor:pointer;outline:none;
+.top-row{
+  display:flex;align-items:baseline;justify-content:space-between;
 }
+.top-row h1{font-family:'EB Garamond',serif;font-size:36px;font-weight:600;letter-spacing:-0.5px}
+.top-row h1 .emoji{font-size:28px;margin-right:6px}
+.top-row .date-col{text-align:right;font-size:12px;color:var(--sepia);font-style:italic;line-height:1.6}
+.top-row .date-col strong{display:block;font-size:14px;color:var(--ink);font-style:normal}
+
+.sub-line{
+  display:flex;align-items:center;gap:8px;margin-top:4px;padding-bottom:4px;
+}
+.sub-line select{
+  border:none;background:none;font-size:13px;font-weight:600;color:var(--sage);
+  font-family:inherit;cursor:pointer;outline:none;
+}
+.sub-line .dot{width:3px;height:3px;border-radius:50%;background:var(--faded)}
 .streak-badge{
   font-size:10px;color:var(--sage);font-weight:600;
-  background:rgba(122,155,124,0.08);padding:3px 12px;border-radius:10px;
+  background:rgba(122,155,124,0.08);padding:3px 10px;border-radius:8px;
 }
 
 nav.tabs{
@@ -129,49 +138,40 @@ nav.tabs button.active{color:var(--sage)}
 
 .encourage-box{
   background:var(--paper);border:1px solid var(--thread);
-  border-radius:22px;padding:20px;margin:12px 0;font-size:14px;line-height:1.8;
-  text-align:center;
+  border-radius:22px;padding:20px;margin:12px 0 18px;font-size:14px;line-height:1.8;
 }
 .encourage-box .greeting{font-family:'EB Garamond',serif;font-size:20px;font-weight:600;margin-bottom:8px}
 .encourage-box .body{color:#3D3528}
-.encourage-box .humor{color:var(--sepia);font-style:italic;margin-top:8px;font-size:13px}
+.encourage-box .humor{color:var(--sepia);font-style:italic;margin-top:8px;padding-top:8px;border-top:1px dotted var(--thread);font-size:13px}
 
 .summary-card{margin-top:10px}
 .summary-card .person-line{padding:6px 0;border-bottom:1px dotted var(--thread);font-size:13px}
 .summary-card .total-line{font-family:'EB Garamond',serif;font-weight:600;font-size:18px;padding:10px 0;color:var(--sage)}
 
 .pred-input-row{display:flex;align-items:center;gap:10px;margin:6px 0}
-.pred-input-row input{
-  width:70px;padding:9px;border:1px solid var(--thread);border-radius:10px;
-  font-size:15px;text-align:center;font-family:'EB Garamond',serif;font-weight:500;background:var(--paper);
-}
+.pred-input-row input{width:70px;padding:9px;border:1px solid var(--thread);border-radius:10px;font-size:15px;text-align:center;font-family:'EB Garamond',serif;font-weight:500;background:var(--paper)}
 .pred-input-row .name{flex:1;font-size:14px;font-weight:500}
 
-.toast{
-  position:fixed;top:20px;left:50%;transform:translateX(-50%);
-  background:var(--ink);color:var(--paper);padding:12px 24px;border-radius:20px;
-  font-size:13px;z-index:200;opacity:0;transition:opacity 0.3s;pointer-events:none;
-}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:12px 24px;border-radius:20px;font-size:13px;z-index:200;opacity:0;transition:opacity 0.3s;pointer-events:none}
 .toast.show{opacity:1}
 .sync-bar{font-size:10px;color:var(--faded);text-align:center;margin-top:5px;min-height:14px}
 .ai-tag{font-size:9px;color:var(--sepia);border:1px solid var(--thread);border-radius:6px;padding:1px 6px;margin-left:4px;vertical-align:middle;font-weight:500}
 .other-ai{font-size:12px;color:var(--sepia);line-height:1.6;font-style:italic}
 
-@media(min-width:600px){
-  .checkin-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .checkin-grid .card{margin-bottom:0}
-}
+@media(min-width:600px){.checkin-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.checkin-grid .card{margin-bottom:0}}
 </style>
 </head>
 <body>
 
 <header>
-<h1>五仁打卡 <span style="font-size:10px;color:var(--faded);font-family:'Inter',sans-serif">v37</span></h1>
-<div class="date" id="headerDate"></div>
-<div class="user-bar">
-<span style="font-size:12px;color:var(--sepia);font-style:italic">👤</span>
-<select id="currentUser" onchange="onUserSwitch()"><option value="">选择自己</option></select>
-<span class="streak-badge" id="streakBadge"></span>
+<div class="top-row">
+  <h1><span class="emoji" id="headerEmoji">🥜</span><span id="headerName">五仁打卡</span></h1>
+  <div class="date-col" id="headerDate"></div>
+</div>
+<div class="sub-line">
+  <select id="currentUser" onchange="onUserSwitch()"><option value="">切换成员 ▾</option></select>
+  <span class="dot"></span>
+  <span class="streak-badge" id="streakBadge"></span>
 </div>
 </header>
 <div class="toast" id="toast"></div>
@@ -259,7 +259,7 @@ async function syncNow(silent){
   }else{bar.textContent='offline';setTimeout(function(){bar.textContent=''},4000);return false}
 }
 async function saveAndSync(data){saveLocal(data);await pushRemote(data);var bar=document.getElementById('syncBar');bar.textContent='OK';setTimeout(function(){bar.textContent=''},3000)}
-function onUserSwitch(){localStorage.setItem('wuren_me',cu());renderCheckin()}
+function onUserSwitch(){var u=cu();localStorage.setItem('wuren_me',u);var hn=document.getElementById('headerName');var he=document.getElementById('headerEmoji');if(hn)hn.textContent=u||'五仁打卡';if(he)he.textContent=AVATARS[u]||'🥜';renderCheckin()}
 
 // AI
 async function callAI(name,ss,sn,es,en,streak,wd,dow,tg){
@@ -403,7 +403,7 @@ function renderCheckin(){
   var nd=document.getElementById('sundayNotice');
   nd.innerHTML=isS?(sw.length>0?'<div class="sunday-winner">周日福利！中奖者：<strong>'+sw.join('、')+'</strong> 可以打卡</div>':'<div class="sunday-lock">周日休息日。等待预测中奖者揭晓~</div>'):'';
 
-  document.getElementById('dailyEncourage').innerHTML=genEnc(data,ds,user);var sb=document.getElementById('streakBadge');if(sb){var strk=countStreak(data,user);if(strk>=3)sb.textContent='连续'+strk+'天';else sb.textContent='';}
+  document.getElementById('dailyEncourage').innerHTML=genEnc(data,ds,user);var sb2=document.getElementById('streakBadge');if(sb2){var sk=countStreak(data,user);sb2.textContent=sk>=3?'连续'+sk+'天':'';}var sb=document.getElementById('streakBadge');if(sb){var strk=countStreak(data,user);if(strk>=3)sb.textContent='连续'+strk+'天';else sb.textContent='';}
 
   var html='';
   if(!user)html+='<div style="text-align:center;color:var(--sub);padding:30px">请先选择我是谁</div>';
@@ -576,9 +576,9 @@ async function checkVersion(){
 
 async function init(){
   var sel=document.getElementById('currentUser');sel.innerHTML='<option value="">选择自己</option>'+PERSONS.map(function(p){return'<option value="'+p+'">'+p+'</option>'}).join('');
-  var saved=localStorage.getItem('wuren_me');if(saved&&PERSONS.indexOf(saved)>-1)sel.value=saved;
+  var saved=localStorage.getItem('wuren_me');if(saved&&PERSONS.indexOf(saved)>-1){sel.value=saved;var hn=document.getElementById('headerName');var he=document.getElementById('headerEmoji');if(hn)hn.textContent=saved;if(he)he.textContent=AVATARS[saved]||'🥜';}
   document.getElementById('checkinDate').value=fd(new Date());
-  await syncNow(true);renderAll();checkVersion();
+  await syncNow(true);renderAll();if(cu()){var hn=document.getElementById('headerName');var he=document.getElementById('headerEmoji');if(hn)hn.textContent=cu();if(he)he.textContent=AVATARS[cu()]||'🥜';}checkVersion();
   if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js').catch(function(){})}
 }
 init();
