@@ -89,7 +89,12 @@ nav.tabs button.active{color:var(--sage)}
 .card h3{font-family:'EB Garamond',serif;font-size:17px;font-weight:600;margin-bottom:10px}
 
 .person-name{font-size:15px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.person-avatar{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:14px}
+.person-avatar{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-family:'EB Garamond',serif;font-weight:600;color:#FFF}
+.person-avatar.av-shi{background:linear-gradient(135deg,#E8C8B8,#D4A090)}
+.person-avatar.av-mei{background:linear-gradient(135deg,#D8C8E0,#C0A8D0)}
+.person-avatar.av-shan{background:linear-gradient(135deg,#C8DCC8,#A8C8A8)}
+.person-avatar.av-wang{background:linear-gradient(135deg,#D8D0C0,#C8B898)}
+.person-avatar.av-shi2{background:linear-gradient(135deg,#D0CCC8,#B8B0A8)}
 
 .score-row{display:flex;gap:10px;margin-bottom:8px}
 .score-block{flex:1}
@@ -158,6 +163,12 @@ nav.tabs button.active{color:var(--sage)}
 .ai-tag{font-size:9px;color:var(--sepia);border:1px solid var(--thread);border-radius:6px;padding:1px 6px;margin-left:4px;vertical-align:middle;font-weight:500}
 .other-ai{font-size:12px;color:var(--sepia);line-height:1.6;font-style:italic}
 
+.person-avatar.av-shi{background:linear-gradient(135deg,#E8C8B8,#D4A090);color:#FFF;font-family:'EB Garamond',serif;font-size:16px;font-weight:600}
+.person-avatar.av-mei{background:linear-gradient(135deg,#D8C8E0,#C0A8D0);color:#FFF;font-family:'EB Garamond',serif;font-size:16px;font-weight:600}
+.person-avatar.av-shan{background:linear-gradient(135deg,#C8DCC8,#A8C8A8);color:#FFF;font-family:'EB Garamond',serif;font-size:16px;font-weight:600}
+.person-avatar.av-wang{background:linear-gradient(135deg,#D8D0C0,#C8B898);color:#FFF;font-family:'EB Garamond',serif;font-size:16px;font-weight:600}
+.person-avatar.av-shi2{background:linear-gradient(135deg,#D0CCC8,#B8B0A8);color:#FFF;font-family:'EB Garamond',serif;font-size:16px;font-weight:600}
+
 @media(min-width:600px){.checkin-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.checkin-grid .card{margin-bottom:0}}
 </style>
 </head>
@@ -201,12 +212,13 @@ nav.tabs button.active{color:var(--sage)}
 <script>
 var PERSONS=['石维婧','梅妍洁','单兰迪','王珂','师旌议'];
 var DAYS=['一','二','三','四','五','六','日'];
-var AVATARS={石维婧:'🌸',梅妍洁:'🥜',单兰迪:'🌟',王珂:'🍃',师旌议:'🔥'};
+var AVATARS={石维婧:'婧',梅妍洁:'洁',单兰迪:'迪',王珂:'珂',师旌议:'议'};
 var TK='ghp_Ry5Qgv1WAuuUTXdU5BNjFYy'+'IeJyvbj1HGOvE';
 var REPO='meiyanjie1990/wuren-checkin';
 var DS_KEY='sk-b536a934fbea40c58afd'+'92739665db75';
 var _sha=null,_local=null;
 
+function avClass(p){if(p==='石维婧')return'av-shi';if(p==='梅妍洁')return'av-mei';if(p==='单兰迪')return'av-shan';if(p==='王珂')return'av-wang';return'av-shi2';}
 function gm(d){d=new Date(d);d.setHours(0,0,0,0);var day=d.getDay();d.setDate(d.getDate()+(day===0?-6:1-day));return d}
 function gs(m){var s=new Date(m);s.setDate(s.getDate()+6);return s}
 function fd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
@@ -377,13 +389,13 @@ function genMini(data,dateStr,person){
   if(!ex)return'';
   var total=(ex.study||0)+(ex.exercise||0);
   if(total===0)return'';
-  var av=AVATARS[person]||'👤';
-  if(ex._ai){return'<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;padding:4px 0;border-bottom:1px solid #f5f5f5"><span style="font-size:16px">'+av+'</span><span><strong>'+person+'</strong> '+total.toFixed(1)+'分<span style="font-size:8px;background:#e8e8e8;color:#999;padding:1px 4px;border-radius:6px;margin-left:2px">AI</span><br><span class="other-ai">'+ex._ai+'</span></span></div>'}
+  var av=AVATARS[person]||'?';var avCls2=avClass(person);
+  if(ex._ai){return'<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;padding:4px 0;border-bottom:1px solid #f5f5f5"><span style="font-size:16px;width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-family:\'EB Garamond\',serif;font-weight:600;color:#FFF;" class="'+avClass+'">'+av+'</span><span><strong>'+person+'</strong> '+total.toFixed(1)+'分<span style="font-size:8px;background:#e8e8e8;color:#999;padding:1px 4px;border-radius:6px;margin-left:2px">AI</span><br><span class="other-ai">'+ex._ai+'</span></span></div>'}
   var r1=(ex.study||0)>0?noteReact(ex.sNote||'','study'):null;
   var r2=(ex.exercise||0)>0?noteReact(ex.eNote||'','exercise'):null;
   var r=r1||r2||'';
   var sr=r?(r.indexOf('。')>-1?r.split('。')[0]:r.slice(0,30)):'';
-  return'<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:4px"><span style="font-size:16px">'+av+'</span><span><strong>'+person+'</strong> '+total.toFixed(1)+'分<br>'+sr+'</span></div>';
+  return'<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:4px"><span style="font-size:16px;width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-family:\'EB Garamond\',serif;font-weight:600;color:#FFF;" class="'+avClass+'">'+av+'</span><span><strong>'+person+'</strong> '+total.toFixed(1)+'分<br>'+sr+'</span></div>';
 }
 
 function countStreak(data,person){var s=0;var d=new Date();d.setDate(d.getDate()-1);while(d.getFullYear()>=2026){var c=gpc(data,person,fd(d));if(!c||((c.study||0)+(c.exercise||0))===0)break;s++;d.setDate(d.getDate()-1)}return s}
@@ -413,13 +425,13 @@ function renderCheckin(){
     var can=!isS||sw.indexOf(p)>-1;
     var isMe=(user===p);
     var cc=isMe?'card self':'card';
-    var av=AVATARS[p]||'👤';
+    var av=AVATARS[p]||'?';var avClass='';if(p==='石维婧')avClass='av-shi';else if(p==='梅妍洁')avClass='av-mei';else if(p==='单兰迪')avClass='av-shan';else if(p==='王珂')avClass='av-wang';else if(p==='师旌议')avClass='av-shi2';
 
     if(!isMe&&!ex)return;
 
     if(ex){
       var st=ex.study||0,et=ex.exercise||0;
-      html+='<div class="'+cc+'"><div class="person-name"><span class="person-avatar" style="background:'+(isMe?'#fff3e8':'#f5f5f5')+'">'+av+'</span>'+p+(isMe?' 👈':'')+' <span class="done-badge">已打卡</span></div><div style="font-size:14px;display:flex;gap:14px;flex-wrap:wrap;line-height:1.8"><span>学习 <strong style="color:var(--accent2)">'+st+'分</strong>'+(ex.sNote?'<br><span style="font-size:12px;color:var(--sub)">'+ex.sNote+'</span>':'')+'</span><span>运动 <strong style="color:var(--accent)">'+et+'分</strong>'+(ex.eNote?'<br><span style="font-size:12px;color:var(--sub)">'+ex.eNote+'</span>':'')+'</span></div>'+(isMe?'<div class="btn-row"><button class="btn btn-outline btn-small" onclick="editMy()">修改</button><button class="btn btn-outline btn-small" onclick="deleteMy()" style="color:#c0392b;border-color:#c0392b">撤销</button></div>':'')+'</div>';
+      html+='<div class="'+cc+'"><div class="person-name"><span class="person-avatar '+avClass+'" style="background:'+(isMe?'#fff3e8':'#f5f5f5')+'">'+av+'</span>'+p+(isMe?' 👈':'')+' <span class="done-badge">已打卡</span></div><div style="font-size:14px;display:flex;gap:14px;flex-wrap:wrap;line-height:1.8"><span>学习 <strong style="color:var(--accent2)">'+st+'分</strong>'+(ex.sNote?'<br><span style="font-size:12px;color:var(--sub)">'+ex.sNote+'</span>':'')+'</span><span>运动 <strong style="color:var(--accent)">'+et+'分</strong>'+(ex.eNote?'<br><span style="font-size:12px;color:var(--sub)">'+ex.eNote+'</span>':'')+'</span></div>'+(isMe?'<div class="btn-row"><button class="btn btn-outline btn-small" onclick="editMy()">修改</button><button class="btn btn-outline btn-small" onclick="deleteMy()" style="color:#c0392b;border-color:#c0392b">撤销</button></div>':'')+'</div>';
     }else if(isMe&&can){
       html+='<div class="card self" id="myCard"><div class="person-name"><span class="person-avatar" style="background:#fff3e8">'+av+'</span>'+p+' 👈</div><div class="score-row"><div class="score-block"><div class="label"><span class="dot s"></span>学习 (0-2分)</div><div class="score-btns">'+scoreBtns('study')+'</div><textarea class="note-input" id="sNote" placeholder="学了什么？多行输入…" style="resize:vertical;height:60px"></textarea></div></div><div class="score-row"><div class="score-block"><div class="label"><span class="dot e"></span>运动 (0-2分)</div><div class="score-btns">'+scoreBtns('exercise')+'</div><textarea class="note-input" id="eNote" placeholder="做了什么运动？…" style="resize:vertical;height:60px"></textarea></div></div><button class="btn btn-primary btn-block" id="btnSave" onclick="saveMy()" style="margin-top:10px">保存打卡</button></div>';
     }else if(isMe&&!can){
