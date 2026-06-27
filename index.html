@@ -66,11 +66,12 @@ nav.tabs button.active{color:var(--accent);font-weight:700}
 .toast.show{opacity:1}
 .sync-bar{font-size:11px;color:var(--sub);text-align:center;margin-top:5px;min-height:16px}
 .ai-tag{font-size:9px;background:#f0883e;color:#fff;padding:1px 6px;border-radius:8px;vertical-align:middle;margin-left:4px}
+.other-ai{font-size:12px;color:#5c4d38;line-height:1.6}
 </style>
 </head>
 <body>
 <header>
-<h1>🥜 五仁打卡 <span style="font-size:12px;color:var(--sub)">v31</span></h1>
+<h1>🥜 五仁打卡 <span style="font-size:12px;color:var(--sub)">v32</span></h1>
 <div class="date" id="headerDate"></div>
 <div class="user-bar"><span style="font-size:13px;font-weight:600">👤 我是</span>
 <select id="currentUser" onchange="onUserSwitch()"><option value="">选择自己</option></select>
@@ -169,7 +170,7 @@ async function callAI(name,ss,sn,es,en,streak,wd,dow,tg){
   if(parts.length===0)return null;
   var prompt='给30-40岁自律成年人写打卡鼓励。口语化像损友，幽默温暖。如果ta学习和运动都做了，两项都得回应。60-100字。直接回复不要前缀。\n时间：'+tg+'\n用户：'+name+'\n'+parts.join('；')+'\n连续：'+streak+'天 本周：'+wd+'天';
   try{
-    var ctrl=new AbortController();setTimeout(function(){ctrl.abort()},10000);
+    var ctrl=new AbortController();setTimeout(function(){ctrl.abort()},12000);
     var resp=await fetch('https://api.deepseek.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+DS_KEY},body:JSON.stringify({model:'deepseek-chat',messages:[{role:'user',content:prompt}],max_tokens:300,temperature:0.95}),signal:ctrl.signal});
     if(!resp.ok)return null;
     var data=await resp.json();
@@ -178,7 +179,7 @@ async function callAI(name,ss,sn,es,en,streak,wd,dow,tg){
   }catch(e){return null}
 }
 
-// Encouragement system
+// Encouragement
 var STUDY_R=[
   {kw:'英语 单词 语法 阅读 听力 口语 作文 翻译 english'.split(' '),r:['英语慢功夫，今天这步走得很稳','语言每天碰一点比周末猛攻有效得多','学语言的快乐是某天突然发现听懂了']},
   {kw:'书 看书 读 小说 文学 历史 哲学 传记'.split(' '),r:['阅读是最低成本的旅行','一本书半小时比刷手机充实太多']},
@@ -278,7 +279,7 @@ function genMini(data,dateStr,person){
   var total=(ex.study||0)+(ex.exercise||0);
   if(total===0)return'';
   var av=AVATARS[person]||'👤';
-  if(ex._ai){return'<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;padding:4px 0;border-bottom:1px solid #f5f5f5"><span style="font-size:16px">'+av+'</span><span><strong>'+person+'</strong> '+total.toFixed(1)+'分<span style="font-size:8px;background:#e8e8e8;color:#999;padding:1px 4px;border-radius:6px;margin-left:2px">AI</span><br><span style="color:#5c4d38;font-size:12px;line-height:1.6">'+ex._ai+'</span></span></div>'}
+  if(ex._ai){return'<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;padding:4px 0;border-bottom:1px solid #f5f5f5"><span style="font-size:16px">'+av+'</span><span><strong>'+person+'</strong> '+total.toFixed(1)+'分<span style="font-size:8px;background:#e8e8e8;color:#999;padding:1px 4px;border-radius:6px;margin-left:2px">AI</span><br><span class="other-ai">'+ex._ai+'</span></span></div>'}
   var r1=(ex.study||0)>0?noteReact(ex.sNote||'','study'):null;
   var r2=(ex.exercise||0)>0?noteReact(ex.eNote||'','exercise'):null;
   var r=r1||r2||'';
@@ -289,7 +290,6 @@ function genMini(data,dateStr,person){
 function countStreak(data,person){var s=0;var d=new Date();d.setDate(d.getDate()-1);while(d.getFullYear()>=2026){var c=gpc(data,person,fd(d));if(!c||((c.study||0)+(c.exercise||0))===0)break;s++;d.setDate(d.getDate()-1)}return s}
 function countWeekDone(data,person){var today=new Date();var m=gm(today);var days=0;for(var i=0;i<6;i++){var d=new Date(m);d.setDate(d.getDate()+i);var c=gpc(data,person,fd(d));if(c&&((c.study||0)+(c.exercise||0))>0)days++}return days}
 
-// Render
 function renderCheckin(){
   var data=getLocal();var ds=cd();
   var dd=new Date(ds+'T00:00:00');var today=new Date();
@@ -322,7 +322,7 @@ function renderCheckin(){
       var st=ex.study||0,et=ex.exercise||0;
       html+='<div class="'+cc+'"><div class="person-name"><span class="person-avatar" style="background:'+(isMe?'#fff3e8':'#f5f5f5')+'">'+av+'</span>'+p+(isMe?' 👈':'')+' <span class="done-badge">已打卡</span></div><div style="font-size:14px;display:flex;gap:14px;flex-wrap:wrap;line-height:1.8"><span>学习 <strong style="color:var(--accent2)">'+st+'分</strong>'+(ex.sNote?'<br><span style="font-size:12px;color:var(--sub)">'+ex.sNote+'</span>':'')+'</span><span>运动 <strong style="color:var(--accent)">'+et+'分</strong>'+(ex.eNote?'<br><span style="font-size:12px;color:var(--sub)">'+ex.eNote+'</span>':'')+'</span></div>'+(isMe?'<div class="btn-row"><button class="btn btn-outline btn-small" onclick="editMy()">修改</button><button class="btn btn-outline btn-small" onclick="deleteMy()" style="color:#c0392b;border-color:#c0392b">撤销</button></div>':'')+'</div>';
     }else if(isMe&&can){
-      html+='<div class="card self" id="myCard"><div class="person-name"><span class="person-avatar" style="background:#fff3e8">'+av+'</span>'+p+' 👈</div><div class="score-row"><div class="score-block"><div class="label"><span class="dot s"></span>学习 (0-2分)</div><div class="score-btns">'+scoreBtns('study')+'</div><input class="note-input" id="sNote" placeholder="学了什么？一句话记录…"></div></div><div class="score-row"><div class="score-block"><div class="label"><span class="dot e"></span>运动 (0-2分)</div><div class="score-btns">'+scoreBtns('exercise')+'</div><input class="note-input" id="eNote" placeholder="做了什么运动？…"></div></div><button class="btn btn-primary btn-block" id="btnSave" onclick="saveMy()" style="margin-top:10px">保存打卡</button></div>';
+      html+='<div class="card self" id="myCard"><div class="person-name"><span class="person-avatar" style="background:#fff3e8">'+av+'</span>'+p+' 👈</div><div class="score-row"><div class="score-block"><div class="label"><span class="dot s"></span>学习 (0-2分)</div><div class="score-btns">'+scoreBtns('study')+'</div><textarea class="note-input" id="sNote" placeholder="学了什么？多行输入…" style="resize:vertical;height:60px"></textarea></div></div><div class="score-row"><div class="score-block"><div class="label"><span class="dot e"></span>运动 (0-2分)</div><div class="score-btns">'+scoreBtns('exercise')+'</div><textarea class="note-input" id="eNote" placeholder="做了什么运动？…" style="resize:vertical;height:60px"></textarea></div></div><button class="btn btn-primary btn-block" id="btnSave" onclick="saveMy()" style="margin-top:10px">保存打卡</button></div>';
     }else if(isMe&&!can){
       html+='<div class="card self"><div class="person-name"><span class="person-avatar" style="background:#fff3e8">'+av+'</span>'+p+' 👈</div><div style="font-size:13px;color:#c0392b">今天不是你的打卡日</div></div>';
     }
@@ -414,7 +414,6 @@ async function fillAI(data,ds){
   }
 }
 
-// Weekly
 function renderWeekly(){
   var data=getLocal();var today=new Date();var m=gm(today);var sun=gs(m);
   document.getElementById('weekRange').textContent=fwr(m,sun);
@@ -432,7 +431,6 @@ function renderWeekly(){
   document.getElementById('lastPredResult').innerHTML=(pd&&pd.actual!=null)?'实际：<strong>'+pd.actual.toFixed(1)+'分</strong> 中奖：<strong>'+(pd.winners||[]).join('、')+'</strong>':'本周未结束周日揭晓~';
 }
 
-// Predictions
 function renderPredict(){
   var data=getLocal();var today=new Date();var m=gm(today);var sun=gs(m);
   var nm=new Date(sun);nm.setDate(nm.getDate()+1);var ns=gs(nm);var isS=isSunday(today);
@@ -457,7 +455,6 @@ async function savePredictions(){
 function getWeekAllTotal(data,m){var t=0;PERSONS.forEach(function(p){t+=getWeekTotal(data,p,m)});return t}
 function getWeekTotal(data,p,m){var t=0;for(var i=0;i<6;i++){var d=new Date(m);d.setDate(d.getDate()+i);var c=gpc(data,p,fd(d));if(c)t+=(c.study||0)+(c.exercise||0)}var sun=gs(m);var wk=fd(new Date(sun.getTime()-14*86400000));var pd=data.predictions[wk];if(pd&&pd.winners&&pd.winners.indexOf(p)>-1){var c=gpc(data,p,fd(sun));if(c)t+=(c.study||0)+(c.exercise||0)}return t}
 
-// History
 function renderHistory(){
   var data=getLocal();var exp='';PERSONS.forEach(function(p){exp+='<div style="margin-bottom:8px"><button class="btn btn-outline btn-small" onclick="exportPerson(\''+p+'\')">'+p+'</button></div>'});exp+='<button class="btn btn-outline btn-small" onclick="exportAll()">导出全部</button>';document.getElementById('exportList').innerHTML=exp;
   var ads=new Set();PERSONS.forEach(function(p){if(data.checkins[p])Object.keys(data.checkins[p]).forEach(function(d){ads.add(d)})});var sorted=Array.from(ads).sort().reverse().slice(0,30);
