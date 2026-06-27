@@ -193,7 +193,7 @@ async function callAI(personName,studyScore,studyNote,exerciseScore,exerciseNote
   if(parts.length===0)return null;
   const prompt='你是一个打卡App里的鼓励助手，给30-40岁的自律成年人写温暖的打卡反馈。口语化，像朋友之间。40-60字，轻松自然，可以有一点冷幽默。直接给回复。\n时间：'+timeGreeting+'\n用户：'+personName+'\n'+parts.join('；')+'\n连续打卡：'+streak+'天\n本周已打卡：'+weekDone+'天\n根据ta写的内容给定制反馈，回应ta具体做了什么。';
   try{
-    const resp=await fetch('https://api.deepseek.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+DS_KEY},body:JSON.stringify({model:'deepseek-chat',messages:[{role:'user',content:prompt}],max_tokens:150,temperature:0.9}),signal:AbortSignal.timeout(8000)});
+    const resp=await fetch('https://api.deepseek.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+DS_KEY},body:JSON.stringify({model:'deepseek-chat',messages:[{role:'user',content:prompt}],max_tokens:150,temperature:0.9}),signal:(()=>{const c=new AbortController();setTimeout(()=>c.abort(),8000);return c.signal})()});
     if(!resp.ok)return null;
     const data=await resp.json();
     const reply=data.choices?.[0]?.message?.content?.trim();
@@ -292,7 +292,7 @@ function generateEncourage(data,dateStr,currentUser){
     const sNote=existing.sNote||'',eNote=existing.eNote||'';
 
     // AI reply from shared data
-    if(existing._ai){return '<div class="greeting">'+greeting+'，'+currentUser+'！</div><div class="body">'+existing._ai+'</div>'}
+    if(existing._ai){return '<div class="greeting">'+greeting+'，'+currentUser+'！ <span style="font-size:10px;background:#f0883e;color:#fff;padding:1px 6px;border-radius:8px;vertical-align:middle">AI</span></div><div class="body">'+existing._ai+'</div>'}
 
     const sReaction=st>0?noteReaction(sNote,'study'):null;
     const eReaction=et>0?noteReaction(eNote,'exercise'):null;
@@ -332,7 +332,7 @@ function generateMiniEnc(data,dateStr,person){
   const total=(existing.study||0)+(existing.exercise||0);
   if(total===0)return'';
   const avatar=AVATARS[person]||'👤';
-  if(existing._ai){const s=existing._ai.length>40?existing._ai.slice(0,40)+'...':existing._ai;return'<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;padding:4px 0;border-bottom:1px solid #f5f5f5"><span style="font-size:16px">'+avatar+'</span><span><strong>'+person+'</strong> '+total.toFixed(1)+'分<br><span style="color:#5c4d38">'+s+'</span></span></div>'}
+  if(existing._ai){const s=existing._ai.length>40?existing._ai.slice(0,40)+'...':existing._ai;return'<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;padding:4px 0;border-bottom:1px solid #f5f5f5"><span style="font-size:16px">'+avatar+'</span><span><strong>'+person+'</strong> '+total.toFixed(1)+'分 <span style="font-size:9px;background:#e8e8e8;color:#888;padding:1px 4px;border-radius:6px">AI</span><br><span style="color:#5c4d38">'+s+'</span></span></div>'}
   const r1=(existing.study||0)>0?noteReaction(existing.sNote||'','study'):null;
   const r2=(existing.exercise||0)>0?noteReaction(existing.eNote||'','exercise'):null;
   const r=r1||r2||'';
