@@ -167,7 +167,7 @@ async function callAI(name,ss,sn,es,en,streak,wd,dow,tg){
   if(ss>0)parts.push('学习'+ss+'分'+(sn?'：'+sn:''));
   if(es>0)parts.push('运动'+es+'分'+(en?'：'+en:''));
   if(parts.length===0)return null;
-  var prompt='给30-40岁自律成年人写打卡鼓励。口语化像损友，幽默温暖。如果ta学习和运动都做了，两项都得回应。注意：0.5分=半小时，1分=1小时，以此类推。60-100字。直接回复不要前缀。\n时间：'+tg+'\n用户：'+name+'\n'+parts.join('；')+'\n连续：'+streak+'天 本周：'+wd+'天';
+  var prompt='你是五仁打卡群的专属鼓励师。五仁是5个30-40岁的好友（石维婧🌸梅妍洁🥜单兰迪🌟王珂🍃师旌议🔥），每周一到周六打卡学习和运动，周日休息。你要像个又暖又损的闺蜜/兄弟，口语化，有点冷幽默。如果ta学习和运动都做了两项都回应。记住0.5分=半小时，1分=1小时。60-100字，直接回复。\n时间：'+tg+'\n用户：'+name+'\n'+parts.join('；')+'\n连续打卡：'+streak+'天 本周已打：'+wd+'天';
   try{
     var ctrl=new AbortController();setTimeout(function(){ctrl.abort()},12000);
     var resp=await fetch('https://api.deepseek.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+DS_KEY},body:JSON.stringify({model:'deepseek-chat',messages:[{role:'user',content:prompt}],max_tokens:300,temperature:0.95}),signal:ctrl.signal});
