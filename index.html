@@ -233,7 +233,7 @@ nav.tabs button.active { color: var(--accent); font-weight: 700; }
 
 <script>
 // ============ CONFIG ============
-const APP_VERSION = 6; // 改代码后+1，所有人自动提示刷新
+const APP_VERSION = 5; // 改代码后+1，所有人自动提示刷新
 const PERSONS = ['石维婧','梅妍洁','单兰迪','王珂','师旌议'];
 const DAYS = ['一','二','三','四','五','六','日'];
 const AVATARS = { '石维婧':'🌸','梅妍洁':'🥜','单兰迪':'🌟','王珂':'🍃','师旌议':'🔥' };
@@ -307,15 +307,59 @@ function countWeeklyDone(data, person) {
   return days;
 }
 
+function hashStr(s){let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0;}return Math.abs(h);}
+
+function noteReaction(note, type) {
+  if(!note||note.trim()==='')return null;
+  const n=note.toLowerCase();
+  const reactions={
+    study:[
+      {kw:['英语','单词','语法','阅读','听力','口语','作文','翻译','english','toefl','ielts'],r:['英语是个慢功夫，今天这步走得很稳 ✍️','语言这东西，每天碰一点比周末猛攻10小时有效得多 🗣️','听说你学英语了？one day 你会感谢今天坚持的自己 😉']},
+      {kw:['数学','做题','公式','计算','代数','几何'],r:['数学脑今天上线了！逻辑清晰的人运气不会太差 🔢','解题的快乐只有解题的人懂。好吧其实也不太快乐，但值得！']},
+      {kw:['书','看书','读','页','章','文章','论文','paper'],r:['阅读是最低成本的旅行，今天你又出发了 📖','一本书、半小时，比刷手机充实一百倍——虽然刷手机确实更轻松 😅']},
+      {kw:['考试','复习','备考','刷题','真题','模拟'],r:['备考人备考魂！今天的每一分都是考场上的底气 💯','考试前的每一分钟复习都是有意义的——考后的每一分钟也是，但那是庆祝时间 🎉']},
+      {kw:['课','上课','听课','视频','网课','教程','课程','学习'],r:['保持学习的状态，本身就是一种能力。你今天做到了 🌱','学习最难的part是开始。开始了，后面就顺了。']},
+      {kw:['笔记','整理','思维导图','总结'],r:['会整理的人，学一遍顶别人三遍。这是学习的高级玩法 🧠','整理笔记 = 给大脑做收纳，以后找什么都快']},
+      {kw:['代码','编程','python','java','写代码'],r:['程序员（或准程序员）的一天。键盘敲烂，月入过万 💻','看着屏幕一行行代码，有没有觉得自己像个魔法师？']},
+    ],
+    exercise:[
+      {kw:['跑','步','公里','km','配速','慢跑','跑步'],r:['跑步的多巴胺仅次于恋爱！今天又赚到了 🏃','每一步都不是白跑的——它会变成你的体力、心情和体检单上的好数字']},
+      {kw:['瑜伽','拉伸','柔韧','冥想','呼吸'],r:['瑜伽人的从容，是那种"我不急但我一直在"的优雅 🧘','拉伸的不只是身体，还有今天一整天积累的紧张']},
+      {kw:['跳绳','跳'],r:['跳绳是性价比最高的运动——一根绳，全身燃 🪢','据说跳绳10分钟 = 慢跑30分钟，今天你又事半功倍了']},
+      {kw:['游泳','游','泳池'],r:['游泳是唯一不会出汗的运动——但消耗一点不少 🏊','在水里的时光，世界都安静了']},
+      {kw:['健身','力量','举','哑铃','器械','深蹲','俯卧撑'],r:['铁片不会辜负你。今天练的每一组，都在塑造更好的自己 💪','肌肉酸痛的第二天，就是成长发生的时刻']},
+      {kw:['走路','散步','步','遛','逛'],r:['走路是最被低估的运动。日行万步的人，身体不会差 🚶','散步的哲学：慢下来，才能看见平时错过的风景']},
+      {kw:['骑车','单车','骑行','自行车'],r:['风从耳边过，自由从心里来。骑起来！🚲','两个轮子带你去的地方，四个轮子永远到不了']},
+      {kw:['跳操','操','hiit','tabata','有氧','燃脂','跳舞'],r:['跟练的视频累不累？累就对了——这说明有效果 🔥','跳操的快乐：音乐够嗨，时间过很快']},
+    ]
+  };
+  const list=reactions[type]||[];
+  for(let item of list){
+    if(item.kw.some(k=>n.includes(k))){
+      const seed=hashStr(note+type);
+      return item.r[seed%item.r.length];
+    }
+  }
+  const generic={
+    study:['看了你的学习记录，感觉你今天很充实 ✨','学习的内容我看到了——坚持下去，积累的力量超乎想象 📚','笔记写下来本身就是一种学习。今天又进步了一点'],
+    exercise:['运动完的感觉是不是特别好？那种"我做到了"的爽快 🎯','动起来就是胜利。具体做了什么不重要，重要的是做了 🏅','出汗了没有？出了就是赚到 💦']
+  };
+  const g=generic[type];
+  return g[hashStr(note+type+'generic')%g.length];
+}
+
 function generateEncourage(data, dateStr, currentUser) {
   const d=new Date(dateStr+'T00:00:00');
   const todayStr=fmtDate(new Date());
   const isToday=(dateStr===todayStr);
   const hour=new Date().getHours();
-  const timeGreeting=hour<9?'☀️ 早安':hour<12?'🌤️ 上午好':hour<14?'🌞 中午好':hour<18?'🌤️ 下午好':hour<21?'🌅 晚上好':'🌙 夜深了';
+  const timeGreetings={early:['☀️ 早安呀','🌄 清晨好','🐦 早起的鸟儿有虫吃'],morning:['🌤️ 上午好','☕ 咖啡时间到','💼 元气满满的上午'],noon:['🌞 中午好','🍜 午饭吃好了吗','☀️ 午安'],afternoon:['🌤️ 下午好','🍵 下午茶时间','🌿 午后时光'],evening:['🌅 傍晚好','🌇 一天快结束了','🍃 晚间好'],night:['🌙 夜深了','🌟 晚上的时光最安静','🦉 夜猫子模式']};
+  let tgKey=hour<7?'early':hour<10?'morning':hour<13?'noon':hour<17?'afternoon':hour<20?'evening':'night';
+  const greetings=timeGreetings[tgKey];
+  const greeting=greetings[hashStr(currentUser+dateStr)%greetings.length];
 
-  if(d.getDay()===0)return `<div class="greeting">🌿 周日休息日</div><div class="body">一周的坚持值得好好放松。泡杯茶、散个步、翻几页闲书——<br>充电也是为了下一周跑得更远。</div><div class="humor">周日的卡路里，不算热量 😌</div>`;
-  if(!currentUser)return `<div class="greeting">${timeGreeting}！</div><div class="body">👆 先在上方选一下你是谁，然后就能开始打卡啦。<br>今天也是元气满满的一天！</div>`;
+  if(d.getDay()===0)return '<div class="greeting">'+greeting+'，'+(currentUser||'朋友')+' 🌿</div><div class="body">周日，不打卡的日子。<br>一周的坚持值得奖励自己——泡杯好喝的、散个步、无所事事一会儿。<br><strong>会休息的人，才能跑更远的路。</strong></div><div class="humor">今天唯一的任务：让自己舒服 😌</div>';
+  if(!currentUser)return '<div class="greeting">'+greeting+'！</div><div class="body">👆 先选一下你是谁，然后就能开始打卡啦~<br>今天的你，一定会比昨天更接近想要的自己。</div>';
 
   const existing=getPersonCheckin(data,currentUser,dateStr);
   const streak=countStreak(data,currentUser);
@@ -325,68 +369,111 @@ function generateEncourage(data, dateStr, currentUser) {
   if(existing) {
     const total=(existing.study||0)+(existing.exercise||0);
     const st=existing.study||0, et=existing.exercise||0;
-    let msgs=[], humor='';
+    const sNote=existing.sNote||'', eNote=existing.eNote||'';
+    const sReaction=noteReaction(sNote,'study');
+    const eReaction=noteReaction(eNote,'exercise');
+    const seed=hashStr(currentUser+dateStr);
+    let parts=[], humor='';
 
+    // Score-based commentary - varied per person+date
     if(total>=3.5){
-      msgs=[
-        `今天已经拿下 <strong>${total.toFixed(1)}分</strong>！这效率，简直像开了外挂 🚀`,
-        `学习${st>0?st+'分':''}${st>0&&et>0?' + ':''}运动${et>0?et+'分':''}，全面发展的一天。`
-      ];
-      humor=st>et?'大脑今天吃得很饱，腿表示：下次该我了 🦵':et>st?'身体在燃烧，书本在角落里投来幽怨的目光 📖':'文武双全，谁也别嫉妒谁 😎';
-    } else if(total>=1.5){
-      msgs=[
-        `已拿下 <strong>${total.toFixed(1)}分</strong>，稳稳地走了一步。`,
-        `积少成多，这些0.5分0.5分的积累，最终会成为别人羡慕的"别人家的坚持"。`
-      ];
-      humor='一只蜗牛走了一米，另一只蜗牛问：你是怎么坚持的？蜗牛说：我只是没停下来 🐌';
+      const p=[
+        ['<strong>'+total.toFixed(1)+'分！满分战神！</strong>今天你属于"别人家的孩子"级别 👑',(st>0&&et>0?'学习和运动双拉满，你这是要卷死谁？':'专注一项做到极致，也很酷。'),'今天过后，你这周的柱状图又要多一根高柱了~'],
+        ['<strong>'+total.toFixed(1)+'分</strong>，今日MVP就是你 🏆',(st>0?'脑子转得飞快':'')+(st>0&&et>0?'，':'')+(et>0?'身体也在线':''),'这状态，明天继续保持的话，这周纪录要破了。'],
+        ['拿下<strong>'+total.toFixed(1)+'分</strong>，今天简直是开挂模式 🚀','效率和执行力同时在线的一天。','这种日子不常有，但每有一次都值得截图留念。']
+      ]; parts=p[seed%3];
+    } else if(total>=2){
+      const p=[
+        ['<strong>'+total.toFixed(1)+'分</strong>，相当扎实的一天！','两小时的有效投入，一年下来就是730个小时——想想就可怕。','今天比昨天进步了一点点，这就够了。'],
+        ['<strong>'+total.toFixed(1)+'分</strong>入账 💰 这是给自己的时间投资。',(st>et?'今天脑袋转得多':et>st?'今天是行动的巨人':'文韬武略的一天')],
+        ['稳稳的<strong>'+total.toFixed(1)+'分</strong>。','不是每一分钟都要用来拼命——稳稳地走，比冲一下然后躺三天强。']
+      ]; parts=p[seed%3];
+    } else if(total>=1){
+      const p=[
+        ['<strong>'+total.toFixed(1)+'分</strong>，小步快跑 ✨','重要的不是今天拿了多少分，是你又一次选择了行动。','打卡这件事，最难的是第一次，第二难的是每天。你已经在"每天"了。'],
+        ['<strong>'+total.toFixed(1)+'分</strong>——轻量但有效。','就像吃一块巧克力不会胖，但每天一块就会——积累就是这样悄悄发生的（好的方面！）🍫'],
+        ['<strong>'+total.toFixed(1)+'分</strong>。忙了一天还能抽出时间来打卡，已经比大多数人厉害了。','成年人的坚持，都是在缝隙里挤出来的。你做到了。']
+      ]; parts=p[seed%3];
     } else {
-      msgs=[
-        `今天打卡了 <strong>${total.toFixed(1)}分</strong>——小步快跑也是跑。`,
-        `哪怕只有半小时，也比躺在沙发上焦虑强一百倍。`
-      ];
-      humor='种一棵树最好的时间是十年前，其次是……算了别喝鸡汤了，你已经很棒了 🌱';
+      parts=['今天也打卡了，哪怕只是一小步，也是往前的方向 🌱','零也是数字，但打卡这件事本身就是一种态度。你在。'];
+      humor='今天打卡的意义：告诉明天的自己——你看，我连这么小的日子都没放弃 😌';
     }
 
-    if(streak>=7) msgs.push(`🔥 连续 <strong>${streak}</strong> 天打卡！你是五仁里面的定海神针。`);
-    else if(streak>=3) msgs.push(`⭐ 连续 <strong>${streak}</strong> 天打卡，势头正好！`);
+    // Note-specific reactions - the KEY personalization
+    if(sReaction) parts.push(sReaction);
+    if(eReaction) parts.push(eReaction);
+    if(!sReaction&&!eReaction&&st>0) parts.push('今天没写备注？没关系，行动比文字更重要。但下次写一句话呗，我想夸得更准一点 😉');
+    if(sReaction||eReaction) parts.push('（读了你的分享，上面那句是针对你写的，不是机器人模板哦 👆）');
 
-    if(dayOfWeek===6) msgs.push(`📌 周六了！本周最后一天冲刺，周日的休息在向你招手~`);
-    if(weekDone===6) msgs.push(`🏆 本周全勤！你就是五仁的模范生！`);
+    // Streak
+    if(streak>=30) parts.push('🔥 连续 <strong>'+streak+'</strong> 天！整整一个月以上的坚持——你不是在打卡，你是在重新定义自己。');
+    else if(streak>=14) parts.push('⚡ 连续 <strong>'+streak+'</strong> 天！两周以上的节奏已经刻进肌肉记忆了吧？');
+    else if(streak>=7) parts.push('⭐ 连续 <strong>'+streak+'</strong> 天达成！一周全勤，这就是"靠谱"两个字的最好解释。');
+    else if(streak>=3) parts.push('✨ 连续 <strong>'+streak+'</strong> 天了，势头在起来。明天继续就快一周了！');
 
+    // Day-specific
+    if(dayOfWeek===6) parts.push('📌 周六都能打卡的人——周日的休息你配得上，甚至值得躺一整天。');
+    if(dayOfWeek===1&&total>=2) parts.push('周一就这么猛，这周的基调被你定下来了。剩下的日子请继续保持！');
+    if(weekDone===5&&dayOfWeek===6) parts.push('🏆 今天打完，本周就是全勤！最后一天冲一下，荣誉在望！');
+
+    // Peers
     if(isToday){
-      // Check others
       let doneList=[]; PERSONS.forEach(p=>{if(p!==currentUser&&getPersonCheckin(data,p,dateStr))doneList.push(p);});
-      if(doneList.length>=3) msgs.push(`👀 今天已有 <strong>${doneList.length}</strong> 位伙伴也打卡了，你们这届五仁很卷啊。`);
-      else if(doneList.length>0) msgs.push(`还有 <strong>${5-doneList.length-1}</strong> 位伙伴在酝酿中……你是最早的行动派！`);
-      else msgs.push(`你是今天第一个打卡的！剩下的四位朋友还在被窝里挣扎吗？🤔`);
+      if(doneList.length>=4) parts.push('今天五仁全员到齐！这是最好的状态——互相看见，互相托着。');
+      else if(doneList.length>=2) parts.push(doneList.join('、')+' 今天也打卡了，你们在互相照亮 🌟');
+      else if(doneList.length===1) parts.push(doneList[0]+' 今天也打卡了——你俩是今天的行动派双人组。');
+      else parts.push('你是今天第一个打卡的！门开了，等其他人跟上~ 🚪');
     }
 
-    return `<div class="greeting">${timeGreeting}，${currentUser}！</div><div class="body">${msgs.join('<br>')}</div><div class="humor">${humor}</div>`;
+    if(!humor){
+      const humors=[
+        '生活小知识：每打卡一次，身上的"优秀"标签就会亮一下 💡',
+        '为什么坚持很难？因为它需要每天都做。为什么它值得？也是因为它需要每天都做。',
+        '有人问：你为什么要打卡？你说：因为我要让未来的自己无话可怼。',
+        '今天你打卡了，你比地球上99%的人都多走了一步（这个数据是我编的，但感觉是真的）',
+        '大脑：该休息了。你：不，再学半小时。大脑：好吧但我要记下来，下次翻旧账。',
+        st>et?'今天学习的分数比运动多，大脑表示很满意，身体表示：明天到我了 💤':'今天运动拉满！肌肉在生长，大脑在喘气，都很忙 💪',
+        '世间万物都会背叛你，但每天0.5分的积累不会。',
+        '打卡就像种树——每天浇一点水，一年后回头看，嚯，一片森林。'
+      ];
+      humor=humors[seed%humors.length];
+    }
+    return '<div class="greeting">'+greeting+'，'+currentUser+'！</div><div class="body">'+parts.join('<br>')+'</div><div class="humor">'+humor+'</div>';
   }
 
-  // Not yet checked in
+  // ===== NOT YET CHECKED IN =====
   let tips=[], humor='';
+  const seed2=hashStr(currentUser+dateStr+'pre');
+
   if(dayOfWeek===1){
-    tips=[`新的一周，新的开始！<strong>周一是拉开差距的一天</strong>——不是在跟别人比，是在跟昨天的自己比。`,`今天给自己定个小目标：哪怕1分，也是从0到1的跨越。`];
-    humor='周一不努力，周二徒伤悲，周三周四继续累，周五发现……咦这周又过去了 😅';
+    const monTips=[['周一是最需要勇气的一天——你敢开始，这周就赢了一半。','给自己一个小目标，不用多，哪怕0.5分，也是破冰。'],['新的一周，blank canvas。你打算在上面画点什么？','研究表明（某个不太严谨的研究），周一打卡的人一周都更顺利。']];
+    tips=monTips[seed2%2];
+    humor='周一：一周中最被误解的一天。其实它挺好的，只是需要你给它一个机会 😅';
   } else if(dayOfWeek===5||dayOfWeek===6){
-    tips=[`周末快到了，但今天还不是松懈的时候！<strong>越到最后越要保持节奏。</strong>`,`周五六坚持住，周日才能心安理得地躺平。`];
-    humor='周五：一周中最甜美的折磨日。咖啡续命，运动续魂 ☕🏃';
+    tips=['周末的诱惑很大（床、手机、外卖），但你打开这个页面本身就已经赢了第一步。','周五六的每一分都有双倍的含金量——因为这时候坚持最难。'];
+    humor='周五：身体在工位，灵魂已经在周末。但你还记得打开打卡页面——这就是纪律 👏';
   } else {
-    const r=Math.floor(Math.random()*5);
-    tips=[
-      [`每一次打卡，都是在跟"算了不做了"的自己较劲——而你每次都赢了。`,`半小时的学习，可能是你一年后回头看时那根关键的杠杆。`],
-      [`很多人高估了一天能做的事，低估了一百天能积累的事。<strong>你现在的每0.5分，都在悄悄改变你。</strong>`,`打开书本或穿上跑鞋的前五分钟最难熬，熬过去就顺了。`],
-      [`打卡不是任务，是给自己的一份交代。<strong>你今天对自己认真了吗？</strong>`,`学习和运动是这世界少有的"付出必有回报"的事。`],
-      [`五仁的意义就是：一个人可能走得快，但五个人才能走得远。<strong>看看群里谁先动？</strong>`,`做第一个打卡的人，有种莫名的成就感——试试看。`],
-      [`你看过小狗钱钱的金钱魔法吗？<strong>每天半小时，就是你的学习魔法。</strong>`,`复利不只是钱的事，知识也讲复利——每天0.5分，一年后看看你积累了什么。`]
-    ][r];
-    humor=['拖延症晚期患者温馨提示：开始比完美重要 100 倍 🤒','大脑：我好累不想动。身体：我也是。理智：你俩闭嘴，先做半小时 🧠','懒惰就像一张信用卡，今天刷得爽，月底还到哭 💳'][Math.floor(Math.random()*3)];
+    const pool=[
+      ['打卡不是考试，不需要每次都满分。<strong>来了就是胜利。</strong>','选0.5分还是2分不重要，重要的是你在做。'],
+      ['很多人高估一天能做的事，低估了一百天能积累的事。','你现在的每0.5分，都是未来的筹码。'],
+      ['今天累了？那就学半小时、动半小时。<strong>轻量完成也是完成。</strong>','坚持不是每天都全力以赴，是每天都不缺席。'],
+      ['打开这个页面就已经超过了昨天的你——如果昨天没打开的话 😄','开始是最难的部分，你已经完成了最难的部分。'],
+      ['五仁的约定是：可以慢，但不可以停。','你今天花五分钟打个卡，比躺着一动不动强一百倍。']
+    ];
+    tips=pool[seed2%pool.length];
+    humor=['大脑：我累了不想学。你：就半小时。大脑：好吧但你欠我一个人情 🧠','拖延症的本质是——你不知道开始之后有多爽。今天试试？','每一滴汗水都是脂肪的眼泪——当然也可能是大脑的眼泪，取决于你学还是动 😂'][seed2%3];
   }
 
-  if(streak>=7) tips.push(`💎 你已经连续 <strong>${streak}</strong> 天了！今天也别断——这个记录太珍贵了。`);
+  if(streak>=14) tips.push('💎 <strong>'+streak+'</strong> 天连续打卡！这个数字太珍贵了，今天千万别让它断掉。');
+  else if(streak>=7) tips.push('⭐ 你已经连续 <strong>'+streak+'</strong> 天了——今天再加一天，让这个数字继续涨。');
 
-  return `<div class="greeting">${timeGreeting}，${currentUser}！</div><div class="body">${tips.join('<br><br>')}</div><div class="humor">${humor}</div>`;
+  if(isToday){
+    let doneList=[]; PERSONS.forEach(p=>{if(p!==currentUser&&getPersonCheckin(data,p,dateStr))doneList.push(p);});
+    if(doneList.length>=3) tips.push(doneList.length+'位伙伴已经打完了，你是下一个吗？🤔');
+    else if(doneList.length>0) tips.push(doneList.join('、')+' 今天已经打了，在等你呢~');
+  }
+
+  return '<div class="greeting">'+greeting+'，'+currentUser+'！</div><div class="body">'+tips.join('<br><br>')+'</div><div class="humor">'+humor+'</div>';
 }
 
 // ============ RENDER CHECKIN ============
