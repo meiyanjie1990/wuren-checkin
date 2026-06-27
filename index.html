@@ -330,6 +330,18 @@ function noteReaction(note, type) {
       {kw:'冥想 正念 静坐 打坐'.split(' '),r:['冥想不是发呆，是给大脑做深度清洁 🧘','安静下来的十分钟，比忙忙碌碌一小时还有效']},
       {kw:'摄影 拍照 扫街'.split(' '),r:['摄影是发现美的训练——你看世界的角度会不一样 📷','按下快门的瞬间，是跟这个世界的对话']},
       {kw:'做菜 做饭 烘焙 料理 下厨'.split(' '),r:['厨房里的创造力，比办公室还多！🍳','做饭是最高级的正念——切菜的时候，全世界只有你和你手里的刀']},
+      {kw:['投资','理财','股票','基金','财报','经济学'],r:['理财也是学习,为未来铺的每一块砖都算数','搞懂钱的规律,是成年人最重要的功课之一']},
+      {kw:['育儿','亲子','孩子','带娃','陪娃','绘本','启蒙'],r:['最好的教育是陪伴,今天又多陪了一程','育儿也是育己,孩子让你成为更好的人']},
+      {kw:['养生','中医','艾灸','喝茶','茶道','穴位'],r:['会养的人,都在默默变好','三十岁以后,养生不是选项,是责任']},
+      {kw:['宠物','猫','狗','猫咪','狗狗','主子','遛狗','撸猫'],r:['伺候主子的同时也动起来了','宠物在乎的不是你有多少钱,是你在不在']},
+      {kw:['花','多肉','养花','绿植','盆栽','花园','种菜'],r:['养花的人和植物一起生长','绿植用生长回应你的照顾']},
+      {kw:['旅行','自驾','出游','攻略','酒店','机票'],r:['世界是一本书,不旅行只读了一页','做攻略也是学习,地理历史美食全学了']},
+      {kw:['装修','搬家','收纳','整理','断舍离'],r:['家是待最久的地方,花时间打理值得','断舍离的不只是物品,还有心里的杂乱']},
+      {kw:['追剧','看剧','综艺','纪录片','b站','豆瓣'],r:['好片子也是养分,故事里藏着别人的人生','好的故事会悄悄改变你看世界的方式']},
+      {kw:['聚会','朋友','饭局','聚餐','闺蜜','社交'],r:['维持友情也是投资,比股票稳','成年人的友谊靠经营,今天又在给感情账户充值']},
+      {kw:['加班','出差','项目','汇报','开会','工作'],r:['工作也是学习,实战中学的最扎实','忙完工作还能打卡,自律已刻进DNA']},
+      {kw:['公益','志愿者','环保','捐赠'],r:['给别人带去什么,自己得到的更多','善良锻炼的是心灵']},
+      {kw:['咖啡','手冲','拉花','品酒'],r:['生活需要仪式感,冲杯好咖啡的十分钟是给自己的礼物','品味是一点一点积累的']},
     ],
     exercise:[
       {kw:'跑 步 公里 km 配速 慢跑 跑步 晨跑 夜跑'.split(' '),r:['跑步的多巴胺仅次于恋爱！今天又赚到了 🏃','每一步都不是白跑的——变成体力、心情、和体检单上的好数字']},
@@ -347,6 +359,10 @@ function noteReaction(note, type) {
       {kw:'家务 打扫 拖地 擦 收拾 大扫除'.split(' '),r:['谁说家务不是运动？拖完地谁累谁知道 🧹','又干净了又消耗了——一举两得的运动方式']},
       {kw:'逛街 逛商场 购物'.split(' '),r:['逛街也是运动——走了一万步还不算？🛍️','购物+运动，完美组合（就是钱包可能不太高兴）']},
       {kw:'滑板 冲浪 滑雪 攀岩 蹦床 飞盘'.split(' '),r:['会玩的人永远不会老！这项运动听起来就很酷 🤙','成年人还能找到新爱好，这本身就是一种生命力']},
+      {kw:['拉伸','拉筋','开肩','松解','泡沫轴'],r:['会拉伸的人，身体比同龄人年轻十岁 🤸','那些酸痛的部位，谢谢你今天照顾了它们']},
+      {kw:['爬楼','上楼','楼梯'],r:['不坐电梯爬楼梯——每一个看似微小的选择都在塑造你 🏢','爬楼的消耗比想象中大，今天腿在谢谢你']},
+      {kw:['广场舞','太极','八段锦','五禽戏','气功'],r:['传统养生功法是老祖宗的智慧——温和但持久 ☯️','国潮养生！二十年后你会感谢现在的自己']},
+      {kw:['划船','皮划艇','桨板','sup'],r:['水上运动的人，心胸跟水面一样开阔 🛶','划船的节奏感——用力、放松、用力、放松，就是人生']},
     ]
   };
 
@@ -385,6 +401,20 @@ function noteReaction(note, type) {
   return pool[hashStr(note+type+'fallback')%pool.length];
 }
 
+
+
+function generateEncourageMini(data, dateStr, person) {
+  const existing = getPersonCheckin(data, person, dateStr);
+  if (!existing) return '';
+  const total = (existing.study||0) + (existing.exercise||0);
+  if (total === 0) return '';
+  const sReaction = (existing.study||0)>0 ? noteReaction(existing.sNote||'','study') : null;
+  const eReaction = (existing.exercise||0)>0 ? noteReaction(existing.eNote||'','exercise') : null;
+  const reaction = sReaction || eReaction || '';
+  const shortReaction = reaction ? reaction.split('。')[0].split('！')[0].slice(0, 30) : '';
+  const avatar = AVATARS[person] || '👤';
+  return '<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:4px;"><span style="font-size:16px;">'+avatar+'</span><span><strong>'+person+'</strong> '+total.toFixed(1)+'分'+'<br>'+shortReaction+'</span></div>';
+}
 
 function generateEncourage(data, dateStr, currentUser) {
   const d=new Date(dateStr+'T00:00:00');
@@ -523,7 +553,20 @@ function renderCheckin(){
 
   document.getElementById('headerDate').textContent=`${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日 星期${DAYS[today.getDay()===0?6:today.getDay()-1]}`;
   document.getElementById('dateBadge').textContent=isToday?'':'⚠️ 补打卡';
-  document.getElementById('dailyEncourage').innerHTML=generateEncourage(data,checkinDateStr,currentUser);
+  let allEncourage = generateEncourage(data, checkinDateStr, currentUser);
+  // Also generate mini-encouragements for others who checked in today
+  let othersEnc = '';
+  PERSONS.forEach(p => {
+    if (p !== currentUser) {
+      const c = getPersonCheckin(data, p, checkinDateStr);
+      if (c && ((c.study||0)+(c.exercise||0)) > 0) {
+        const miniEnc = generateEncourageMini(data, checkinDateStr, p);
+        if (miniEnc) othersEnc += miniEnc;
+      }
+    }
+  });
+  if (othersEnc) allEncourage += '<div style="margin-top:14px;border-top:1px dashed var(--border);padding-top:10px;font-size:12px;color:var(--sub);">' + othersEnc + '</div>';
+  document.getElementById('dailyEncourage').innerHTML = allEncourage;
 
   let sundayWinners=[];
   if(isSun){const twoSundaysAgo=new Date(checkinDate);twoSundaysAgo.setDate(twoSundaysAgo.getDate()-14);const predData=data.predictions[fmtDate(twoSundaysAgo)];if(predData&&predData.winners)sundayWinners=predData.winners;}
