@@ -714,14 +714,29 @@ async function saveMyCheckin(){
   toast('✅ 打卡已保存！');setTimeout(()=>{if(btn&&btn.classList.contains('btn-saved')){btn.textContent='💾 保存打卡';btn.className='btn btn-primary btn-block';}},3000);
   const total = (record.study||0) + (record.exercise||0);
   renderCheckin();
-  // Add AI enhance button after encouragement
-  const encDiv2 = document.getElementById('dailyEncourage');
-  if (encDiv2 && total > 0) {
-    const aiBtn = document.createElement('div');
-    aiBtn.id = 'aiBtn';
-    aiBtn.style.cssText = 'text-align:center;margin-top:8px;';
-    aiBtn.innerHTML = '<button class="btn btn-outline btn-small" onclick="enhanceWithAI()">🤖 AI润色回复</button>';
-    encDiv2.appendChild(aiBtn);
+  // Auto-fire AI in background
+  const _total = (record.study||0) + (record.exercise||0);
+  if (_total > 0) {
+    const _streak = countStreak(data, currentUser);
+    const _weekDone = countWeeklyDone(data, currentUser);
+    const _hour = new Date().getHours();
+    const _timeGreeting = _hour<7?'清晨':_hour<10?'上午':_hour<13?'中午':_hour<17?'下午':_hour<20?'傍晚':'晚上';
+    const _day = new Date(checkinDateStr+'T00:00:00').getDay()||7;
+    callDeepSeek(currentUser, record.study||0, record.sNote||'', record.exercise||0, record.eNote||'', _streak, _weekDone, _day, _timeGreeting).then(async (aiReply) => {
+      if (aiReply) {
+        const sharedData = getLocal();
+        if (sharedData.checkins[currentUser] && sharedData.checkins[currentUser][checkinDateStr]) {
+          sharedData.checkins[currentUser][checkinDateStr]._aiReply = aiReply;
+          sharedData.checkins[currentUser][checkinDateStr]._aiTime = Date.now();
+          saveLocal(sharedData);
+          await pushRemote(sharedData);
+        }
+        const encDiv3 = document.getElementById('dailyEncourage');
+        if (encDiv3) {
+          encDiv3.innerHTML = generateEncourage(sharedData||getLocal(), checkinDateStr, currentUser);
+        }
+      }
+    });
   }
 }
 
