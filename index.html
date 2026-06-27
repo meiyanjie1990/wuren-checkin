@@ -499,12 +499,28 @@ async function checkVersion(){
   }catch(e){}
 }
 
+async function testAIConnection(){
+  try{
+    const ctrl=new AbortController();setTimeout(()=>ctrl.abort(),5000);
+    const resp=await fetch('https://api.deepseek.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+DS_KEY},body:JSON.stringify({model:'deepseek-chat',messages:[{role:'user',content:'say ok'}],max_tokens:5}),signal:ctrl.signal});
+    if(resp.ok){
+      const bar=document.getElementById('syncBar');
+      if(bar){bar.textContent='AI online';setTimeout(()=>{if(bar.textContent==='AI online')bar.textContent=''},3000)}
+    }
+  }catch(e){
+    const bar=document.getElementById('syncBar');
+    if(bar){bar.textContent='AI offline - using keywords';setTimeout(()=>{if(bar.textContent==='AI offline - using keywords')bar.textContent=''},5000)}
+  }
+}
+
 // ===== INIT =====
 async function init(){
   const sel=document.getElementById('currentUser');sel.innerHTML='<option value="">选择自己</option>'+PERSONS.map(p=>'<option value="'+p+'">'+p+'</option>').join('');
   const saved=localStorage.getItem('wuren_me');if(saved&&PERSONS.includes(saved))sel.value=saved;
   document.getElementById('checkinDate').value=fmtDate(new Date());
   await syncNow(true);renderAll();
+  // Test AI connectivity
+  testAIConnection();
   checkVersion();
   if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{})}
 }
