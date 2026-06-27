@@ -253,7 +253,7 @@ async function callDeepSeek(personName, studyScore, studyNote, exerciseScore, ex
   if (parts.length === 0) return null;
 
   const context = parts.join("；");
-  const prompt = `你是一个打卡App里的鼓励助手，给30-40岁的自律成年人写一句温暖的、有活人感的打卡反馈。用口语化的中文，像朋友之间的鼓励。要轻松自然，不要喊口号，不要用感叹号堆砌。偶尔可以有一点点冷幽默。30字以内。
+  const prompt = `你是一个打卡App里的鼓励助手，给30-40岁的自律成年人写一句温暖的、有活人感的打卡反馈。用口语化的中文，像朋友之间的鼓励。要轻松自然，不要喊口号，不要用感叹号堆砌。偶尔可以有一点点冷幽默。40-60字，像个话痨但温暖的朋友。
 
 时间：${timeGreeting}
 用户：${personName}
@@ -270,7 +270,7 @@ ${context}
       body: JSON.stringify({
         model: "deepseek-chat",
         messages: [{ role: "user", content: prompt }],
-        max_tokens: 80,
+        max_tokens: 150,
         temperature: 0.9
       }),
       signal: (()=>{const c=new AbortController();setTimeout(()=>c.abort(),5000);return c.signal;})()
@@ -489,7 +489,7 @@ function generateEncourage(data, dateStr, currentUser) {
     if (aiEntry && aiEntry.reply && aiEntry.time && (Date.now() - aiEntry.time < 86400000)) {
       const prefix = greeting + '，'+currentUser+'！';
       const streakExtra = streak>=7 ? ' 🔥连续'+streak+'天！' : streak>=3 ? ' ⭐连续'+streak+'天' : '';
-      return '<div class="greeting">'+prefix+'</div><div class="body">'+aiEntry.reply+streakExtra+'</div><div class="humor">🤖 AI定制回复（离线时用关键词兜底）</div>';
+      return '<div class="greeting">'+prefix+'</div><div class="body">'+aiEntry.reply+streakExtra+'</div>';
     }
     const sReaction=st>0?noteReaction(sNote,'study'):null;
     const eReaction=et>0?noteReaction(eNote,'exercise'):null;
