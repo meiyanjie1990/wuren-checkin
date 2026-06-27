@@ -453,12 +453,21 @@ function generateEncourageMini(data, dateStr, person) {
   if (!existing) return '';
   const total = (existing.study||0) + (existing.exercise||0);
   if (total === 0) return '';
+  const avatar = AVATARS[person] || '👤';
+  // Check AI cache first
+  const aiCache = JSON.parse(localStorage.getItem('wuren_ai_cache')||'{}');
+  const aiEntry = aiCache[person+'|'+dateStr];
+  if (aiEntry && aiEntry.reply && aiEntry.time && (Date.now() - aiEntry.time < 86400000)) {
+    const shortAI = aiEntry.reply.length>40 ? aiEntry.reply.slice(0,40)+'...' : aiEntry.reply;
+    return '<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;padding:4px 0;border-bottom:1px solid #f5f5f5;"><span style="font-size:16px;">'+avatar+'</span><span><strong>'+person+'</strong> '+total.toFixed(1)+'分'+'<br><span style="color:#5c4d38;">'+shortAI+'</span></span></div>';
+  }
+  // Fallback to keyword
   const sReaction = (existing.study||0)>0 ? noteReaction(existing.sNote||'','study') : null;
   const eReaction = (existing.exercise||0)>0 ? noteReaction(existing.eNote||'','exercise') : null;
   const reaction = sReaction || eReaction || '';
-  const shortReaction = reaction ? reaction.split('。')[0].split('！')[0].slice(0, 30) : '';
-  const avatar = AVATARS[person] || '👤';
-  return '<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:4px;"><span style="font-size:16px;">'+avatar+'</span><span><strong>'+person+'</strong> '+total.toFixed(1)+'分'+'<br>'+shortReaction+'</span></div>';
+  const shortReaction = reaction ? (reaction.includes('。')?reaction.split('。')[0]:reaction.includes('！')?reaction.split('！')[0]:reaction.slice(0,30)) : '';
+  if (!shortReaction && !total) return '';
+  return '<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:4px;"><span style="font-size:16px;">'+avatar+'</span><span><strong>'+person+'</strong> '+total.toFixed(1)+'分'+'<br>'+(shortReaction||'今天也打卡了')+'</span></div>';
 }
 
 function generateEncourage(data, dateStr, currentUser) {
@@ -618,7 +627,7 @@ function renderCheckin(){
       }
     }
   });
-  if (othersEnc) allEncourage += '<div style="margin-top:14px;border-top:1px dashed var(--border);padding-top:10px;font-size:12px;color:var(--sub);">' + othersEnc + '</div>';
+  if (othersEnc) allEncourage += '<div style="margin-top:14px;border-top:1px dashed var(--border);padding-top:10px;"><div style="font-size:11px;color:var(--sub);margin-bottom:6px;">其他伙伴今日打卡</div>' + othersEnc + '</div>';
   document.getElementById('dailyEncourage').innerHTML = allEncourage;
 
   let sundayWinners=[];
@@ -666,6 +675,8 @@ function renderCheckin(){
   });
 
   document.getElementById('checkinArea').innerHTML=html||`<div style="text-align:center;color:var(--sub);padding:20px;">所有人都还没打卡，等待第一位行动派！</div>`;
+  // Background: generate AI replies for anyone without cache
+  generateMissingAI(data, checkinDateStr);
 
   // Restore temp
   if(window._tmp&&(checkinDateStr===window._tmpDate)){[0,0.5,1,1.5,2].forEach(v=>{const bs=document.getElementById('bs-'+v),be=document.getElementById('be-'+v);if(bs&&window._tmp.study===v)bs.classList.add('sel');if(be&&window._tmp.exercise===v)be.classList.add('sel');});const sn=document.getElementById('sNote'),en=document.getElementById('eNote');if(sn)sn.value=window._tmp.sNote||'';if(en)en.value=window._tmp.eNote||'';}
@@ -776,6 +787,39 @@ function downloadFile(filename, content){
 }
 
 // ============ TABS ============
+async function generateMissingAI(data, dateStr) {
+  const aiCache = JSON.parse(localStorage.getItem('wuren_ai_cache')||'{}');
+  const hour = new Date().getHours();
+  const timeGreeting = hour<7?'清晨':hour<10?'上午':hour<13?'中午':hour<17?'下午':hour<20?'傍晚':'晚上';
+  
+  for (const person of PERSONS) {
+    const existing = getPersonCheckin(data, person, dateStr);
+    if (!existing || ((existing.study||0)+(existing.exercise||0))===0) continue;
+    // Skip if AI reply already cached
+    const cacheKey = person+'|'+dateStr;
+    if (aiCache[cacheKey] && aiCache[cacheKey].reply) continue;
+    
+    const streak = countStreak(data, person);
+    const weekDone = countWeeklyDone(data, person);
+    const day = new Date(dateStr+'T00:00:00').getDay()||7;
+    
+    // Stagger calls to avoid rate limit (500ms apart)
+    const aiReply = await callDeepSeek(person, existing.study||0, existing.sNote||'', existing.exercise||0, existing.eNote||'', streak, weekDone, day, timeGreeting);
+    if (aiReply) {
+      aiCache[cacheKey] = {reply:aiReply, time:Date.now()};
+      localStorage.setItem('wuren_ai_cache', JSON.stringify(aiCache));
+      // Update encouragement display
+      const encDiv = document.getElementById('dailyEncourage');
+      if (encDiv && document.getElementById('page-checkin').classList.contains('active')) {
+        const d = getLocal();
+        encDiv.innerHTML = generateEncourage(d, dateStr, getCurrentUser());
+      }
+    }
+    // Small delay between calls
+    await new Promise(r => setTimeout(r, 500));
+  }
+}
+
 function switchTab(idx){document.querySelectorAll('.page').forEach((p,i)=>p.classList.toggle('active',i===idx));document.querySelectorAll('nav.tabs button').forEach((b,i)=>b.classList.toggle('active',i===idx));if(idx===0)renderCheckin();if(idx===1)renderWeekly();if(idx===2)renderPredict();if(idx===3)renderHistory();}
 
 // ============ INIT ============
@@ -797,9 +841,15 @@ async function checkVersion(){
         banner.textContent='🆕 有新版本！点此刷新 →';
         banner.onclick=()=>{
           localStorage.setItem('wuren_ver',String(remoteVer));
-          if('serviceWorker'in navigator){navigator.serviceWorker.getRegistrations().then(regs=>regs.forEach(r=>r.unregister()));}
+          // Aggressively clear all caches
+          if('serviceWorker'in navigator){
+            navigator.serviceWorker.getRegistrations().then(regs=>regs.forEach(r=>r.unregister()));
+          }
+          if('caches'in window){
+            caches.keys().then(keys=>keys.forEach(k=>caches.delete(k)));
+          }
           banner.textContent='✅ 已更新！';banner.style.background='#55a392';
-          setTimeout(()=>location.reload(true),300);
+          setTimeout(()=>location.reload(true),200);
         };
         document.body.appendChild(banner);
         setTimeout(()=>{const b=document.getElementById('verBanner');if(b)b.remove();},20000);
