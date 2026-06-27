@@ -179,10 +179,18 @@ async function syncNow(silent){
       if(le&&le._ai&&re&&!re._ai){if(!remote.checkins[p])remote.checkins[p]={};if(!remote.checkins[p][d])remote.checkins[p][d]={};remote.checkins[p][d]._ai=le._ai}
     }
     saveLocal(remote);if(bar)bar.textContent='OK';if(!silent){renderAll();toast('synced')}
-    setTimeout(()=>{if(bar)bar.textContent=''},3000);return true;
-  }else{if(bar)bar.textContent='offline';if(!silent)toast('offline');setTimeout(()=>{if(bar)bar.textContent=''},4000);return false}
+    // Auto-generate AI for anyone without it
+  fillMissingAI(dateStr);
+  setTimeout(()=>{if(bar)bar.textContent=''},3000);return true;
+  }else{if(bar)bar.textContent='offline';if(!silent)toast('offline');// Auto-generate AI for anyone without it
+  fillMissingAI(dateStr);
+  setTimeout(()=>{if(bar)bar.textContent=''},4000);return false}
 }
-async function saveAndSync(data){saveLocal(data);const ok=await pushRemote(data);const bar=document.getElementById('syncBar');if(ok){bar.textContent='OK';setTimeout(()=>{bar.textContent=''},3000)}else{bar.textContent='saved locally';setTimeout(()=>{bar.textContent=''},5000)};return ok}
+async function saveAndSync(data){saveLocal(data);const ok=await pushRemote(data);const bar=document.getElementById('syncBar');if(ok){bar.textContent='OK';// Auto-generate AI for anyone without it
+  fillMissingAI(dateStr);
+  setTimeout(()=>{bar.textContent=''},3000)}else{bar.textContent='saved locally';// Auto-generate AI for anyone without it
+  fillMissingAI(dateStr);
+  setTimeout(()=>{bar.textContent=''},5000)};return ok}
 function onUserSwitch(){const user=getCurrentUser();if(user){localStorage.setItem('wuren_me',user);toast(user+'!')}renderCheckin()}
 
 // ===== AI (DeepSeek) =====
@@ -254,6 +262,8 @@ function renderCheckin(){
   document.getElementById('checkinArea').innerHTML=html||'<div style="text-align:center;color:var(--sub);padding:20px">等待第一位行动派</div>';
 
   // Add others' encouragement
+  // Auto-generate AI for anyone without it
+  fillMissingAI(dateStr);
   setTimeout(()=>{
     let othersEnc='';
     PERSONS.forEach(p=>{if(p!==currentUser){const c=getPersonCheckin(data,p,checkinDateStr);if(c&&((c.study||0)+(c.exercise||0))>0){const mini=generateMiniEnc(data,checkinDateStr,p);if(mini)othersEnc+=mini}}});
@@ -279,7 +289,9 @@ async function saveMy(){
   data.checkins[currentUser][checkinDateStr]=record;
   await saveAndSync(data);window._tmp=null;window._tmpDate=null;
   const btn=document.getElementById('btnSave');if(btn){btn.textContent='saved';btn.className='btn btn-saved btn-block'}
-  toast('saved!');setTimeout(()=>{if(btn&&btn.classList.contains('btn-saved')){btn.textContent='保存打卡';btn.className='btn btn-primary btn-block'}},3000);
+  toast('saved!');// Auto-generate AI for anyone without it
+  fillMissingAI(dateStr);
+  setTimeout(()=>{if(btn&&btn.classList.contains('btn-saved')){btn.textContent='保存打卡';btn.className='btn btn-primary btn-block'}},3000);
   renderCheckin();
 
   // Fire AI in background
@@ -294,7 +306,9 @@ async function saveMy(){
       if(aiReply){
         const d2=getLocal();
         if(d2.checkins[currentUser]&&d2.checkins[currentUser][checkinDateStr]){d2.checkins[currentUser][checkinDateStr]._ai=aiReply;saveLocal(d2);await pushRemote(d2)}
-        const encDiv=document.getElementById('dailyEncourage');if(encDiv){encDiv.innerHTML=generateEncourage(getLocal(),checkinDateStr,currentUser);setTimeout(()=>renderCheckin(),800)}
+        const encDiv=document.getElementById('dailyEncourage');if(encDiv){encDiv.innerHTML=generateEncourage(getLocal(),checkinDateStr,currentUser);setTimeout(()=>renderCheckin(),800);
+  // Auto-generate AI for all checked-in people missing AI replies
+  fillMissingAI(checkinDateStr);}
       }
     });
   }
@@ -360,8 +374,42 @@ function renderAll(){renderCheckin();renderWeekly();renderPredict();renderHistor
 async function checkVersion(){
   try{
     const resp=await fetch('https://api.github.com/repos/'+REPO+'/contents/version.json?t='+Date.now(),{headers:{Authorization:'token '+TK,Accept:'application/vnd.github.v3+json'},cache:'no-cache'});
-    if(resp.ok){const json=await resp.json();const rv=JSON.parse(decodeURIComponent(escape(atob(json.content.replace(/\s/g,''))))).version;const lv=parseInt(localStorage.getItem('wuren_ver')||'0');if(rv>lv){const b=document.createElement('div');b.id='verBanner';b.style.cssText='position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:300;background:#f0883e;color:#fff;padding:10px 20px;border-radius:0 0 16px 16px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);animation:bounce 0.5s ease';b.textContent='New version! Click to update';b.onclick=()=>{localStorage.setItem('wuren_ver',String(rv));if('serviceWorker'in navigator){navigator.serviceWorker.getRegistrations().then(regs=>regs.forEach(r=>r.unregister()))}if('caches'in window){caches.keys().then(keys=>keys.forEach(k=>caches.delete(k)))}b.textContent='Updated!';b.style.background='#55a392';setTimeout(()=>location.reload(true),200)};document.body.appendChild(b);setTimeout(()=>{const vb=document.getElementById('verBanner');if(vb)vb.remove()},30000)}else{localStorage.setItem('wuren_ver',String(rv))}}
+    if(resp.ok){const json=await resp.json();const rv=JSON.parse(decodeURIComponent(escape(atob(json.content.replace(/\s/g,''))))).version;const lv=parseInt(localStorage.getItem('wuren_ver')||'0');if(rv>lv){const b=document.createElement('div');b.id='verBanner';b.style.cssText='position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:300;background:#f0883e;color:#fff;padding:10px 20px;border-radius:0 0 16px 16px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);animation:bounce 0.5s ease';b.textContent='New version! Click to update';b.onclick=()=>{localStorage.setItem('wuren_ver',String(rv));if('serviceWorker'in navigator){navigator.serviceWorker.getRegistrations().then(regs=>regs.forEach(r=>r.unregister()))}if('caches'in window){caches.keys().then(keys=>keys.forEach(k=>caches.delete(k)))}b.textContent='Updated!';b.style.background='#55a392';setTimeout(()=>location.reload(true),200)};document.body.appendChild(b);// Auto-generate AI for anyone without it
+  fillMissingAI(dateStr);
+  setTimeout(()=>{const vb=document.getElementById('verBanner');if(vb)vb.remove()},30000)}else{localStorage.setItem('wuren_ver',String(rv))}}
   }catch(e){}
+}
+
+async function fillMissingAI(dateStr){
+  const data = getLocal();
+  const hour = new Date().getHours();
+  const tg = hour<7?'清晨':hour<10?'上午':hour<13?'中午':hour<17?'下午':hour<20?'傍晚':'晚上';
+
+  for (const person of PERSONS) {
+    const existing = getPersonCheckin(data, person, dateStr);
+    if (!existing || ((existing.study||0)+(existing.exercise||0))===0) continue;
+    if (existing._ai) continue; // already has AI
+
+    const streak = countStreak(data, person);
+    const weekDone = countWeeklyDone(data, person);
+    const day = new Date(dateStr+'T00:00:00').getDay()||7;
+
+    const aiReply = await callAI(person, existing.study||0, existing.sNote||'', existing.exercise||0, existing.eNote||'', streak, weekDone, day, tg);
+    if (aiReply) {
+      const d2 = getLocal();
+      if (d2.checkins[person] && d2.checkins[person][dateStr]) {
+        d2.checkins[person][dateStr]._ai = aiReply;
+        saveLocal(d2);
+        pushRemote(d2).catch(()=>{});
+      }
+      // Update display
+      const encDiv = document.getElementById('dailyEncourage');
+      if (encDiv && document.getElementById('page-checkin').classList.contains('active')) {
+        encDiv.innerHTML = generateEncourage(getLocal(), dateStr, getCurrentUser());
+      }
+    }
+    await new Promise(r => setTimeout(r, 1500)); // Stagger calls
+  }
 }
 
 async function testAIConnection(){
@@ -370,11 +418,15 @@ async function testAIConnection(){
     const resp=await fetch('https://api.deepseek.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+DS_KEY},body:JSON.stringify({model:'deepseek-chat',messages:[{role:'user',content:'say ok'}],max_tokens:5}),signal:ctrl.signal});
     if(resp.ok){
       const bar=document.getElementById('syncBar');
-      if(bar){bar.textContent='AI online';setTimeout(()=>{if(bar.textContent==='AI online')bar.textContent=''},3000)}
+      if(bar){bar.textContent='AI online';// Auto-generate AI for anyone without it
+  fillMissingAI(dateStr);
+  setTimeout(()=>{if(bar.textContent==='AI online')bar.textContent=''},3000)}
     }
   }catch(e){
     const bar=document.getElementById('syncBar');
-    if(bar){bar.textContent='AI offline - using keywords';setTimeout(()=>{if(bar.textContent==='AI offline - using keywords')bar.textContent=''},5000)}
+    if(bar){bar.textContent='AI offline - using keywords';// Auto-generate AI for anyone without it
+  fillMissingAI(dateStr);
+  setTimeout(()=>{if(bar.textContent==='AI offline - using keywords')bar.textContent=''},5000)}
   }
 }
 
