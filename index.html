@@ -611,7 +611,7 @@ async function init(){
     
   }
   document.getElementById('checkinDate').value=fd(new Date());
-  document.getElementById('verNum').textContent=localStorage.getItem('wuren_ver')||'?';
+  document.getElementById('verNum').textContent='4';
   // Render immediately with local data, then sync
   renderAll();
   await syncNow(true);
