@@ -188,7 +188,7 @@ nav.tabs button.active{color:var(--sage)}
 
 <div class="page" id="page-weekly"><div class="card"><h3>📊 本周战报</h3><div id="weekRange" style="font-size:12px;color:var(--sepia);font-style:italic;margin-bottom:10px"></div><div style="overflow-x:auto" id="weekTable"></div><div class="summary-card" id="weekSummary"></div></div><div class="card"><h3>🔮 上周预测揭晓</h3><div id="lastPredResult" style="font-size:13px;line-height:1.8"></div></div></div>
 
-<div class="page" id="page-predict"><div class="card"><h3>🔮 预测下周总分</h3><div id="predInfo" style="font-size:12px;color:var(--sepia);font-style:italic;margin-bottom:12px;line-height:1.6"></div><div id="predInputs"></div><button class="btn btn-primary btn-block" onclick="savePredictions()" style="margin-top:12px">📝 提交预测</button></div><div class="card"><h3>📜 预测历史</h3><div id="predHistory"></div></div></div>
+<div class="page" id="page-predict"><div class="card"><h3>🔮 预测下周总分</h3><div id="predInfo" style="font-size:12px;color:var(--sepia);font-style:italic;margin-bottom:12px;line-height:1.6"></div><div id="predInputs"></div><button class="btn btn-primary btn-block" onclick="savePredictions()" style="margin-top:12px">📝 提交预测</button><div id="revealArea"></div></div><div class="card"><h3>📜 预测历史</h3><div id="predHistory"></div></div></div>
 
 <div class="page" id="page-history"><div class="card"><h3>📋 导出个人记录</h3><div id="exportList"></div></div><div class="card"><h3>📈 近期记录</h3><div id="historyOverview"></div></div></div>
 
@@ -528,33 +528,59 @@ function renderWeekly(){
   var sorted=PERSONS.slice().sort(function(a,b){return totals[b]-totals[a]});
   sorted.forEach(function(p,i){var t=totals[p];sum+='<div class="person-line">'+(i===0?'🥇':i===1?'🥈':i===2?'🥉':'')+' '+p+'：<strong>'+t.toFixed(1)+'分</strong> '+(t>=8?'太强':t>=5?'稳定':t>=2?'在路上':'加油')+'</div>'});
   document.getElementById('weekSummary').innerHTML=sum;
-  var pd=data.predictions[fd(sun)];
-  document.getElementById('lastPredResult').innerHTML=(pd&&pd.actual!=null)?'实际：<strong>'+pd.actual.toFixed(1)+'分</strong> 中奖：<strong>'+(pd.winners||[]).join('、')+'</strong>':'本周未结束周日揭晓~';
+  var predSun=new Date(m);predSun.setDate(predSun.getDate()-1);var pd=data.predictions[fd(predSun)];
+  document.getElementById('lastPredResult').innerHTML=(pd&&pd.revealed)?'实际：<strong>'+pd.actual.toFixed(1)+'分</strong> 中奖：<strong>'+(pd.winners||[]).join('、')+'</strong>':'本周预测尚未揭晓，周日见~';
 }
 
 function renderPredict(){
   var data=getLocal();var today=new Date();var m=gm(today);var sun=gs(m);
-  var nm=new Date(sun);nm.setDate(nm.getDate()+1);var ns=gs(nm);var isS=isSunday(today);
-  document.getElementById('predInfo').innerHTML=isS?'预测下周（'+fwr(nm,ns)+'）团队总分<br><span style="font-size:12px">最准的人获下周周日打卡权。预测保密</span>':'周日开放预测<br><span style="font-size:12px">猜下周团队总分最接近的获周日打卡权</span>';
-  var pk=fd(sun);var ep=(data.predictions[pk]&&data.predictions[pk].preds)?data.predictions[pk].preds:{};
-  var inputs='';PERSONS.forEach(function(p){var v=ep[p]!==undefined?ep[p]:'';inputs+='<div class="pred-input-row"><span class="name">'+p+'</span><input type="number" id="pred-'+p+'" value="'+v+'" placeholder="猜总分" step="0.5" min="0" max="40"></div>'});
+  var nm=new Date(sun);nm.setDate(nm.getDate()+1);var ns=gs(nm);var isS=isSunday(today);var user=cu();
+  document.getElementById('predInfo').innerHTML=isS?'预测下周（'+fwr(nm,ns)+'）团队总分<br><span style="font-size:12px">最准的人获下周日打卡权。预测保密，揭晓后才公开</span>':'周日开放预测<br><span style="font-size:12px">猜下周团队总分最接近的获周日打卡权</span>';
+  var pk=fd(sun);var pred=data.predictions[pk];var revealed=pred&&pred.revealed;
+  var inputs='';
+  if(revealed){
+    PERSONS.forEach(function(p){var v=(pred&&pred.preds&&pred.preds[p]!==undefined)?pred.preds[p]:'-';var isWinner=pred&&pred.winners&&pred.winners.indexOf(p)>-1;inputs+='<div class="pred-input-row"><span class="name">'+p+(isWinner?' 🏆':'')+'</span><span style="font-weight:600">'+v+'分</span></div>'});
+    if(pred.actual!==null){inputs+='<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--thread);font-size:13px;color:var(--sage)">实际总分：<strong>'+pred.actual.toFixed(1)+'分</strong> | 中奖：<strong>'+(pred.winners||[]).join('、')+'</strong></div>'}
+  }else if(isS&&user){
+    PERSONS.forEach(function(p){if(p===user){var v=(pred&&pred.preds&&pred.preds[p]!==undefined)?pred.preds[p]:'';inputs+='<div class="pred-input-row"><span class="name">'+p+' 👈</span><input type="number" id="pred-'+p+'" value="'+v+'" placeholder="猜总分" step="0.5" min="0" max="40"></div>'}else{var submitted=(pred&&pred.preds&&pred.preds[p]!==undefined);inputs+='<div class="pred-input-row"><span class="name">'+p+'</span><span style="color:var(--faded);font-size:13px">'+(submitted?'已预测 🔒':'未预测')+'</span></div>'}});
+  }else if(isS&&!user){inputs='<div style="text-align:center;color:var(--sepia);padding:10px">请先选择自己再预测</div>'}
   document.getElementById('predInputs').innerHTML=inputs;document.getElementById('predInputs').style.display=isS?'block':'none';
-  document.querySelector('#page-predict .btn-primary').style.display=isS?'block':'none';
-  var hist='';Object.keys(data.predictions).sort().reverse().forEach(function(k){var pd=data.predictions[k];if(!pd||pd.actual===null||pd.actual===undefined)return;hist+='<div style="margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #f5f0e8"><div style="font-weight:700">'+k+'</div><div style="font-size:12px;color:var(--sub)">预测周：'+pd.weekStart+' 起</div>';if(pd.preds)Object.keys(pd.preds).forEach(function(p){hist+=p+':'+pd.preds[p]+'分 '});hist+='<div style="color:#27ae60">实际：'+pd.actual.toFixed(1)+'分 | 中奖：'+(pd.winners||[]).join('、')+'</div></div>'});
+  var saveBtn=document.querySelector('#page-predict .btn-primary');saveBtn.style.display=(isS&&user)?'block':'none';
+  if(isS&&user)saveBtn.textContent='📝 提交预测';
+  var ls=new Date(sun);ls.setDate(ls.getDate()-7);var lk=fd(ls);var lp=data.predictions[lk];
+  var canReveal=isS&&lp&&!lp.revealed&&lp.preds&&Object.keys(lp.preds).length>0;
+  var ra=document.getElementById('revealArea');
+  if(canReveal){var pm=new Date(ls);pm.setDate(pm.getDate()+1);ra.innerHTML='<div class="card" style="margin-top:12px;border-color:var(--sage)"><h3>📢 揭晓上周预测</h3><div style="font-size:12px;color:var(--sepia);margin-bottom:8px">预测周：'+fwr(pm,ls)+'</div><button class="btn btn-primary btn-block" onclick="revealPrediction()">🔓 揭晓结果</button></div>'}
+  else if(isS){ra.innerHTML='<div style="text-align:center;color:var(--faded);font-size:12px;padding:10px">'+(lp&&lp.revealed?'上周预测已揭晓 ✅':'暂无需要揭晓的预测')+'</div>'}
+  else{ra.innerHTML=''}
+  var hist='';Object.keys(data.predictions).sort().reverse().forEach(function(k){var pd=data.predictions[k];if(!pd||!pd.revealed)return;hist+='<div style="margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #f5f0e8"><div style="font-weight:700">'+k+' 揭晓</div><div style="font-size:12px;color:var(--sub)">预测周：'+pd.weekStart+' 起</div>';if(pd.preds)Object.keys(pd.preds).forEach(function(p){hist+=p+':'+pd.preds[p]+'分 '});hist+='<div style="color:#27ae60">实际：'+pd.actual.toFixed(1)+'分 | 中奖：'+(pd.winners||[]).join('、')+'</div></div>'});
   document.getElementById('predHistory').innerHTML=hist||'<div style="text-align:center;color:var(--sub);padding:20px">还没有已揭晓的预测<br><span style="font-size:12px">周日来猜下周总分！预测保密揭晓日才公开</span></div>';
 }
 
 async function savePredictions(){
   var data=getLocal();var today=new Date();if(!isSunday(today)){toast('只有周日才能提交预测');return}
-  var m=gm(today);var sun=gs(m);var nm=new Date(sun);nm.setDate(nm.getDate()+1);var pk=fd(sun);
-  if(!data.predictions[pk])data.predictions[pk]={weekStart:fd(nm),preds:{},actual:null,winners:[]};
-  var count=0;PERSONS.forEach(function(p){var inp=document.getElementById('pred-'+p);if(inp&&inp.value!==''){data.predictions[pk].preds[p]=parseFloat(inp.value)||0;count++}});
+  var user=cu();if(!user){toast('请先选择自己');return}
+  var m=gm(today);var sun=gs(m);var nm=new Date(sun);nm.setDate(nm.getDate()+1);var ns=gs(nm);var pk=fd(sun);
+  var inp=document.getElementById('pred-'+user);if(!inp||inp.value===''){toast('请输入你的预测分数');return}
+  if(!data.predictions[pk])data.predictions[pk]={weekStart:fd(nm),weekEnd:fd(ns),preds:{},actual:null,winners:[],revealed:false};
+  data.predictions[pk].preds[user]=parseFloat(inp.value)||0;
+  await saveAndSync(data);toast('预测已保存 🔒');renderPredict();
+}
+async function revealPrediction(){
+  var data=getLocal();var today=new Date();if(!isSunday(today)){toast('只有周日才能揭晓预测');return}
+  var m=gm(today);var sun=gs(m);
   var ls=new Date(sun);ls.setDate(ls.getDate()-7);var lk=fd(ls);var lp=data.predictions[lk];
-  if(lp&&lp.actual===null){var tm=new Date(sun);tm.setDate(tm.getDate()-6);var act=getWeekAllTotal(data,tm);lp.actual=act;if(lp.preds&&Object.keys(lp.preds).length>0){var minDiff=Infinity,winners=[];Object.keys(lp.preds).forEach(function(p){var diff=Math.abs(lp.preds[p]-act);if(diff<minDiff){minDiff=diff;winners=[p]}else if(diff===minDiff){winners.push(p)}});lp.winners=winners}}
-  await saveAndSync(data);toast('saved '+count+' predictions');renderPredict()
+  if(!lp){toast('没有找到上周的预测');return}
+  if(lp.revealed){toast('上周预测已经揭晓过了');return}
+  if(!lp.preds||Object.keys(lp.preds).length===0){toast('上周没有人提交预测');return}
+  if(!confirm('确定揭晓上周预测结果吗？揭晓后所有人的预测将公开。'))return;
+  var lm=new Date(sun);lm.setDate(lm.getDate()-6);var act=getWeekAllTotal(data,lm);
+  lp.actual=act;lp.revealed=true;
+  if(lp.preds&&Object.keys(lp.preds).length>0){var minDiff=Infinity,winners=[];Object.keys(lp.preds).forEach(function(p){var diff=Math.abs(lp.preds[p]-act);if(diff<minDiff){minDiff=diff;winners=[p]}else if(diff===minDiff){winners.push(p)}});lp.winners=winners}
+  await saveAndSync(data);toast('🎉 揭晓！中奖：'+(lp.winners||[]).join('、'));renderPredict();renderWeekly();
 }
 function getWeekAllTotal(data,m){var t=0;PERSONS.forEach(function(p){t+=getWeekTotal(data,p,m)});return t}
-function getWeekTotal(data,p,m){var t=0;for(var i=0;i<6;i++){var d=new Date(m);d.setDate(d.getDate()+i);var c=gpc(data,p,fd(d));if(c)t+=(c.study||0)+(c.exercise||0)}var sun=gs(m);var wk=fd(new Date(sun.getTime()-14*86400000));var pd=data.predictions[wk];if(pd&&pd.winners&&pd.winners.indexOf(p)>-1){var c=gpc(data,p,fd(sun));if(c)t+=(c.study||0)+(c.exercise||0)}return t}
+function getWeekTotal(data,p,m){var t=0;for(var i=0;i<7;i++){var d=new Date(m);d.setDate(d.getDate()+i);var c=gpc(data,p,fd(d));if(c)t+=(c.study||0)+(c.exercise||0)}return t}
 
 function renderHistory(){
   var data=getLocal();var exp='';PERSONS.forEach(function(p){exp+='<div style="margin-bottom:8px"><button class="btn btn-outline btn-small" onclick="exportPerson(\''+p+'\')">'+p+'</button></div>'});exp+='<button class="btn btn-outline btn-small" onclick="exportAll()">导出全部</button>';document.getElementById('exportList').innerHTML=exp;
