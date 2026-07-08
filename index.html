@@ -167,7 +167,7 @@ nav.tabs button.active{color:var(--sage)}
 <header>
 <div class="top-row">
   <h1><span id="headerName">五仁打卡</span></h1>
-  <div class="date-col" id="headerDate"></div>
+  <div class="date-col" id="headerDate"><span style="font-size:9px;color:var(--faded);display:block">v<span id="verNum">?</span></span></div>
 </div>
 <div class="sub-line">
   <select id="currentUser" onchange="onUserSwitch()"><option value="">切换成员 ▾</option></select>
@@ -598,7 +598,7 @@ function renderAll(){renderCheckin();renderWeekly();renderPredict();renderHistor
 async function checkVersion(){
   try{
     var resp=await fetch('https://api.github.com/repos/'+REPO+'/contents/version.json?t='+Date.now(),{headers:{Authorization:'token '+TK,Accept:'application/vnd.github.v3+json'},cache:'no-cache'});
-    if(resp.ok){var json=await resp.json();var rv=JSON.parse(decodeURIComponent(escape(atob(json.content.replace(/\s/g,''))))).version;var lv=parseInt(localStorage.getItem('wuren_ver')||'0');if(rv>lv){var b=document.createElement('div');b.style.cssText='position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:300;background:#f0883e;color:#fff;padding:10px 20px;border-radius:0 0 16px 16px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);animation:bounce 0.5s ease';b.textContent='New version! Click to update';b.onclick=function(){localStorage.setItem('wuren_ver',String(rv));if('serviceWorker'in navigator){navigator.serviceWorker.getRegistrations().then(function(regs){regs.forEach(function(r){r.unregister()})})}if('caches'in window){caches.keys().then(function(keys){keys.forEach(function(k){caches.delete(k)})})}location.reload(true)};document.body.appendChild(b);setTimeout(function(){if(b.parentNode)b.remove()},30000)}else{localStorage.setItem('wuren_ver',String(rv))}}
+    if(resp.ok){var json=await resp.json();var rv=JSON.parse(decodeURIComponent(escape(atob(json.content.replace(/\s/g,''))))).version;var lv=parseInt(localStorage.getItem('wuren_ver')||'0');document.getElementById('verNum').textContent=rv;if(rv>lv){var b=document.createElement('div');b.style.cssText='position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:300;background:#f0883e;color:#fff;padding:10px 20px;border-radius:0 0 16px 16px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);animation:bounce 0.5s ease';b.textContent='New version! Click to update';b.onclick=function(){localStorage.setItem('wuren_ver',String(rv));if('serviceWorker'in navigator){navigator.serviceWorker.getRegistrations().then(function(regs){regs.forEach(function(r){r.unregister()})})}if('caches'in window){caches.keys().then(function(keys){keys.forEach(function(k){caches.delete(k)})})}location.reload(true)};document.body.appendChild(b);setTimeout(function(){if(b.parentNode)b.remove()},30000)}else{localStorage.setItem('wuren_ver',String(rv));document.getElementById('verNum').textContent=rv}}
   }catch(e){}
 }
 
@@ -611,6 +611,7 @@ async function init(){
     
   }
   document.getElementById('checkinDate').value=fd(new Date());
+  document.getElementById('verNum').textContent=localStorage.getItem('wuren_ver')||'?';
   // Render immediately with local data, then sync
   renderAll();
   await syncNow(true);
