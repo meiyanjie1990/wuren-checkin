@@ -535,7 +535,7 @@ function renderWeekly(){
 function renderPredict(){
   var data=getLocal();var today=new Date();var m=gm(today);var sun=gs(m);
   var nm=new Date(sun);nm.setDate(nm.getDate()+1);var ns=gs(nm);var isS=isSunday(today);var user=cu();
-  document.getElementById('predInfo').innerHTML=isS?'预测下周（'+fwr(nm,ns)+'）团队总分<br><span style="font-size:12px">最准的人获下周日打卡权。预测保密，揭晓后才公开</span>':'周日开放预测<br><span style="font-size:12px">猜下周团队总分最接近的获周日打卡权</span>';
+  document.getElementById('predInfo').innerHTML=isS?'预测下周（'+fwr(nm,ns)+'）团队总分<br><span style="font-size:12px">最准的人获下周日打卡权。预测保密，揭晓后才公开</span>':('周日开放预测<br><span style="font-size:12px">预测保密：每人仅见自己的预测，揭晓后全员公开</span>';
   var pk=fd(sun);var pred=data.predictions[pk];var revealed=pred&&pred.revealed;
   var inputs='';
   if(revealed){
