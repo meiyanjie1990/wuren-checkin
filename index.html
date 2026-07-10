@@ -247,7 +247,7 @@ nav.tabs button.active::before{content:'';position:absolute;top:0;width:24px;hei
 // ====== 版本升级自动修复 ======
 // 当检测到版本号变化时，在 SW 接管之前就清理掉旧缓存
 (function(){
-  var EXPECTED=7;
+  var EXPECTED=8;
   var stored=parseInt(localStorage.getItem('wuren_ver')||'0');
   if(stored>0 && stored<EXPECTED){
     // 有旧版本缓存，抢先清理
@@ -307,6 +307,23 @@ function saveLocal(data){_local=data;localStorage.setItem('wuren_data',JSON.stri
 function getLocal(){if(_local)return _local;var d=loadLocal();if(!d.checkins)d.checkins={};if(!d.predictions)d.predictions={};_local=d;return d}
 function gpc(data,person,dateStr){if(!data.checkins[person])return null;return data.checkins[person][dateStr]||null}
 
+// 深度合并：src 优先（用于 SHA 冲突时把本地改动合入远程数据）
+function deepMerge(dst,src){
+  var res=JSON.parse(JSON.stringify(dst));
+  for(var k in src){
+    if(!res[k]){res[k]=JSON.parse(JSON.stringify(src[k]));continue;}
+    if(typeof src[k]==='object'&&src[k]!==null&&!Array.isArray(src[k])){
+      for(var k2 in src[k]){
+        if(!res[k][k2]){res[k][k2]=JSON.parse(JSON.stringify(src[k][k2]));continue;}
+        if(typeof src[k][k2]==='object'&&src[k][k2]!==null){
+          for(var k3 in src[k][k2]){res[k][k2][k3]=src[k][k2][k3];}
+        }else{res[k][k2]=src[k][k2];}
+      }
+    }else{res[k]=src[k];}
+  }
+  return res;
+}
+
 async function fetchRemote(){
   try{
     var resp=await fetch('https://api.github.com/repos/'+REPO+'/contents/data.json',{headers:{Authorization:'token '+TK,Accept:'application/vnd.github.v3+json'},cache:'no-cache'});
@@ -319,29 +336,78 @@ async function pushRemote(data){
   var s=JSON.stringify(data,null,2);
   var c=b64Encode(s);
   var body={message:'update',content:c,branch:'main'};
+  // 如果没有 SHA，先获取最新 SHA（处理初次推送或脱机恢复）
+  if(!_sha){
+    try{
+      var pre=await fetch('https://api.github.com/repos/'+REPO+'/contents/data.json',{headers:{Authorization:'token '+TK,Accept:'application/vnd.github.v3+json'}});
+      if(pre.ok){var pd=await pre.json();_sha=pd.sha;}
+    }catch(e){}
+  }
   if(_sha)body.sha=_sha;
   try{
     var resp=await fetch('https://api.github.com/repos/'+REPO+'/contents/data.json',{method:'PUT',headers:{Authorization:'token '+TK,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify(body)});
-    if(!resp.ok){var err=await resp.json();if(err.message&&err.message.indexOf('sha')>-1){var rf=await fetch('https://api.github.com/repos/'+REPO+'/contents/data.json',{headers:{Authorization:'token '+TK,Accept:'application/vnd.github.v3+json'}});if(rf.ok){var rd=await rf.json();body.sha=rd.sha;var rt=await fetch('https://api.github.com/repos/'+REPO+'/contents/data.json',{method:'PUT',headers:{Authorization:'token '+TK,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify(body)});if(rt.ok){_sha=(await rt.json()).content.sha;return true}}}return false}
+    if(!resp.ok){
+      var err=await resp.json();
+      if(err.message&&err.message.indexOf('sha')>-1){
+        // SHA 冲突：拉取最新远程数据，把本地改动合并进去再推送
+        var rf=await fetch('https://api.github.com/repos/'+REPO+'/contents/data.json',{headers:{Authorization:'token '+TK,Accept:'application/vnd.github.v3+json'}});
+        if(rf.ok){
+          var rd=await rf.json();
+          var remoteData=JSON.parse(b64Decode(rd.content));
+          // 合并：本地数据优先（保留自己的打卡），远程其他人的数据保留
+          var merged=deepMerge(remoteData,data);
+          body.content=b64Encode(JSON.stringify(merged,null,2));
+          body.sha=rd.sha;
+          var rt=await fetch('https://api.github.com/repos/'+REPO+'/contents/data.json',{method:'PUT',headers:{Authorization:'token '+TK,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify(body)});
+          if(rt.ok){_sha=(await rt.json()).content.sha;return true;}
+        }
+      }
+      console.error('pushRemote failed:',err);
+      return false;
+    }
     _sha=(await resp.json()).content.sha;return true;
-  }catch(e){return false}
+  }catch(e){console.error('pushRemote error:',e);return false}
 }
 async function syncNow(silent){
   var bar=document.getElementById('syncBar');bar.textContent='syncing...';
   var remote=await fetchRemote();
   if(remote){
     var local=getLocal();
+    // 保留本地的 AI 鼓励语（远程可能没有）
     if(local.checkins)for(var p in local.checkins)for(var d in local.checkins[p]){
       var le=local.checkins[p][d];
       if(le&&le._ai&&remote.checkins&&remote.checkins[p]&&remote.checkins[p][d]&&!remote.checkins[p][d]._ai){
         remote.checkins[p][d]._ai=le._ai;
       }
     }
-    saveLocal(remote);bar.textContent='OK';if(!silent){renderAll();toast('synced')}
-    setTimeout(function(){bar.textContent=''},3000);return true;
+    // 如果有上次未推送的数据，合并到远程数据中并尝试推送
+    if(localStorage.getItem('wuren_need_sync')==='1'){
+      remote=deepMerge(remote,local);
+      saveLocal(remote);
+      var ok=await pushRemote(remote);
+      if(ok){localStorage.removeItem('wuren_need_sync');bar.textContent='OK ✓ 已补推';}
+      else{bar.textContent='⚠️ 仍有数据待同步';}
+    }else{
+      saveLocal(remote);bar.textContent='OK';
+    }
+    if(!silent){renderAll();}
+    setTimeout(function(){bar.textContent=''},4000);return true;
   }else{bar.textContent='offline';setTimeout(function(){bar.textContent=''},4000);return false}
 }
-async function saveAndSync(data){saveLocal(data);await pushRemote(data);var bar=document.getElementById('syncBar');bar.textContent='OK';setTimeout(function(){bar.textContent=''},3000)}
+async function saveAndSync(data){
+  saveLocal(data);
+  var ok=await pushRemote(data);
+  var bar=document.getElementById('syncBar');
+  if(ok){
+    bar.textContent='OK ✓';
+    localStorage.removeItem('wuren_need_sync');
+  }else{
+    bar.textContent='⚠️ 已存本地，联网后同步';
+    localStorage.setItem('wuren_need_sync','1');
+  }
+  setTimeout(function(){bar.textContent=''},5000);
+  return ok;
+}
 function onUserSwitch(){var u=cu();localStorage.setItem('wuren_me',u);var hn=document.getElementById('headerName');var he=document.getElementById('headerEmoji');if(hn)hn.textContent=u||'五仁打卡';if(he)he.textContent=AVATARS[u]||'🥜';renderCheckin()}
 
 // AI
@@ -551,7 +617,10 @@ async function saveMy(){
   data.checkins[user][ds]=record;
   await saveAndSync(data);window._tmp=null;window._tmpDate=null;
   var btn=document.getElementById('btnSave');if(btn){btn.textContent='saved';btn.className='btn btn-saved btn-block'}
-  toast('saved!');setTimeout(function(){if(btn&&btn.classList.contains('btn-saved')){btn.textContent='保存打卡';btn.className='btn btn-primary btn-block'}},3000);
+  var needSync=localStorage.getItem('wuren_need_sync');
+  if(needSync==='1'){toast('⚠️ 已存本地，联网后自动同步')}
+  else{toast('saved! ✓')}
+  setTimeout(function(){if(btn&&btn.classList.contains('btn-saved')){btn.textContent='保存打卡';btn.className='btn btn-primary btn-block'}},3000);
   renderCheckin();
 
   var total=(record.study||0)+(record.exercise||0);
@@ -708,7 +777,7 @@ async function init(){
     
   }
   document.getElementById('checkinDate').value=fd(new Date());
-  document.getElementById('verNum').textContent='7';
+  document.getElementById('verNum').textContent='8';
   // Render immediately with local data, then sync
   renderAll();
   await syncNow(true);
@@ -727,7 +796,7 @@ async function init(){
     setTimeout(function(){renderCheckin();},100);
     setTimeout(function(){renderCheckin();},400);
   }
-  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=7').catch(function(){})}
+  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=8').catch(function(){})}
 }
 init();
 </script>
