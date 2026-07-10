@@ -735,16 +735,8 @@ function getWeekTotal(data,p,m){var t=0;for(var i=0;i<7;i++){var d=new Date(m);d
 function renderHistory(){
   var data=getLocal();var exp='';PERSONS.forEach(function(p){exp+='<div style="margin-bottom:8px"><button class="btn btn-outline btn-small" onclick="exportPerson(\''+p+'\')">'+p+'</button></div>'});exp+='<button class="btn btn-outline btn-small" onclick="exportAll()">导出全部</button>';document.getElementById('exportList').innerHTML=exp;
   var ads=new Set();PERSONS.forEach(function(p){if(data.checkins[p])Object.keys(data.checkins[p]).forEach(function(d){ads.add(d)})});var sorted=Array.from(ads).sort().reverse().slice(0,30);
-  // 数据诊断
-  var diag='<div style="margin-top:12px;padding:8px 12px;background:#fef9e7;border-radius:8px;font-size:11px;color:#8B7355;line-height:1.6">📋 <strong>数据诊断</strong>（当前浏览器存储）：';
-  PERSONS.forEach(function(p){
-    var entries=data.checkins[p]?Object.keys(data.checkins[p]).sort().reverse():[];
-    var total=0;entries.forEach(function(d){total+=(data.checkins[p][d].study||0)+(data.checkins[p][d].exercise||0)});
-    diag+='<br>'+p+'：'+entries.length+'条记录，共'+total.toFixed(1)+'分'+(entries.length>0?'（'+entries.join(', ')+'）':'');
-  });
-  diag+='</div>';
-  if(sorted.length===0){document.getElementById('historyOverview').innerHTML='<div style="text-align:center;color:var(--sub);padding:30px">还没有打卡记录</div>'+diag}
-  else{var tbl='<table class="week-table"><thead><tr><th>日期</th>';PERSONS.forEach(function(p){tbl+='<th>'+p.slice(0,2)+'</th>'});tbl+='<th>日总</th></tr></thead><tbody>';sorted.forEach(function(ds){tbl+='<tr><td>'+ds.slice(5)+'</td>';var dt=0;PERSONS.forEach(function(p){var c=gpc(data,p,ds);var sc=c?(c.study||0)+(c.exercise||0):0;dt+=sc;tbl+='<td>'+(sc>0?sc.toFixed(1):'-')+'</td>'});tbl+='<td><strong>'+dt.toFixed(1)+'</strong></td></tr>'});tbl+='</tbody></table>';document.getElementById('historyOverview').innerHTML=tbl+diag}
+  if(sorted.length===0){document.getElementById('historyOverview').innerHTML='<div style="text-align:center;color:var(--sub);padding:30px">还没有打卡记录</div>'}
+  else{var tbl='<table class="week-table"><thead><tr><th>日期</th>';PERSONS.forEach(function(p){tbl+='<th>'+p.slice(0,2)+'</th>'});tbl+='<th>日总</th></tr></thead><tbody>';sorted.forEach(function(ds){tbl+='<tr><td>'+ds.slice(5)+'</td>';var dt=0;PERSONS.forEach(function(p){var c=gpc(data,p,ds);var sc=c?(c.study||0)+(c.exercise||0):0;dt+=sc;tbl+='<td>'+(sc>0?sc.toFixed(1):'-')+'</td>'});tbl+='<td><strong>'+dt.toFixed(1)+'</strong></td></tr>'});tbl+='</tbody></table>';document.getElementById('historyOverview').innerHTML=tbl}
 }
 function exportPerson(p){var data=getLocal();var rs=data.checkins[p]||{};var ds=Object.keys(rs).sort();var txt=p+' 打卡记录\n'+'='.repeat(40)+'\n\n';var g=0;ds.forEach(function(d){var r=rs[d];var dob=new Date(d+'T00:00:00');var dn=DAYS[dob.getDay()===0?6:dob.getDay()-1];var sc=(r.study||0)+(r.exercise||0);g+=sc;txt+=d+' 星期'+dn+'\n  学习：'+(r.study||0)+'分'+(r.sNote?' - '+r.sNote:'')+'\n  运动：'+(r.exercise||0)+'分'+(r.eNote?' - '+r.eNote:'')+'\n  小计：'+sc.toFixed(1)+'分\n\n'});txt+='-'.repeat(40)+'\n总计：'+g.toFixed(1)+'分 | '+ds.length+'天\n导出：'+new Date().toLocaleString()+'\n';downloadFile(p+'_打卡记录.txt',txt)}
 function exportAll(){var data=getLocal();var txt='五仁打卡汇总\n'+'='.repeat(50)+'\n\n';PERSONS.forEach(function(p){var rs=data.checkins[p]||{};var ds=Object.keys(rs).sort();var t=0;ds.forEach(function(d){t+=(rs[d].study||0)+(rs[d].exercise||0)});txt+=p+'：'+t.toFixed(1)+'分 | '+ds.length+'天\n'});txt+='\n导出：'+new Date().toLocaleString()+'\n';downloadFile('五仁打卡_汇总.txt',txt)}
