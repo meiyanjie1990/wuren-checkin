@@ -211,7 +211,7 @@ nav.tabs button.active::before{content:'';position:absolute;top:0;width:24px;hei
 <header>
 <div class="top-row">
   <h1><span id="headerName">五仁打卡</span><span class="sub">Day by Day · Together</span></h1>
-  <div class="date-col" id="headerDate"></div><div style="text-align:right;font-size:9px;color:var(--faded);margin-top:-2px">v<span id="verNum">5</span></div>
+  <div class="date-col" id="headerDate"></div><div style="text-align:right;font-size:9px;color:var(--faded);margin-top:-2px">v<span id="verNum">5</span> <span onclick="repairApp()" style="cursor:pointer;font-size:11px;color:var(--rose);" title="修复加载问题">🔧</span></div>
 </div>
 <div class="sub-line">
   <select id="currentUser" onchange="onUserSwitch()"><option value="">切换成员 ▾</option></select>
@@ -244,6 +244,29 @@ nav.tabs button.active::before{content:'';position:absolute;top:0;width:24px;hei
 </nav>
 
 <script>
+// ====== 版本升级自动修复 ======
+// 当检测到版本号变化时，在 SW 接管之前就清理掉旧缓存
+(function(){
+  var EXPECTED=7;
+  var stored=parseInt(localStorage.getItem('wuren_ver')||'0');
+  if(stored>0 && stored<EXPECTED){
+    // 有旧版本缓存，抢先清理
+    if('serviceWorker'in navigator){
+      navigator.serviceWorker.getRegistrations().then(function(regs){
+        regs.forEach(function(r){r.unregister();});
+      });
+    }
+    if('caches'in window){
+      caches.keys().then(function(keys){
+        keys.forEach(function(k){caches.delete(k);});
+      });
+    }
+    localStorage.setItem('wuren_ver',String(EXPECTED));
+    // 延迟重载，确保清理完成
+    setTimeout(function(){location.reload(true);},300);
+  }
+})();
+
 var PERSONS=['石维婧','梅妍洁','单兰迪','王珂','师旌议'];
 var DAYS=['一','二','三','四','五','六','日'];
 var AVATARS={石维婧:'婧',梅妍洁:'洁',单兰迪:'迪',王珂:'珂',师旌议:'议'};
@@ -653,6 +676,22 @@ function downloadFile(fn,c){var b=new Blob(['﻿'+c],{type:'text/plain;charset=u
 function switchTab(idx){document.querySelectorAll('.page').forEach(function(p,i){p.classList.toggle('active',i===idx)});document.querySelectorAll('nav.tabs button').forEach(function(b,i){b.classList.toggle('active',i===idx)});if(idx===0)renderCheckin();if(idx===1)renderWeekly();if(idx===2)renderPredict();if(idx===3)renderHistory()}
 function renderAll(){renderCheckin();renderWeekly();renderPredict();renderHistory()}
 
+function repairApp(){
+  toast('正在清理缓存…');
+  if('serviceWorker'in navigator){
+    navigator.serviceWorker.getRegistrations().then(function(regs){
+      regs.forEach(function(r){r.unregister();});
+    });
+  }
+  if('caches'in window){
+    caches.keys().then(function(keys){
+      keys.forEach(function(k){caches.delete(k);});
+    });
+  }
+  localStorage.removeItem('wuren_ver');
+  setTimeout(function(){location.reload(true);},500);
+}
+
 async function checkVersion(){
   try{
     var resp=await fetch('https://api.github.com/repos/'+REPO+'/contents/version.json?t='+Date.now(),{headers:{Authorization:'token '+TK,Accept:'application/vnd.github.v3+json'},cache:'no-cache'});
@@ -669,7 +708,7 @@ async function init(){
     
   }
   document.getElementById('checkinDate').value=fd(new Date());
-  document.getElementById('verNum').textContent='6';
+  document.getElementById('verNum').textContent='7';
   // Render immediately with local data, then sync
   renderAll();
   await syncNow(true);
@@ -688,7 +727,7 @@ async function init(){
     setTimeout(function(){renderCheckin();},100);
     setTimeout(function(){renderCheckin();},400);
   }
-  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js').catch(function(){})}
+  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=7').catch(function(){})}
 }
 init();
 </script>
