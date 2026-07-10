@@ -12,8 +12,6 @@
 <link rel="manifest" href="./manifest.json">
 <title>五仁打卡</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,500;0,600;1,400&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap');
-
 :root{
   --parchment:#F5F1E8; --paper:#FEFCF8; --paper2:#FBF7EF;
   --ink:#2C2416; --sepia:#8B7355; --faded:#B8A88A;
@@ -28,7 +26,7 @@
 
 *{margin:0;padding:0;box-sizing:border-box}
 body{
-  font-family:'Inter',-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+  font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
   background:var(--parchment);color:var(--ink);
   min-height:100vh;padding-bottom:92px;
   -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;
@@ -45,11 +43,11 @@ header{
   padding:24px 20px 14px;position:sticky;top:0;z-index:10;border-bottom:1px solid var(--thread);
 }
 .top-row{display:flex;align-items:flex-start;justify-content:space-between}
-.top-row h1{font-family:'EB Garamond',serif;font-size:34px;font-weight:600;letter-spacing:-0.5px;line-height:1}
+.top-row h1{font-family:Georgia,'Songti SC','Noto Serif SC',serif;font-size:34px;font-weight:600;letter-spacing:-0.5px;line-height:1}
 .top-row h1 .emoji{font-size:26px;margin-right:4px}
-.top-row h1 .sub{display:block;font-family:'Inter';font-size:10px;font-weight:500;color:var(--faded);letter-spacing:2px;margin-top:6px;text-transform:uppercase}
+.top-row h1 .sub{display:block;font-family:-apple-system,'PingFang SC',sans-serif;font-size:10px;font-weight:500;color:var(--faded);letter-spacing:2px;margin-top:6px;text-transform:uppercase}
 .top-row .date-col{text-align:right;font-size:12px;color:var(--sepia);font-style:italic;line-height:1.7}
-.top-row .date-col strong{display:block;font-size:15px;color:var(--ink);font-style:normal;font-family:'EB Garamond',serif;font-weight:600}
+.top-row .date-col strong{display:block;font-size:15px;color:var(--ink);font-style:normal;font-family:Georgia,'Songti SC','Noto Serif SC',serif;font-weight:600}
 
 .sub-line{display:flex;align-items:center;gap:10px;margin-top:14px}
 .sub-line select{
@@ -89,7 +87,7 @@ nav.tabs button.active::before{content:'';position:absolute;top:0;width:24px;hei
 @keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-8px)}}
 
 .section-label{
-  font-family:'EB Garamond',serif;font-size:13px;font-weight:600;color:var(--sepia);
+  font-family:Georgia,'Songti SC','Noto Serif SC',serif;font-size:13px;font-weight:600;color:var(--sepia);
   letter-spacing:0.5px;margin:6px 2px 12px;display:flex;align-items:center;gap:8px;
 }
 .section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--thread),transparent)}
@@ -103,13 +101,13 @@ nav.tabs button.active::before{content:'';position:absolute;top:0;width:24px;hei
   border:1.5px solid var(--sage);
   background:linear-gradient(180deg,rgba(122,155,124,0.05),var(--paper) 34%);
 }
-.card h3{font-family:'EB Garamond',serif;font-size:18px;font-weight:600;margin-bottom:12px}
+.card h3{font-family:Georgia,'Songti SC','Noto Serif SC',serif;font-size:18px;font-weight:600;margin-bottom:12px}
 
 .person-name{font-size:15px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:10px}
 .person-avatar{
   display:inline-flex;align-items:center;justify-content:center;
   width:34px;height:34px;border-radius:50%;flex-shrink:0;
-  font-family:'EB Garamond',serif;font-weight:600;font-size:15px;color:#fff;
+  font-family:Georgia,'Songti SC','Noto Serif SC',serif;font-weight:600;font-size:15px;color:#fff;
 }
 .person-avatar.av-shi{background:var(--av-shi)}
 .person-avatar.av-mei{background:var(--av-mei)}
@@ -128,7 +126,7 @@ nav.tabs button.active::before{content:'';position:absolute;top:0;width:24px;hei
 .score-btns button{
   flex:1;min-width:36px;padding:13px 3px;border:1px solid var(--thread);
   border-radius:11px;background:var(--paper);
-  font-family:'EB Garamond',serif;font-size:16px;font-weight:600;
+  font-family:Georgia,'Songti SC','Noto Serif SC',serif;font-size:16px;font-weight:600;
   color:var(--ink);cursor:pointer;transition:all 0.15s;
 }
 .score-btns button:hover{border-color:var(--sage)}
@@ -147,7 +145,7 @@ nav.tabs button.active::before{content:'';position:absolute;top:0;width:24px;hei
 .me-tag{font-size:10px;color:var(--sage);border-bottom:1.5px solid var(--sage);font-weight:600;padding-bottom:1px}
 .done-detail{display:flex;gap:22px;flex-wrap:wrap;font-size:14px;line-height:1.6}
 .done-detail .k{font-size:11px;color:var(--faded);display:block;margin-bottom:1px}
-.done-detail .v{font-family:'EB Garamond',serif;font-weight:600;font-size:19px}
+.done-detail .v{font-family:Georgia,'Songti SC','Noto Serif SC',serif;font-weight:600;font-size:19px}
 .done-detail .v.s{color:var(--moss)}
 .done-detail .v.e{color:var(--rose)}
 .done-detail .nt{font-size:12px;color:var(--sepia);font-style:italic;margin-top:3px;max-width:130px}
@@ -159,7 +157,7 @@ nav.tabs button.active::before{content:'';position:absolute;top:0;width:24px;hei
 /* ---------- Tables ---------- */
 .week-table{width:100%;border-collapse:collapse;font-size:12px}
 .week-table th,.week-table td{padding:8px 3px;text-align:center;border-bottom:1px dotted var(--thread)}
-.week-table th{font-weight:600;font-size:11px;color:var(--sepia);font-family:'EB Garamond',serif}
+.week-table th{font-weight:600;font-size:11px;color:var(--sepia);font-family:Georgia,'Songti SC','Noto Serif SC',serif}
 .week-table td:first-child{text-align:left;font-weight:600}
 .week-table .sun-col{color:var(--rose)}
 .week-table .highlight{background:rgba(122,155,124,0.08);font-weight:600;border-radius:6px}
@@ -182,8 +180,8 @@ nav.tabs button.active::before{content:'';position:absolute;top:0;width:24px;hei
   font-size:14px;line-height:1.85;box-shadow:var(--shadow);position:relative;overflow:hidden;
 }
 .encourage-box:empty{display:none}
-.encourage-box::before{content:'“';position:absolute;top:-6px;right:16px;font-family:'EB Garamond',serif;font-size:88px;color:var(--sage);opacity:0.08;line-height:1;pointer-events:none}
-.encourage-box .greeting{font-family:'EB Garamond',serif;font-size:21px;font-weight:600;margin-bottom:9px;position:relative}
+.encourage-box::before{content:'“';position:absolute;top:-6px;right:16px;font-family:Georgia,'Songti SC','Noto Serif SC',serif;font-size:88px;color:var(--sage);opacity:0.08;line-height:1;pointer-events:none}
+.encourage-box .greeting{font-family:Georgia,'Songti SC','Noto Serif SC',serif;font-size:21px;font-weight:600;margin-bottom:9px;position:relative}
 .encourage-box .body{color:#3D3528;position:relative}
 .encourage-box .body strong{color:var(--moss)}
 .encourage-box .humor{color:var(--sepia);font-style:italic;margin-top:10px;padding-top:10px;border-top:1px dotted var(--thread);font-size:13px;position:relative}
@@ -191,10 +189,10 @@ nav.tabs button.active::before{content:'';position:absolute;top:0;width:24px;hei
 /* ---------- Summary / predict ---------- */
 .summary-card{margin-top:12px}
 .summary-card .person-line{padding:8px 0;border-bottom:1px dotted var(--thread);font-size:13px}
-.summary-card .total-line{font-family:'EB Garamond',serif;font-weight:600;font-size:19px;padding:12px 0;color:var(--moss)}
+.summary-card .total-line{font-family:Georgia,'Songti SC','Noto Serif SC',serif;font-weight:600;font-size:19px;padding:12px 0;color:var(--moss)}
 
 .pred-input-row{display:flex;align-items:center;gap:10px;margin:8px 0}
-.pred-input-row input{width:74px;padding:10px;border:1px solid var(--thread);border-radius:11px;font-size:15px;text-align:center;font-family:'EB Garamond',serif;font-weight:600;background:var(--paper2);outline:none}
+.pred-input-row input{width:74px;padding:10px;border:1px solid var(--thread);border-radius:11px;font-size:15px;text-align:center;font-family:Georgia,'Songti SC','Noto Serif SC',serif;font-weight:600;background:var(--paper2);outline:none}
 .pred-input-row input:focus{border-color:var(--sage);background:var(--paper)}
 .pred-input-row .name{flex:1;font-size:14px;font-weight:600}
 
@@ -254,6 +252,20 @@ var REPO='meiyanjie1990/wuren-checkin';
 var DS_KEY='sk-b536a934fbea40c58afd'+'92739665db75';
 var _sha=null,_local=null;
 
+// UTF-8 <-> base64 转换（替代废弃的 escape/unescape）
+function b64Decode(b64){
+  var bin=atob(b64.replace(/\s/g,''));
+  var bytes=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+  return new TextDecoder('utf-8').decode(bytes);
+}
+function b64Encode(str){
+  var bytes=new TextEncoder().encode(str);
+  var bin='';
+  for(var i=0;i<bytes.length;i++)bin+=String.fromCharCode(bytes[i]);
+  return btoa(bin);
+}
+
 function avClass(p){if(p==='石维婧')return'av-shi';if(p==='梅妍洁')return'av-mei';if(p==='单兰迪')return'av-shan';if(p==='王珂')return'av-wang';return'av-shi2';}
 function gm(d){d=new Date(d);d.setHours(0,0,0,0);var day=d.getDay();d.setDate(d.getDate()+(day===0?-6:1-day));return d}
 function gs(m){var s=new Date(m);s.setDate(s.getDate()+6);return s}
@@ -277,12 +289,12 @@ async function fetchRemote(){
     var resp=await fetch('https://api.github.com/repos/'+REPO+'/contents/data.json',{headers:{Authorization:'token '+TK,Accept:'application/vnd.github.v3+json'},cache:'no-cache'});
     if(!resp.ok)return null;
     var json=await resp.json();_sha=json.sha;
-    return JSON.parse(decodeURIComponent(escape(atob(json.content.replace(/\s/g,'')))));
+    return JSON.parse(b64Decode(json.content));
   }catch(e){return null}
 }
 async function pushRemote(data){
   var s=JSON.stringify(data,null,2);
-  var c=btoa(unescape(encodeURIComponent(s)));
+  var c=b64Encode(s);
   var body={message:'update',content:c,branch:'main'};
   if(_sha)body.sha=_sha;
   try{
@@ -644,7 +656,7 @@ function renderAll(){renderCheckin();renderWeekly();renderPredict();renderHistor
 async function checkVersion(){
   try{
     var resp=await fetch('https://api.github.com/repos/'+REPO+'/contents/version.json?t='+Date.now(),{headers:{Authorization:'token '+TK,Accept:'application/vnd.github.v3+json'},cache:'no-cache'});
-    if(resp.ok){var json=await resp.json();var rv=JSON.parse(decodeURIComponent(escape(atob(json.content.replace(/\s/g,''))))).version;var lv=parseInt(localStorage.getItem('wuren_ver')||'0');document.getElementById('verNum').textContent=rv;if(rv>lv){var b=document.createElement('div');b.style.cssText='position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:300;background:#7A9B7C;color:#fff;padding:10px 22px;border-radius:0 0 16px 16px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);animation:bounce 0.5s ease';b.textContent='✨ 新版界面来啦 · 点我更新';b.onclick=function(){localStorage.setItem('wuren_ver',String(rv));if('serviceWorker'in navigator){navigator.serviceWorker.getRegistrations().then(function(regs){regs.forEach(function(r){r.unregister()})})}if('caches'in window){caches.keys().then(function(keys){keys.forEach(function(k){caches.delete(k)})})}location.reload(true)};document.body.appendChild(b);setTimeout(function(){if(b.parentNode)b.remove()},30000)}else{localStorage.setItem('wuren_ver',String(rv));document.getElementById('verNum').textContent=rv}}
+    if(resp.ok){var json=await resp.json();var rv=JSON.parse(b64Decode(json.content)).version;var lv=parseInt(localStorage.getItem('wuren_ver')||'0');document.getElementById('verNum').textContent=rv;if(rv>lv){var b=document.createElement('div');b.style.cssText='position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:300;background:#7A9B7C;color:#fff;padding:10px 22px;border-radius:0 0 16px 16px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);animation:bounce 0.5s ease';b.textContent='✨ 新版界面来啦 · 点我更新';b.onclick=function(){localStorage.setItem('wuren_ver',String(rv));if('serviceWorker'in navigator){navigator.serviceWorker.getRegistrations().then(function(regs){regs.forEach(function(r){r.unregister()})})}if('caches'in window){caches.keys().then(function(keys){keys.forEach(function(k){caches.delete(k)})})}location.reload(true)};document.body.appendChild(b);setTimeout(function(){if(b.parentNode)b.remove()},30000)}else{localStorage.setItem('wuren_ver',String(rv));document.getElementById('verNum').textContent=rv}}
   }catch(e){}
 }
 
@@ -657,7 +669,7 @@ async function init(){
     
   }
   document.getElementById('checkinDate').value=fd(new Date());
-  document.getElementById('verNum').textContent='5';
+  document.getElementById('verNum').textContent='6';
   // Render immediately with local data, then sync
   renderAll();
   await syncNow(true);
