@@ -218,6 +218,7 @@ nav.tabs button.active::before{content:'';position:absolute;top:0;width:24px;hei
   <span class="dot"></span>
   <span class="streak-badge" id="streakBadge"></span>
 </div>
+<div class="sync-bar" id="syncBar"></div>
 </header>
 <div class="toast" id="toast"></div>
 
@@ -225,7 +226,7 @@ nav.tabs button.active::before{content:'';position:absolute;top:0;width:24px;hei
 <div class="encourage-box" id="dailyEncourage"></div>
 <div id="sundayNotice"></div>
 <div style="text-align:center;margin-bottom:10px;font-size:12px;color:var(--sepia);font-style:italic">
-📅 <input type="date" id="checkinDate" onchange="renderCheckin()" style="padding:6px 10px;border:1px solid var(--thread);border-radius:8px;font-family:inherit;font-size:12px;background:var(--paper);color:var(--ink)">
+📅 <input type="date" id="checkinDate" onchange="onDateChange()" style="padding:6px 10px;border:1px solid var(--thread);border-radius:8px;font-family:inherit;font-size:12px;background:var(--paper);color:var(--ink)">
 <span id="dateBadge" style="font-size:10px;color:var(--rose);font-weight:600;margin-left:6px"></span>
 </div>
 <div class="section-label">今日打卡</div><div id="checkinArea"></div></div>
@@ -247,7 +248,7 @@ nav.tabs button.active::before{content:'';position:absolute;top:0;width:24px;hei
 // ====== 版本升级自动修复 ======
 // 当检测到版本号变化时，在 SW 接管之前就清理掉旧缓存
 (function(){
-  var EXPECTED=9;
+  var EXPECTED=10;
   var stored=parseInt(localStorage.getItem('wuren_ver')||'0');
   if(stored>0 && stored<EXPECTED){
     // 有旧版本缓存，抢先清理
@@ -299,6 +300,7 @@ function isSunday(d){return d.getDay()===0}
 function isSameDay(a,b){return fd(a)===fd(b)}
 function hashStr(s){var h=0;for(var i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0}return Math.abs(h)}
 function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2500)}
+function setSyncStatus(msg,clearAfter){var bar=document.getElementById('syncBar');if(!bar)return;bar.textContent=msg;if(clearAfter)setTimeout(function(){if(bar)bar.textContent=''},clearAfter)}
 function cu(){return document.getElementById('currentUser').value}
 function cd(){return document.getElementById('checkinDate').value||fd(new Date())}
 
@@ -382,7 +384,7 @@ async function pushRemote(data,deletedPaths,changedPaths){
   }catch(e){console.error('pushRemote error:',e);return false}
 }
 async function syncNow(silent){
-  var bar=document.getElementById('syncBar');bar.textContent='syncing...';
+  setSyncStatus('正在读取共享数据…');
   var remote=await fetchRemote();
   if(remote){
     var local=getLocal();
@@ -402,38 +404,38 @@ async function syncNow(silent){
       pendingDeletes.forEach(function(path){removePath(remote,path)});
       saveLocal(remote);
       var ok=await pushRemote(remote,pendingDeletes,pendingWrites);
-      if(ok){localStorage.removeItem('wuren_need_sync');localStorage.removeItem('wuren_pending_deletes');localStorage.removeItem('wuren_pending_writes');bar.textContent='OK ✓ 已补推';}
-      else{bar.textContent='⚠️ 仍有数据待同步';}
+      if(ok){localStorage.removeItem('wuren_need_sync');localStorage.removeItem('wuren_pending_deletes');localStorage.removeItem('wuren_pending_writes');setSyncStatus('共享数据已更新 ✓');}
+      else{setSyncStatus('⚠️ 仍有数据待同步');}
     }else{
-      saveLocal(remote);bar.textContent='OK';
+      saveLocal(remote);setSyncStatus('共享数据已更新 ✓');
     }
     if(!silent){renderAll();}
-    setTimeout(function(){bar.textContent=''},4000);return true;
-  }else{bar.textContent='offline';setTimeout(function(){bar.textContent=''},4000);return false}
+    setSyncStatus(document.getElementById('syncBar')?document.getElementById('syncBar').textContent:'',4000);return true;
+  }else{setSyncStatus('⚠️ 共享数据读取失败，请检查网络',5000);return false}
 }
 async function saveAndSync(data,deletedPaths,changedPaths){
-  var bar=document.getElementById('syncBar');
-  bar.textContent='正在同步…';
+  setSyncStatus('正在同步…');
   var remote=await fetchRemote();
   var merged=remote?mergeForUpload(remote,data,changedPaths):data;
   (deletedPaths||[]).forEach(function(path){removePath(merged,path)});
   saveLocal(merged);
   var ok=await pushRemote(merged,deletedPaths,changedPaths);
   if(ok){
-    bar.textContent='已同步 ✓';
+    setSyncStatus('已同步 ✓');
     localStorage.removeItem('wuren_need_sync');
     localStorage.removeItem('wuren_pending_deletes');
     localStorage.removeItem('wuren_pending_writes');
   }else{
-    bar.textContent='⚠️ 已存本地，联网后同步';
+    setSyncStatus('⚠️ 已存本地，联网后同步');
     localStorage.setItem('wuren_need_sync','1');
     if(deletedPaths&&deletedPaths.length)localStorage.setItem('wuren_pending_deletes',JSON.stringify(deletedPaths));
     if(changedPaths&&changedPaths.length)localStorage.setItem('wuren_pending_writes',JSON.stringify(changedPaths));
   }
-  setTimeout(function(){bar.textContent=''},5000);
+  setSyncStatus(document.getElementById('syncBar')?document.getElementById('syncBar').textContent:'',5000);
   return ok;
 }
 function onUserSwitch(){var u=cu();localStorage.setItem('wuren_me',u);var hn=document.getElementById('headerName');var he=document.getElementById('headerEmoji');if(hn)hn.textContent=u||'五仁打卡';if(he)he.textContent=AVATARS[u]||'🥜';renderCheckin()}
+async function onDateChange(){renderCheckin();await syncNow(false)}
 
 // AI
 async function callAI(name,ss,sn,es,en,streak,wd,dow,tg){
@@ -811,7 +813,7 @@ async function init(){
     
   }
   document.getElementById('checkinDate').value=fd(new Date());
-  document.getElementById('verNum').textContent='9';
+  document.getElementById('verNum').textContent='10';
   // Render immediately with local data, then sync
   renderAll();
   await syncNow(true);
@@ -830,7 +832,7 @@ async function init(){
     setTimeout(function(){renderCheckin();},100);
     setTimeout(function(){renderCheckin();},400);
   }
-  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=9').catch(function(){})}
+  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=10').catch(function(){})}
 }
 init();
 document.addEventListener('visibilitychange',function(){if(!document.hidden&&!window._tmp)syncNow(false)});
