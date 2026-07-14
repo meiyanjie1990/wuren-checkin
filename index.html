@@ -247,7 +247,7 @@ nav.tabs button.active::before{content:'';position:absolute;top:0;width:24px;hei
 // ====== 版本升级自动修复 ======
 // 当检测到版本号变化时，在 SW 接管之前就清理掉旧缓存
 (function(){
-  var EXPECTED=8;
+  var EXPECTED=9;
   var stored=parseInt(localStorage.getItem('wuren_ver')||'0');
   if(stored>0 && stored<EXPECTED){
     // 有旧版本缓存，抢先清理
@@ -307,21 +307,33 @@ function saveLocal(data){_local=data;localStorage.setItem('wuren_data',JSON.stri
 function getLocal(){if(_local)return _local;var d=loadLocal();if(!d.checkins)d.checkins={};if(!d.predictions)d.predictions={};_local=d;return d}
 function gpc(data,person,dateStr){if(!data.checkins[person])return null;return data.checkins[person][dateStr]||null}
 
-// 深度合并：src 优先（用于 SHA 冲突时把本地改动合入远程数据）
+// 递归合并：src 优先，保留不同成员、日期和预测的并发更新
 function deepMerge(dst,src){
-  var res=JSON.parse(JSON.stringify(dst));
-  for(var k in src){
-    if(!res[k]){res[k]=JSON.parse(JSON.stringify(src[k]));continue;}
-    if(typeof src[k]==='object'&&src[k]!==null&&!Array.isArray(src[k])){
-      for(var k2 in src[k]){
-        if(!res[k][k2]){res[k][k2]=JSON.parse(JSON.stringify(src[k][k2]));continue;}
-        if(typeof src[k][k2]==='object'&&src[k][k2]!==null){
-          for(var k3 in src[k][k2]){res[k][k2][k3]=src[k][k2][k3];}
-        }else{res[k][k2]=src[k][k2];}
-      }
-    }else{res[k]=src[k];}
-  }
-  return res;
+  if(src===undefined)return JSON.parse(JSON.stringify(dst));
+  if(src===null||typeof src!=='object'||Array.isArray(src))return JSON.parse(JSON.stringify(src));
+  var res=(dst&&typeof dst==='object'&&!Array.isArray(dst))?JSON.parse(JSON.stringify(dst)):{};
+  Object.keys(src).forEach(function(k){res[k]=deepMerge(res[k],src[k])});
+  return res
+}
+function removePath(data,path){
+  var node=data;
+  for(var i=0;i<path.length-1;i++){if(!node||!node[path[i]])return;node=node[path[i]]}
+  if(node)delete node[path[path.length-1]]
+}
+function getPath(data,path){var node=data;for(var i=0;i<path.length;i++){if(node===undefined||node===null)return undefined;node=node[path[i]]}return node}
+function setPath(data,path,value){var node=data;for(var i=0;i<path.length-1;i++){if(!node[path[i]]||typeof node[path[i]]!=='object')node[path[i]]={};node=node[path[i]]}node[path[path.length-1]]=JSON.parse(JSON.stringify(value))}
+function mergeForUpload(remote,local,changedPaths){
+  var merged=deepMerge(local,remote);
+  (changedPaths||[]).forEach(function(path){var value=getPath(local,path);if(value!==undefined)setPath(merged,path,value)});
+  var predictions=(remote&&remote.predictions)||{};
+  Object.keys(predictions).forEach(function(week){
+    var preds=predictions[week]&&predictions[week].preds;
+    if(!preds)return;
+    if(!merged.predictions[week])merged.predictions[week]={};
+    if(!merged.predictions[week].preds)merged.predictions[week].preds={};
+    Object.keys(preds).forEach(function(person){merged.predictions[week].preds[person]=preds[person]});
+  });
+  return merged
 }
 
 async function fetchRemote(){
@@ -332,7 +344,7 @@ async function fetchRemote(){
     return JSON.parse(b64Decode(json.content));
   }catch(e){return null}
 }
-async function pushRemote(data){
+async function pushRemote(data,deletedPaths,changedPaths){
   var s=JSON.stringify(data,null,2);
   var c=b64Encode(s);
   var body={message:'update',content:c,branch:'main'};
@@ -355,7 +367,8 @@ async function pushRemote(data){
           var rd=await rf.json();
           var remoteData=JSON.parse(b64Decode(rd.content));
           // 合并：本地数据优先（保留自己的打卡），远程其他人的数据保留
-          var merged=deepMerge(remoteData,data);
+          var merged=mergeForUpload(remoteData,data,changedPaths);
+          (deletedPaths||[]).forEach(function(path){removePath(merged,path)});
           body.content=b64Encode(JSON.stringify(merged,null,2));
           body.sha=rd.sha;
           var rt=await fetch('https://api.github.com/repos/'+REPO+'/contents/data.json',{method:'PUT',headers:{Authorization:'token '+TK,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify(body)});
@@ -382,10 +395,14 @@ async function syncNow(silent){
     }
     // 如果有上次未推送的数据，合并到远程数据中并尝试推送
     if(localStorage.getItem('wuren_need_sync')==='1'){
-      remote=deepMerge(remote,local);
+      remote=mergeForUpload(remote,local);
+      var pendingDeletes=JSON.parse(localStorage.getItem('wuren_pending_deletes')||'[]');
+      var pendingWrites=JSON.parse(localStorage.getItem('wuren_pending_writes')||'[]');
+      remote=mergeForUpload(remote,local,pendingWrites);
+      pendingDeletes.forEach(function(path){removePath(remote,path)});
       saveLocal(remote);
-      var ok=await pushRemote(remote);
-      if(ok){localStorage.removeItem('wuren_need_sync');bar.textContent='OK ✓ 已补推';}
+      var ok=await pushRemote(remote,pendingDeletes,pendingWrites);
+      if(ok){localStorage.removeItem('wuren_need_sync');localStorage.removeItem('wuren_pending_deletes');localStorage.removeItem('wuren_pending_writes');bar.textContent='OK ✓ 已补推';}
       else{bar.textContent='⚠️ 仍有数据待同步';}
     }else{
       saveLocal(remote);bar.textContent='OK';
@@ -394,16 +411,24 @@ async function syncNow(silent){
     setTimeout(function(){bar.textContent=''},4000);return true;
   }else{bar.textContent='offline';setTimeout(function(){bar.textContent=''},4000);return false}
 }
-async function saveAndSync(data){
-  saveLocal(data);
-  var ok=await pushRemote(data);
+async function saveAndSync(data,deletedPaths,changedPaths){
   var bar=document.getElementById('syncBar');
+  bar.textContent='正在同步…';
+  var remote=await fetchRemote();
+  var merged=remote?mergeForUpload(remote,data,changedPaths):data;
+  (deletedPaths||[]).forEach(function(path){removePath(merged,path)});
+  saveLocal(merged);
+  var ok=await pushRemote(merged,deletedPaths,changedPaths);
   if(ok){
-    bar.textContent='OK ✓';
+    bar.textContent='已同步 ✓';
     localStorage.removeItem('wuren_need_sync');
+    localStorage.removeItem('wuren_pending_deletes');
+    localStorage.removeItem('wuren_pending_writes');
   }else{
     bar.textContent='⚠️ 已存本地，联网后同步';
     localStorage.setItem('wuren_need_sync','1');
+    if(deletedPaths&&deletedPaths.length)localStorage.setItem('wuren_pending_deletes',JSON.stringify(deletedPaths));
+    if(changedPaths&&changedPaths.length)localStorage.setItem('wuren_pending_writes',JSON.stringify(changedPaths));
   }
   setTimeout(function(){bar.textContent=''},5000);
   return ok;
@@ -615,12 +640,11 @@ async function saveMy(){
   if(record.study===0&&record.exercise===0){toast('请至少选一项分数');return}
   if(!data.checkins[user])data.checkins[user]={};
   data.checkins[user][ds]=record;
-  await saveAndSync(data);window._tmp=null;window._tmpDate=null;
-  var btn=document.getElementById('btnSave');if(btn){btn.textContent='saved';btn.className='btn btn-saved btn-block'}
-  var needSync=localStorage.getItem('wuren_need_sync');
-  if(needSync==='1'){toast('⚠️ 已存本地，联网后自动同步')}
-  else{toast('saved! ✓')}
-  setTimeout(function(){if(btn&&btn.classList.contains('btn-saved')){btn.textContent='保存打卡';btn.className='btn btn-primary btn-block'}},3000);
+  var btn=document.getElementById('btnSave');if(btn){btn.disabled=true;btn.textContent='正在提交…'}
+  var synced=await saveAndSync(data,null,[['checkins',user,ds]]);window._tmp=null;window._tmpDate=null;
+  if(btn){btn.textContent=synced?'已提交并同步 ✓':'已保存，等待同步';btn.className='btn btn-saved btn-block'}
+  if(synced){toast('打卡已提交，伙伴们可以看到了 ✓')}
+  else{toast('⚠️ 已保存在本机，网络恢复后会自动同步')}
   renderCheckin();
 
   var total=(record.study||0)+(record.exercise||0);
@@ -633,7 +657,7 @@ async function saveMy(){
     callAI(user,record.study||0,record.sNote||'',record.exercise||0,record.eNote||'',streak,wd,day,tg).then(function(r){
       if(r){
         var d2=getLocal();
-        if(d2.checkins[user]&&d2.checkins[user][ds]){d2.checkins[user][ds]._ai=r;saveLocal(d2);pushRemote(d2)}
+        if(d2.checkins[user]&&d2.checkins[user][ds]){d2.checkins[user][ds]._ai=r;saveAndSync(d2,null,[['checkins',user,ds,'_ai']])}
         var ed=document.getElementById('dailyEncourage');if(ed){ed.innerHTML=genEnc(getLocal(),ds,user);setTimeout(function(){renderCheckin()},800)}
       }
     });
@@ -641,7 +665,7 @@ async function saveMy(){
 }
 
 function editMy(){var u=cu();var ds=cd();var data=getLocal();var ex=gpc(data,u,ds);if(!ex)return;window._tmp={study:ex.study||0,exercise:ex.exercise||0,sNote:ex.sNote||'',eNote:ex.eNote||''};window._tmpDate=ds;delete data.checkins[u][ds];saveLocal(data);renderCheckin()}
-async function deleteMy(){var u=cu();var ds=cd();var data=getLocal();var ex=gpc(data,u,ds);if(!ex)return;if(!confirm('确定撤销'+u+'在'+ds+'的打卡？'))return;delete data.checkins[u][ds];await saveAndSync(data);window._tmp=null;window._tmpDate=null;toast('已撤销');renderCheckin()}
+async function deleteMy(){var u=cu();var ds=cd();var data=getLocal();var ex=gpc(data,u,ds);if(!ex)return;if(!confirm('确定撤销'+u+'在'+ds+'的打卡？'))return;delete data.checkins[u][ds];var ok=await saveAndSync(data,[['checkins',u,ds]]);window._tmp=null;window._tmpDate=null;toast(ok?'已撤销并同步':'已在本机撤销，等待同步');renderCheckin()}
 
 async function fillAI(data,ds){
   var hour=new Date().getHours();
@@ -657,7 +681,7 @@ async function fillAI(data,ds){
     var r=await callAI(p,ex.study||0,ex.sNote||'',ex.exercise||0,ex.eNote||'',streak,wd,day,tg);
     if(r){
       var d2=getLocal();
-      if(d2.checkins[p]&&d2.checkins[p][ds]){d2.checkins[p][ds]._ai=r;saveLocal(d2);pushRemote(d2).catch(function(){})}
+      if(d2.checkins[p]&&d2.checkins[p][ds]){d2.checkins[p][ds]._ai=r;saveAndSync(d2,null,[['checkins',p,ds,'_ai']]).catch(function(){})}
       var ed=document.getElementById('dailyEncourage');
       if(ed&&document.getElementById('page-checkin').classList.contains('active')){ed.innerHTML=genEnc(getLocal(),ds,cu())}
     }
@@ -687,16 +711,17 @@ function renderPredict(){
   var nm=new Date(sun);nm.setDate(nm.getDate()+1);var ns=gs(nm);var isS=isSunday(today);var user=cu();
   document.getElementById('predInfo').innerHTML=isS?'预测下周（'+fwr(nm,ns)+'）团队总分<br><span style="font-size:12px">最准的人获下周日打卡权。预测保密，揭晓后才公开</span>':'周日开放预测<br><span style="font-size:12px">预测保密：每人仅见自己的预测，揭晓后全员公开</span>';
   var pk=fd(sun);var pred=data.predictions[pk];var revealed=pred&&pred.revealed;
+  var userSubmitted=!!(user&&pred&&pred.preds&&pred.preds[user]!==undefined);
   var inputs='';
   if(revealed){
     PERSONS.forEach(function(p){var v=(pred&&pred.preds&&pred.preds[p]!==undefined)?pred.preds[p]:'-';var isWinner=pred&&pred.winners&&pred.winners.indexOf(p)>-1;inputs+='<div class="pred-input-row"><span class="name">'+p+(isWinner?' 🏆':'')+'</span><span style="font-weight:600">'+v+'分</span></div>'});
     if(pred.actual!==null){inputs+='<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--thread);font-size:13px;color:var(--sage)">实际总分：<strong>'+pred.actual.toFixed(1)+'分</strong> | 中奖：<strong>'+(pred.winners||[]).join('、')+'</strong></div>'}
   }else if(isS&&user){
-    PERSONS.forEach(function(p){if(p===user){var v=(pred&&pred.preds&&pred.preds[p]!==undefined)?pred.preds[p]:'';inputs+='<div class="pred-input-row"><span class="name">'+p+' 👈</span><input type="number" id="pred-'+p+'" value="'+v+'" placeholder="猜总分" step="0.5" min="0" max="40"></div>'}else{var submitted=(pred&&pred.preds&&pred.preds[p]!==undefined);inputs+='<div class="pred-input-row"><span class="name">'+p+'</span><span style="color:var(--faded);font-size:13px">'+(submitted?'已预测 🔒':'未预测')+'</span></div>'}});
+    PERSONS.forEach(function(p){var submitted=!!(pred&&pred.preds&&pred.preds[p]!==undefined);if(p===user&&!submitted){inputs+='<div class="pred-input-row"><span class="name">'+p+' 👈</span><input type="number" id="pred-'+p+'" placeholder="猜总分" step="0.5" min="0" max="100"></div>'}else{inputs+='<div class="pred-input-row"><span class="name">'+p+(p===user?' 👈':'')+'</span><span style="color:'+(submitted?'var(--sage)':'var(--faded)')+';font-size:13px;font-weight:'+(submitted?'600':'400')+'">'+(submitted?'已猜分 🔒':'未猜分')+'</span></div>'}});
   }else if(isS&&!user){inputs='<div style="text-align:center;color:var(--sepia);padding:10px">请先选择自己再预测</div>'}
   document.getElementById('predInputs').innerHTML=inputs;document.getElementById('predInputs').style.display=isS?'block':'none';
-  var saveBtn=document.querySelector('#page-predict .btn-primary');saveBtn.style.display=(isS&&user)?'block':'none';
-  if(isS&&user)saveBtn.textContent='📝 提交预测';
+  var saveBtn=document.querySelector('#page-predict .btn-primary');saveBtn.style.display=(isS&&user&&!userSubmitted)?'block':'none';
+  if(isS&&user&&!userSubmitted){saveBtn.disabled=false;saveBtn.textContent='📝 提交我的猜分'}
   var ls=new Date(sun);ls.setDate(ls.getDate()-7);var lk=fd(ls);var lp=data.predictions[lk];
   var canReveal=isS&&lp&&!lp.revealed&&lp.preds&&Object.keys(lp.preds).length>0;
   var ra=document.getElementById('revealArea');
@@ -708,18 +733,27 @@ function renderPredict(){
 }
 
 async function savePredictions(){
-  var data=getLocal();var today=new Date();if(!isSunday(today)){toast('只有周日才能提交预测');return}
+  var today=new Date();if(!isSunday(today)){toast('只有周日才能提交预测');return}
   var user=cu();if(!user){toast('请先选择自己');return}
   var m=gm(today);var sun=gs(m);var nm=new Date(sun);nm.setDate(nm.getDate()+1);var ns=gs(nm);var pk=fd(sun);
   var inp=document.getElementById('pred-'+user);if(!inp||inp.value===''){toast('请输入你的预测分数');return}
+  var score=parseFloat(inp.value);if(!Number.isFinite(score)||score<0||score>100||score*2%1!==0){toast('请输入 0–100 之间、以 0.5 为单位的分数');return}
+  var btn=document.querySelector('#page-predict .btn-primary');btn.disabled=true;btn.textContent='正在提交…';
+  var remote=await fetchRemote();
+  if(!remote){btn.disabled=false;btn.textContent='📝 重新提交';toast('提交失败：网络连接异常，请稍后重试');return}
+  var data=deepMerge(remote,getLocal());
+  if(data.predictions[pk]&&data.predictions[pk].preds&&data.predictions[pk].preds[user]!==undefined){saveLocal(data);toast('你本周已经猜过分了，每人只有一次机会');renderPredict();return}
   if(!data.predictions[pk])data.predictions[pk]={weekStart:fd(nm),weekEnd:fd(ns),preds:{},actual:null,winners:[],revealed:false};
-  data.predictions[pk].preds[user]=parseFloat(inp.value)||0;
-  await saveAndSync(data);toast('预测已保存 🔒');renderPredict();
+  data.predictions[pk].preds[user]=score;
+  var ok=await saveAndSync(data);
+  if(ok){toast('猜分提交成功！每人只有一次机会 🔒');await syncNow(true);renderPredict()}
+  else{delete data.predictions[pk].preds[user];saveLocal(data);btn.disabled=false;btn.textContent='📝 重新提交';toast('提交失败，系统尚未收到，请检查网络后重试')}
 }
 async function revealPrediction(){
-  var data=getLocal();var today=new Date();if(!isSunday(today)){toast('只有周日才能揭晓预测');return}
+  var today=new Date();if(!isSunday(today)){toast('只有周日才能揭晓预测');return}
   var m=gm(today);var sun=gs(m);
-  var ls=new Date(sun);ls.setDate(ls.getDate()-7);var lk=fd(ls);var lp=data.predictions[lk];
+  var ls=new Date(sun);ls.setDate(ls.getDate()-7);var lk=fd(ls);
+  var remote=await fetchRemote();if(!remote){toast('网络连接异常，暂时不能揭晓');return}var data=remote;var lp=data.predictions[lk];
   if(!lp){toast('没有找到上周的预测');return}
   if(lp.revealed){toast('上周预测已经揭晓过了');return}
   if(!lp.preds||Object.keys(lp.preds).length===0){toast('上周没有人提交预测');return}
@@ -727,7 +761,7 @@ async function revealPrediction(){
   var lm=new Date(sun);lm.setDate(lm.getDate()-6);var act=getWeekAllTotal(data,lm);
   lp.actual=act;lp.revealed=true;
   if(lp.preds&&Object.keys(lp.preds).length>0){var minDiff=Infinity,winners=[];Object.keys(lp.preds).forEach(function(p){var diff=Math.abs(lp.preds[p]-act);if(diff<minDiff){minDiff=diff;winners=[p]}else if(diff===minDiff){winners.push(p)}});lp.winners=winners}
-  await saveAndSync(data);toast('🎉 揭晓！中奖：'+(lp.winners||[]).join('、'));renderPredict();renderWeekly();
+  await saveAndSync(data,null,[['predictions',lk]]);toast('🎉 揭晓！中奖：'+(lp.winners||[]).join('、'));renderPredict();renderWeekly();
 }
 function getWeekAllTotal(data,m){var t=0;PERSONS.forEach(function(p){t+=getWeekTotal(data,p,m)});return t}
 function getWeekTotal(data,p,m){var t=0;for(var i=0;i<7;i++){var d=new Date(m);d.setDate(d.getDate()+i);var c=gpc(data,p,fd(d));if(c)t+=(c.study||0)+(c.exercise||0)}return t}
@@ -777,7 +811,7 @@ async function init(){
     
   }
   document.getElementById('checkinDate').value=fd(new Date());
-  document.getElementById('verNum').textContent='8';
+  document.getElementById('verNum').textContent='9';
   // Render immediately with local data, then sync
   renderAll();
   await syncNow(true);
@@ -796,8 +830,15 @@ async function init(){
     setTimeout(function(){renderCheckin();},100);
     setTimeout(function(){renderCheckin();},400);
   }
-  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=8').catch(function(){})}
+  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=9').catch(function(){})}
 }
 init();
+document.addEventListener('visibilitychange',function(){if(!document.hidden&&!window._tmp)syncNow(false)});
+window.addEventListener('focus',function(){if(!window._tmp)syncNow(false)});
+setInterval(function(){
+  var active=document.activeElement;
+  var editing=active&&(active.tagName==='INPUT'||active.tagName==='TEXTAREA');
+  if(!document.hidden&&!window._tmp&&!editing)syncNow(false);
+},30000);
 </script>
 </html>
