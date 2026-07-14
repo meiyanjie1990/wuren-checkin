@@ -1,11 +1,11 @@
 {
-  "name": "五仁打卡",
-  "short_name": "五仁打卡",
-  "description": "五人学习运动打卡小组",
+  "name": "F5 · 五人手账",
+  "short_name": "F5",
+  "description": "五个朋友的学习与运动手账",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#faf7f2",
-  "theme_color": "#f5f0e8",
+  "background_color": "#EEE5D4",
+  "theme_color": "#EEE5D4",
   "icons": [
     {
       "src": "./icon-192.png",
