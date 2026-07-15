@@ -1,6 +1,6 @@
-// F5 五人手账 Service Worker v11
+// F5 五人手账 Service Worker v12
 // 策略：HTML页面=网络优先（保证拿到最新版），静态资源=缓存优先（加速加载）
-var CACHE_NAME = 'f5-journal-v11';
+var CACHE_NAME = 'f5-journal-v12';
 
 self.addEventListener('install', function(e) {
   // 立即激活，不等待旧 SW 释放
