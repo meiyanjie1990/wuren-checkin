@@ -149,8 +149,6 @@ nav.tabs button.active::before{content:'';position:absolute;top:0;width:24px;hei
 .done-detail .v.s{color:var(--moss)}
 .done-detail .v.e{color:var(--rose)}
 .done-detail .nt{font-size:12px;color:var(--sepia);font-style:italic;margin-top:3px;max-width:130px}
-.mini-ai{margin-top:12px;padding-top:12px;border-top:1px dotted var(--thread);font-size:12.5px;color:var(--sepia);font-style:italic;line-height:1.7}
-
 .sunday-lock{text-align:center;color:var(--rose);font-size:13px;padding:14px;background:rgba(192,112,96,0.06);border-radius:16px;margin:10px 0;line-height:1.6}
 .sunday-winner{text-align:center;color:var(--moss);font-size:13px;padding:14px;background:rgba(122,155,124,0.07);border-radius:16px;margin:10px 0;line-height:1.6}
 
@@ -173,19 +171,6 @@ nav.tabs button.active::before{content:'';position:absolute;top:0;width:24px;hei
 .btn-block{display:block;width:100%}
 .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 
-/* ---------- Encourage box ---------- */
-.encourage-box{
-  background:linear-gradient(160deg,var(--paper),var(--paper2));
-  border:1px solid var(--thread);border-radius:24px;padding:22px;margin:4px 0 20px;
-  font-size:14px;line-height:1.85;box-shadow:var(--shadow);position:relative;overflow:hidden;
-}
-.encourage-box:empty{display:none}
-.encourage-box::before{content:'“';position:absolute;top:-6px;right:16px;font-family:Georgia,'Songti SC','Noto Serif SC',serif;font-size:88px;color:var(--sage);opacity:0.08;line-height:1;pointer-events:none}
-.encourage-box .greeting{font-family:Georgia,'Songti SC','Noto Serif SC',serif;font-size:21px;font-weight:600;margin-bottom:9px;position:relative}
-.encourage-box .body{color:#3D3528;position:relative}
-.encourage-box .body strong{color:var(--moss)}
-.encourage-box .humor{color:var(--sepia);font-style:italic;margin-top:10px;padding-top:10px;border-top:1px dotted var(--thread);font-size:13px;position:relative}
-
 /* ---------- Summary / predict ---------- */
 .summary-card{margin-top:12px}
 .summary-card .person-line{padding:8px 0;border-bottom:1px dotted var(--thread);font-size:13px}
@@ -200,9 +185,6 @@ nav.tabs button.active::before{content:'';position:absolute;top:0;width:24px;hei
 .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:12px 24px;border-radius:20px;font-size:13px;z-index:200;opacity:0;transition:opacity 0.3s;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.18)}
 .toast.show{opacity:1}
 .sync-bar{font-size:10px;color:var(--faded);text-align:center;margin-top:6px;min-height:14px}
-.ai-tag{font-size:9px;color:var(--sage);border:1px solid var(--sage);border-radius:6px;padding:2px 7px;margin-left:6px;vertical-align:middle;font-weight:600;letter-spacing:1px}
-.other-ai{font-size:12px;color:var(--sepia);line-height:1.6;font-style:italic}
-
 @media(min-width:600px){.checkin-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.checkin-grid .card{margin-bottom:0}}
 
 /* ---------- F5 Warm Journal ---------- */
@@ -216,8 +198,7 @@ header{position:relative;padding:25px 20px 13px;background:rgba(238,229,212,.94)
 .friend-strip{margin:0 15px;padding:14px 8px 12px;background:rgba(250,245,233,.62);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;border:1px solid rgba(167,140,101,.25);transform:rotate(-.25deg)}
 .friend-status{text-align:center;font-size:8px;color:var(--faded);position:relative;white-space:nowrap}.friend-status .person-avatar{display:flex;width:34px;height:34px;margin:0 auto 6px;border-radius:48% 52% 47% 53%;font-size:13px}.friend-status.checked::after{content:'✓';position:absolute;top:-5px;right:3px;color:var(--sage);font:bold 14px "Comic Sans MS",cursive}.friend-status.current{font-weight:700;color:var(--ink)}.friend-status.current .person-avatar{outline:2px solid var(--paper);box-shadow:0 0 0 3px var(--ink)}
 .page{padding:14px 17px}.section-label{font-family:"Songti SC","STSong",serif;font-size:18px;color:var(--ink);letter-spacing:0;margin:18px 4px 8px;border-bottom:1px solid var(--ink);padding-bottom:7px}.section-label::after{display:none}
-.encourage-box{margin:2px 5px 16px;padding:17px 16px 15px;border:0;border-radius:0;background:var(--paper);box-shadow:var(--shadow);transform:rotate(.3deg);overflow:visible}.encourage-box::before{content:'TODAY';top:-9px;right:12px;font:9px Georgia,serif;letter-spacing:1px;color:var(--rose);opacity:1;border:1px solid var(--rose);padding:2px 7px;background:var(--parchment);transform:rotate(-3deg)}.encourage-box .greeting{font-family:"Kaiti SC","STKaiti","Songti SC",serif;font-size:19px}.encourage-box .body{font-family:"Songti SC","STSong",serif;line-height:1.8}.encourage-box .humor,.other-ai{font-family:"Kaiti SC","STKaiti",serif;color:var(--rose);font-style:normal}
-.card{border:0;border-top:1px dashed var(--thread);border-radius:0;padding:15px 5px;margin:0;background:rgba(250,245,233,.35);box-shadow:none}.card.self{border:0;border-top:1.5px solid var(--ink);background:rgba(250,245,233,.72)}.card h3{font-family:"Songti SC","STSong",serif;font-size:18px}.person-name{font-family:"Songti SC","STSong",serif}.person-avatar{border-radius:48% 52% 50% 46%}.done-badge{font-family:Georgia,serif;font-size:12px;font-style:italic}.done-detail{padding-left:44px;margin-top:-6px;display:grid;grid-template-columns:1fr 1fr;gap:10px}.done-detail .nt{max-width:none;font-family:"Songti SC","STSong",serif;font-style:normal;line-height:1.55}.done-detail .v{font-style:italic}.me-tag{border:1px solid var(--rose);color:var(--rose);padding:1px 6px;border-radius:0}.mini-ai{font-family:"Kaiti SC","STKaiti",serif;color:var(--rose)}
+.card{border:0;border-top:1px dashed var(--thread);border-radius:0;padding:15px 5px;margin:0;background:rgba(250,245,233,.35);box-shadow:none}.card.self{border:0;border-top:1.5px solid var(--ink);background:rgba(250,245,233,.72)}.card h3{font-family:"Songti SC","STSong",serif;font-size:18px}.person-name{font-family:"Songti SC","STSong",serif}.person-avatar{border-radius:48% 52% 50% 46%}.done-badge{font-family:Georgia,serif;font-size:12px;font-style:italic}.done-detail{padding-left:44px;margin-top:-6px;display:grid;grid-template-columns:1fr 1fr;gap:10px}.done-detail .nt{max-width:none;font-family:"Songti SC","STSong",serif;font-style:normal;line-height:1.55}.done-detail .v{font-style:italic}.me-tag{border:1px solid var(--rose);color:var(--rose);padding:1px 6px;border-radius:0}
 .score-btns button,.note-input,.btn,.pred-input-row input{border-radius:2px;box-shadow:none}.score-btns button{background:rgba(250,245,233,.7)}.note-input{background:rgba(250,245,233,.72);font-style:normal}.btn-primary{background:var(--rose);box-shadow:3px 4px 0 rgba(67,43,27,.14)}.btn-primary:hover{background:#914B3B}.btn-outline{border-radius:2px}.sunday-lock,.sunday-winner{border-radius:2px;background:rgba(250,245,233,.7);border:1px dashed var(--thread)}
 .week-table th,.week-table td{border-bottom:1px dashed var(--thread)}.week-table th{font-family:"Songti SC",serif}.summary-card .total-line{font-family:Georgia,"Songti SC",serif}.pred-input-row{border-bottom:1px dashed var(--thread);padding:7px 0}.summary-card .person-line{border-bottom:1px dashed var(--thread)}
 nav.tabs{height:64px;background:rgba(238,229,212,.97);border-top:1px solid var(--thread);padding-top:7px}nav.tabs button{font-size:9px}nav.tabs button .ico{font-size:17px}nav.tabs button.active{color:var(--rose)}nav.tabs button.active::before{background:var(--rose);height:2px;border-radius:0}
@@ -246,7 +227,6 @@ nav.tabs{height:64px;background:rgba(238,229,212,.97);border-top:1px solid var(-
 <div class="toast" id="toast"></div>
 
 <div class="page active" id="page-checkin">
-<div class="encourage-box" id="dailyEncourage"></div>
 <div id="sundayNotice"></div>
 <div style="text-align:center;margin-bottom:10px;font-size:12px;color:var(--sepia);font-style:italic">
 📅 <input type="date" id="checkinDate" onchange="onDateChange()" style="padding:6px 10px;border:1px solid var(--thread);border-radius:8px;font-family:inherit;font-size:12px;background:var(--paper);color:var(--ink)">
@@ -271,7 +251,7 @@ nav.tabs{height:64px;background:rgba(238,229,212,.97);border-top:1px solid var(-
 // ====== 版本升级自动修复 ======
 // 当检测到版本号变化时，在 SW 接管之前就清理掉旧缓存
 (function(){
-  var EXPECTED=12;
+  var EXPECTED=13;
   var stored=parseInt(localStorage.getItem('wuren_ver')||'0');
   if(stored>0 && stored<EXPECTED){
     // 有旧版本缓存，抢先清理
@@ -296,7 +276,6 @@ var DAYS=['一','二','三','四','五','六','日'];
 var AVATARS={石维婧:'婧',梅妍洁:'洁',单兰迪:'迪',王珂:'珂',师旌议:'议'};
 var TK='ghp_FcDaU2QoRwXlfLBs7gUX'+'gcfMv9qjpE43aYys';
 var REPO='meiyanjie1990/wuren-checkin';
-var DS_KEY='sk-b536a934fbea40c58afd'+'92739665db75';
 var _sha=null,_local=null,_seasonData=null;
 
 // UTF-8 <-> base64 转换（替代废弃的 escape/unescape）
@@ -321,7 +300,6 @@ function fds(d){return (d.getMonth()+1)+'/'+d.getDate()}
 function fwr(m,s){return (m.getMonth()+1)+'月'+m.getDate()+'日 - '+(s.getMonth()+1)+'月'+s.getDate()+'日'}
 function isSunday(d){return d.getDay()===0}
 function isSameDay(a,b){return fd(a)===fd(b)}
-function hashStr(s){var h=0;for(var i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0}return Math.abs(h)}
 function esc(s){return String(s===undefined||s===null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2500)}
 function setSyncStatus(msg,clearAfter){var bar=document.getElementById('syncBar');if(!bar)return;bar.textContent=msg;if(clearAfter)setTimeout(function(){if(bar)bar.textContent=''},clearAfter)}
@@ -420,13 +398,6 @@ async function syncNow(silent){
   var remote=await fetchRemote();
   if(remote){
     var local=getLocal();
-    // 保留本地的 AI 鼓励语（远程可能没有）
-    if(local.checkins)for(var p in local.checkins)for(var d in local.checkins[p]){
-      var le=local.checkins[p][d];
-      if(le&&le._ai&&remote.checkins&&remote.checkins[p]&&remote.checkins[p][d]&&!remote.checkins[p][d]._ai){
-        remote.checkins[p][d]._ai=le._ai;
-      }
-    }
     // 如果有上次未推送的数据，合并到远程数据中并尝试推送
     if(localStorage.getItem('wuren_need_sync')==='1'){
       remote=mergeForUpload(remote,local);
@@ -498,133 +469,7 @@ async function deleteComment(ds,person,id){
   if(!confirm('删除这条留言吗？'))return;delete data.comments[ds][person][id];var ok=await saveAndSync(data,[['comments',ds,person,id]]);toast(ok?'留言已删除':'已在本机删除，等待同步');renderCheckin()
 }
 
-// AI
-async function callAI(name,ss,sn,es,en,streak,wd,dow,tg){
-  var parts=[];
-  if(ss>0)parts.push('学习'+ss+'分'+(sn?'：'+sn:''));
-  if(es>0)parts.push('运动'+es+'分'+(en?'：'+en:''));
-  if(parts.length===0)return null;
-  var prompt='你是五仁打卡群的专属鼓励师。五仁是5个30-40岁的好友（石维婧🌸梅妍洁🥜单兰迪🌟王珂🍃师旌议🔥），每周一到周六打卡学习和运动，周日休息。你要像个又暖又损的闺蜜/兄弟，口语化，有点冷幽默。如果ta学习和运动都做了两项都回应。记住0.5分=半小时，1分=1小时。60-100字，直接回复。\n时间：'+tg+'\n用户：'+name+'\n'+parts.join('；')+'\n连续打卡：'+streak+'天 本周已打：'+wd+'天';
-  try{
-    var ctrl=new AbortController();setTimeout(function(){ctrl.abort()},12000);
-    var resp=await fetch('https://api.deepseek.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+DS_KEY},body:JSON.stringify({model:'deepseek-chat',messages:[{role:'user',content:prompt}],max_tokens:300,temperature:0.95}),signal:ctrl.signal});
-    if(!resp.ok)return null;
-    var data=await resp.json();
-    var reply=data.choices&&data.choices[0]?data.choices[0].message.content.trim():null;
-    return (reply&&reply.length>2)?reply:null;
-  }catch(e){return null}
-}
-
-// Encouragement
-var STUDY_R=[
-  {kw:'英语 单词 语法 阅读 听力 口语 作文 翻译 english'.split(' '),r:['英语慢功夫，今天这步走得很稳','语言每天碰一点比周末猛攻有效得多','学语言的快乐是某天突然发现听懂了']},
-  {kw:'书 看书 读 小说 文学 历史 哲学 传记'.split(' '),r:['阅读是最低成本的旅行','一本书半小时比刷手机充实太多']},
-  {kw:'考试 复习 备考 考证 职称'.split(' '),r:['成年人主动学习比学生时代酷多了','不是为了分数是为了更好的自己']},
-  {kw:'博物馆 看展 展览 美术馆 画廊'.split(' '),r:['逛博物馆是最好的通识教育','看展的人眼睛里装着另一个世界']},
-  {kw:'写作 日记 公众号 随笔'.split(' '),r:['把想法写成文字是对思考的二次加工','写作是给自己整理思绪']},
-  {kw:'理财 股票 基金 投资 经济学'.split(' '),r:['搞懂钱的规律是成年人最重要的功课','理财也是学习——每一块砖都算数']},
-  {kw:'育儿 亲子 孩子 带娃 陪娃 绘本'.split(' '),r:['最好的教育是陪伴','育儿也是育己']},
-  {kw:'旅行 自驾 出游 攻略'.split(' '),r:['世界是一本书不旅行只读了一页','做攻略也是学习']},
-];
-var EXERCISE_R=[
-  {kw:'跑 步 公里 km 慢跑 晨跑 夜跑'.split(' '),r:['跑步的多巴胺仅次于恋爱','每一步都不是白跑的']},
-  {kw:'瑜伽 拉伸 普拉提'.split(' '),r:['瑜伽人的从容是我不急但我一直在','拉伸的不只是身体还有一天的紧张']},
-  {kw:'跳绳'.split(' '),r:['跳绳性价比最高——一根绳全身燃','10分钟跳绳等于半小时慢跑']},
-  {kw:'游泳 游 泳池'.split(' '),r:['游泳是唯一不会出汗的运动','在水里的时光世界安静了']},
-  {kw:'健身 力量 哑铃 器械 深蹲 俯卧撑'.split(' '),r:['铁片不会辜负你','肌肉酸痛的第二天就是成长']},
-  {kw:'走路 散步 遛 溜达'.split(' '),r:['走路是最被低估的运动','散步的哲学：慢下来']},
-  {kw:'骑车 单车 骑行 自行车'.split(' '),r:['风从耳边过自由从心里来','两个轮子去的地方四轮永远到不了']},
-  {kw:'爬山 登山 徒步 户外 郊游'.split(' '),r:['山就在那里你去了它就矮了一截','户外是最好的健身房']},
-  {kw:'带娃 遛娃 抱娃 陪娃'.split(' '),r:['带娃是最高强度的有氧运动懂的都懂','看看手腕上的娃就知道运动量了']},
-  {kw:'太极 八段锦 五禽戏 气功'.split(' '),r:['传统养生功法温和但持久','国潮养生！']},
-  {kw:'跳舞 跳操 hiit tabata 有氧'.split(' '),r:['成年人挤出时间运动本身就是胜利','跟着音乐流汗时间过得快']},
-];
-
-function noteReact(note,type){
-  if(!note||note.trim()==='')return null;
-  var n=note.toLowerCase();
-  var list=type==='study'?STUDY_R:EXERCISE_R;
-  for(var i=0;i<list.length;i++){
-    if(list[i].kw.some(function(k){return n.indexOf(k)>-1})){
-      return list[i].r[hashStr(note+type)%list[i].r.length];
-    }
-  }
-  var cleaned=note.replace(/[，,。.!！？?、\s～—\-…]+/g,' ').replace(/(今天|了|的|也|很|都|是|在|和|与|吧|呢|啊|哦|哈|嗯)/g,' ').trim();
-  var words=cleaned.split(/[\s]+/).filter(function(w){return w.length>=2&&!/^[a-zA-Z0-9]+$/.test(w)});
-  var hook=words.length>0?words[0].slice(0,8):'';
-  if(!hook||hook.length<2)return null;
-  return (type==='study'?'看到你提到'+hook+'——学什么都不白学':'用自己的方式运动——'+hook+'听起来不错');
-}
-
-function genEnc(data,dateStr,user){
-  var d=new Date(dateStr+'T00:00:00');
-  var hour=new Date().getHours();
-  var tgKeys=['night','early','morning','noon','afternoon','evening','night'];
-  var tgVals=[['夜深了','晚间好'],['早安呀','清晨好'],['上午好','咖啡时间'],['中午好','午安'],['下午好','午后时光'],['傍晚好'],['夜深了','晚间好']];
-  var idx=Math.min(Math.floor(hour/3),6);
-  var gs=tgVals[idx]||tgVals[0];
-  var greeting=gs[hashStr(user+dateStr)%gs.length];
-
-  if(d.getDay()===0)return '<div class="greeting">'+greeting+'，'+(user||'朋友')+'</div><div class="body">周日不打卡。一周坚持值得奖励自己。<br><strong>会休息的人才能跑更远。</strong></div><div class="humor">今天唯一任务：让自己舒服</div>';
-  if(!user)return '<div class="greeting">'+greeting+'！</div><div class="body">选一下你是谁，开始打卡吧~</div>';
-
-  var ex=gpc(data,user,dateStr);
-  var streak=countStreak(data,user);
-  var wd=countWeekDone(data,user);
-  var dow=d.getDay()||7;
-
-  if(ex){
-    var total=(ex.study||0)+(ex.exercise||0);
-    var st=ex.study||0,et=ex.exercise||0;
-
-    if(ex._ai)return '<div class="greeting">'+greeting+'，'+user+'！<span class="ai-tag">AI</span></div><div class="body">'+ex._ai+'</div>';
-
-    var parts=[],humor='';
-    var seed=hashStr(user+dateStr);
-
-    if(total>=3.5){parts=['<strong>'+total.toFixed(1)+'分！</strong>今天属于让人羡慕的自律人',st>0&&et>0?'学习运动双拉满自律额度已用满':'专注一项做到极致']}
-    else if(total>=2){parts=['<strong>'+total.toFixed(1)+'分</strong>扎实的一天','两小时有效投入一年就是730小时']}
-    else if(total>=1){parts=['<strong>'+total.toFixed(1)+'分</strong>小步快跑','重要的不是多少分是又一次选择了行动']}
-    else{parts=['今天也打卡了'];humor='告诉明天的自己——你看我连这么小的日子都没放弃'}
-
-    var sr=st>0?noteReact(ex.sNote||'','study'):null;
-    var er=et>0?noteReact(ex.eNote||'','exercise'):null;
-    if(sr)parts.push(sr);
-    if(er)parts.push(er);
-    if(streak>=14)parts.push('连续<strong>'+streak+'</strong>天！节奏刻进肌肉记忆了');
-    else if(streak>=7)parts.push('连续<strong>'+streak+'</strong>天！靠谱两个字的最好解释');
-    else if(streak>=3)parts.push('连续<strong>'+streak+'</strong>天了势头在起来');
-
-    if(!humor)humor=['万物都会背叛你但每天0.5分的积累不会','打卡像种树每天浇一点水一年后回头看一片森林','三十岁以后的坚持是给自己的交代'][seed%3];
-
-    return '<div class="greeting">'+greeting+'，'+user+'！</div><div class="body">'+parts.join('<br>')+'</div><div class="humor">'+humor+'</div>';
-  }
-
-  var tips=[],humor='';
-  if(dow===1){tips=['周一最需要勇气你敢开始这周就赢了一半','新的一周给自己一个小目标'];humor='周一：一周中最被误解的一天但它需要你'}
-  else if(dow===5||dow===6){tips=['周末诱惑很大但打开这个页面本身就赢了第一步','周五六的每一分都有双倍含金量'];humor='周五：身体在工位灵魂在周末但你还记得打卡就是纪律'}
-  else{tips=['打卡不是考试不需要每次都满分来了就是胜利','高估一天低估百天'];humor='拖延症的本质是你不知道开始之后有多爽'}
-
-  if(streak>=7)tips.push('连续<strong>'+streak+'</strong>天了今天再加一天！');
-  return '<div class="greeting">'+greeting+'，'+user+'！</div><div class="body">'+tips.join('<br><br>')+'</div><div class="humor">'+humor+'</div>';
-}
-
-function genMini(data,dateStr,person){
-  var ex=gpc(data,person,dateStr);
-  if(!ex)return'';
-  var total=(ex.study||0)+(ex.exercise||0);
-  if(total===0)return'';
-  var av=AVATARS[person]||'?';var avCls2=avClass(person);
-  if(ex._ai){return'<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px dotted var(--thread)"><span class="person-avatar '+avCls2+'" style="width:26px;height:26px;font-size:13px">'+av+'</span><span><strong>'+person+'</strong> '+total.toFixed(1)+'分<span class="ai-tag">AI</span><br><span class="other-ai">'+ex._ai+'</span></span></div>'}
-  var r1=(ex.study||0)>0?noteReact(ex.sNote||'','study'):null;
-  var r2=(ex.exercise||0)>0?noteReact(ex.eNote||'','exercise'):null;
-  var r=r1||r2||'';
-  var sr=r?(r.indexOf('。')>-1?r.split('。')[0]:r.slice(0,30)):'';
-  return'<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:6px"><span class="person-avatar '+avCls2+'" style="width:26px;height:26px;font-size:13px">'+av+'</span><span><strong>'+person+'</strong> '+total.toFixed(1)+'分'+(sr?'<br><span class="other-ai">'+sr+'</span>':'')+'</span></div>';
-}
-
 function countStreak(data,person){var s=0;var d=new Date();d.setDate(d.getDate()-1);while(d.getFullYear()>=2026){var c=gpc(data,person,fd(d));if(!c||((c.study||0)+(c.exercise||0))===0)break;s++;d.setDate(d.getDate()-1)}return s}
-function countWeekDone(data,person){var today=new Date();var m=gm(today);var days=0;for(var i=0;i<6;i++){var d=new Date(m);d.setDate(d.getDate()+i);var c=gpc(data,person,fd(d));if(c&&((c.study||0)+(c.exercise||0))>0)days++}return days}
 
 function renderCheckin(){
   var data=getLocal();var ds=cd();
@@ -642,7 +487,7 @@ function renderCheckin(){
   var nd=document.getElementById('sundayNotice');
   nd.innerHTML=isS?(sw.length>0?'<div class="sunday-winner">周日福利！中奖者：<strong>'+sw.join('、')+'</strong> 可以打卡</div>':'<div class="sunday-lock">周日休息日。等待预测中奖者揭晓~</div>'):'';
 
-  document.getElementById('dailyEncourage').innerHTML=genEnc(data,ds,user);var sb2=document.getElementById('streakBadge');if(sb2){var sk=countStreak(data,user);sb2.textContent=sk>=3?'连续'+sk+'天':'';}var sb=document.getElementById('streakBadge');if(sb){var strk=countStreak(data,user);if(strk>=3)sb.textContent='连续'+strk+'天';else sb.textContent='';}
+  var sb=document.getElementById('streakBadge');if(sb){var strk=countStreak(data,user);if(strk>=3)sb.textContent='连续'+strk+'天';else sb.textContent='';}
 
   var html='';
   if(!user)html+='<div style="text-align:center;color:var(--sub);padding:30px">请先选择我是谁</div>';
@@ -679,9 +524,6 @@ function renderCheckin(){
     if(en)en.value=window._tmp.eNote||'';
   }
 
-  setTimeout(function(){
-    fillAI(data,ds);
-  },600);
 }
 
 function scoreBtns(type){var id=type==='study'?'bs':'be';return[0,0.5,1,1.5,2].map(function(v){return'<button id="'+id+'-'+v+'" onclick="selScore(\''+type+'\','+v+')">'+(v===0?'0':v)+'</button>'}).join('')}
@@ -704,47 +546,10 @@ async function saveMy(){
   else{toast('⚠️ 已保存在本机，网络恢复后会自动同步')}
   renderCheckin();
 
-  var total=(record.study||0)+(record.exercise||0);
-  if(total>0){
-    var streak=countStreak(data,user);
-    var wd=countWeekDone(data,user);
-    var hour=new Date().getHours();
-    var tg=hour<7?'清晨':hour<10?'上午':hour<13?'中午':hour<17?'下午':hour<20?'傍晚':'晚上';
-    var day=new Date(ds+'T00:00:00').getDay()||7;
-    callAI(user,record.study||0,record.sNote||'',record.exercise||0,record.eNote||'',streak,wd,day,tg).then(function(r){
-      if(r){
-        var d2=getLocal();
-        if(d2.checkins[user]&&d2.checkins[user][ds]){d2.checkins[user][ds]._ai=r;saveAndSync(d2,null,[['checkins',user,ds,'_ai']])}
-        var ed=document.getElementById('dailyEncourage');if(ed){ed.innerHTML=genEnc(getLocal(),ds,user);setTimeout(function(){renderCheckin()},800)}
-      }
-    });
-  }
 }
 
 function editMy(){var u=cu();var ds=cd();var data=getLocal();var ex=gpc(data,u,ds);if(!ex)return;window._tmp={study:ex.study||0,exercise:ex.exercise||0,sNote:ex.sNote||'',eNote:ex.eNote||''};window._tmpDate=ds;delete data.checkins[u][ds];saveLocal(data);renderCheckin()}
 async function deleteMy(){var u=cu();var ds=cd();var data=getLocal();var ex=gpc(data,u,ds);if(!ex)return;if(!confirm('确定撤销'+u+'在'+ds+'的打卡？'))return;delete data.checkins[u][ds];var ok=await saveAndSync(data,[['checkins',u,ds]]);window._tmp=null;window._tmpDate=null;toast(ok?'已撤销并同步':'已在本机撤销，等待同步');renderCheckin()}
-
-async function fillAI(data,ds){
-  var hour=new Date().getHours();
-  var tg=hour<7?'清晨':hour<10?'上午':hour<13?'中午':hour<17?'下午':hour<20?'傍晚':'晚上';
-  for(var i=0;i<PERSONS.length;i++){
-    var p=PERSONS[i];
-    var ex=gpc(data,p,ds);
-    if(!ex||((ex.study||0)+(ex.exercise||0))===0)continue;
-    if(ex._ai)continue;
-    var streak=countStreak(data,p);
-    var wd=countWeekDone(data,p);
-    var day=new Date(ds+'T00:00:00').getDay()||7;
-    var r=await callAI(p,ex.study||0,ex.sNote||'',ex.exercise||0,ex.eNote||'',streak,wd,day,tg);
-    if(r){
-      var d2=getLocal();
-      if(d2.checkins[p]&&d2.checkins[p][ds]){d2.checkins[p][ds]._ai=r;saveAndSync(d2,null,[['checkins',p,ds,'_ai']]).catch(function(){})}
-      var ed=document.getElementById('dailyEncourage');
-      if(ed&&document.getElementById('page-checkin').classList.contains('active')){ed.innerHTML=genEnc(getLocal(),ds,cu())}
-    }
-    await new Promise(function(rs){setTimeout(rs,1500)});
-  }
-}
 
 function renderWeekly(){
   var data=getLocal();var today=new Date();var m=gm(today);var sun=gs(m);
@@ -895,7 +700,7 @@ async function init(){
     sel.value=saved;
   }
   document.getElementById('checkinDate').value=fd(new Date());
-  document.getElementById('verNum').textContent='12';
+  document.getElementById('verNum').textContent='13';
   // Render immediately with local data, then sync
   renderAll();
   await syncNow(true);
@@ -908,7 +713,7 @@ async function init(){
     setTimeout(function(){renderCheckin();},100);
     setTimeout(function(){renderCheckin();},400);
   }
-  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=12').catch(function(){})}
+  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=13').catch(function(){})}
 }
 init();
 document.addEventListener('visibilitychange',function(){if(!document.hidden&&!window._tmp)syncNow(false)});
