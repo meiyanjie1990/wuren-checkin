@@ -157,6 +157,16 @@
         "石维婧"
       ],
       "revealed": true
+    },
+    "2026-07-19": {
+      "weekStart": "2026-07-20",
+      "weekEnd": "2026-07-26",
+      "preds": {
+        "梅妍洁": 28
+      },
+      "actual": null,
+      "winners": [],
+      "revealed": false
     }
   },
   "comments": {
