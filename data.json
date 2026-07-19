@@ -152,9 +152,11 @@
         "王珂": 62,
         "师旌议": 10
       },
-      "actual": null,
-      "winners": [],
-      "revealed": false
+      "actual": 32.5,
+      "winners": [
+        "石维婧"
+      ],
+      "revealed": true
     }
   },
   "comments": {
