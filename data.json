@@ -214,9 +214,11 @@
         "梅妍洁": 28,
         "师旌议": 15
       },
-      "actual": null,
-      "winners": [],
-      "revealed": false
+      "actual": 20,
+      "winners": [
+        "师旌议"
+      ],
+      "revealed": true
     }
   },
   "comments": {
