@@ -536,7 +536,7 @@ async function saveMy(){
   if(!window._tmp){toast('请选择分数');return}
   var data=getLocal();
   var record={study:window._tmp.study||0,sNote:(document.getElementById('sNote')?document.getElementById('sNote').value:'').trim(),exercise:window._tmp.exercise||0,eNote:(document.getElementById('eNote')?document.getElementById('eNote').value:'').trim()};
-  if(record.study===0&&record.exercise===0){toast('请至少选一项分数');return}
+
   if(!data.checkins[user])data.checkins[user]={};
   data.checkins[user][ds]=record;
   var btn=document.getElementById('btnSave');if(btn){btn.disabled=true;btn.textContent='正在提交…'}
@@ -700,7 +700,7 @@ async function init(){
     sel.value=saved;
   }
   document.getElementById('checkinDate').value=fd(new Date());
-  document.getElementById('verNum').textContent='13';
+  document.getElementById('verNum').textContent='14';
   // Render immediately with local data, then sync
   renderAll();
   await syncNow(true);
