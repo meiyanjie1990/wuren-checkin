@@ -196,7 +196,7 @@ header{position:relative;padding:25px 20px 13px;background:rgba(238,229,212,.94)
 .top-row{display:grid;grid-template-columns:minmax(0,1fr) 76px;gap:12px}.top-row h1{font:500 48px/.9 Georgia,"Times New Roman",serif;letter-spacing:-2px}.top-row h1 .sub{font:10px/1.4 Georgia,serif;letter-spacing:1.7px;margin:0 0 7px;text-transform:uppercase}.date-col{width:68px;height:68px;border:1.5px solid var(--rose);border-radius:50%;display:flex;align-items:center;justify-content:center;text-align:center!important;color:var(--rose)!important;font:10px/1.45 Georgia,"Songti SC",serif!important;transform:rotate(5deg);padding:7px}.version-box{position:absolute;right:17px;top:101px;font-size:9px;color:var(--faded)}
 .sub-line{margin-top:12px}.sub-line select{border-radius:2px;border-color:rgba(167,140,101,.35);box-shadow:none;background:rgba(250,245,233,.72);padding:7px 12px;color:var(--ink)}.streak-badge{border-radius:2px;background:rgba(85,114,93,.08);padding:7px 11px}.sync-bar{text-align:left;margin:7px 0 0;font-size:10px;color:var(--sage)}
 .friend-strip{margin:0 15px;padding:14px 8px 12px;background:rgba(250,245,233,.62);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;border:1px solid rgba(167,140,101,.25);transform:rotate(-.25deg)}
-.friend-status{text-align:center;font-size:8px;color:var(--faded);position:relative;white-space:nowrap}.friend-status .person-avatar{display:flex;width:34px;height:34px;margin:0 auto 6px;border-radius:48% 52% 47% 53%;font-size:13px}.friend-status.checked::after{content:'✓';position:absolute;top:-5px;right:3px;color:var(--sage);font:bold 14px "Comic Sans MS",cursive}.friend-status.current{font-weight:700;color:var(--ink)}.friend-status.current .person-avatar{outline:2px solid var(--paper);box-shadow:0 0 0 3px var(--ink)}
+.friend-status{text-align:center;font-size:8px;color:var(--faded);position:relative;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:2px}.friend-status .person-avatar{display:flex;width:34px;height:34px;margin:0 auto 2px;border-radius:48% 52% 47% 53%;font-size:13px;transition:filter 0.2s,opacity 0.2s}.friend-status.checked::after{content:'✓';position:absolute;top:-5px;right:3px;color:var(--sage);font:bold 14px "Comic Sans MS",cursive}.friend-status.unchecked .person-avatar{filter:grayscale(0.6);opacity:0.5}.friend-status.current{font-weight:700;color:var(--ink)}.friend-status.current .person-avatar{outline:2px solid var(--paper);box-shadow:0 0 0 3px var(--ink)}.friend-score{font-size:10px;color:var(--sage);font-weight:600;line-height:1}.friend-no-check{font-size:8px;color:var(--rose);line-height:1}.friend-name{font-size:9px;color:var(--sepia);line-height:1}
 .page{padding:14px 17px}.section-label{font-family:"Songti SC","STSong",serif;font-size:18px;color:var(--ink);letter-spacing:0;margin:18px 4px 8px;border-bottom:1px solid var(--ink);padding-bottom:7px}.section-label::after{display:none}
 .card{border:0;border-top:1px dashed var(--thread);border-radius:0;padding:15px 5px;margin:0;background:rgba(250,245,233,.35);box-shadow:none}.card.self{border:0;border-top:1.5px solid var(--ink);background:rgba(250,245,233,.72)}.card h3{font-family:"Songti SC","STSong",serif;font-size:18px}.person-name{font-family:"Songti SC","STSong",serif}.person-avatar{border-radius:48% 52% 50% 46%}.done-badge{font-family:Georgia,serif;font-size:12px;font-style:italic}.done-detail{padding-left:44px;margin-top:-6px;display:grid;grid-template-columns:1fr 1fr;gap:10px}.done-detail .nt{max-width:none;font-family:"Songti SC","STSong",serif;font-style:normal;line-height:1.55}.done-detail .v{font-style:italic}.me-tag{border:1px solid var(--rose);color:var(--rose);padding:1px 6px;border-radius:0}
 .score-btns button,.note-input,.btn,.pred-input-row input{border-radius:2px;box-shadow:none}.score-btns button{background:rgba(250,245,233,.7)}.note-input{background:rgba(250,245,233,.72);font-style:normal}.btn-primary{background:var(--rose);box-shadow:3px 4px 0 rgba(67,43,27,.14)}.btn-primary:hover{background:#914B3B}.btn-outline{border-radius:2px}.sunday-lock,.sunday-winner{border-radius:2px;background:rgba(250,245,233,.7);border:1px dashed var(--thread)}
@@ -234,9 +234,9 @@ nav.tabs{height:64px;background:rgba(238,229,212,.97);border-top:1px solid var(-
 </div>
 <div class="section-label">今天留下的痕迹</div><div id="checkinArea"></div></div>
 
-<div class="page" id="page-weekly"><div class="card"><h3>📊 本周战报</h3><div id="weekRange" style="font-size:12px;color:var(--sepia);font-style:italic;margin-bottom:10px"></div><div style="overflow-x:auto" id="weekTable"></div><div class="summary-card" id="weekSummary"></div></div><div class="card"><h3>🔮 上周预测揭晓</h3><div id="lastPredResult" style="font-size:13px;line-height:1.8"></div></div></div>
+<div class="page" id="page-weekly"><div class="card"><h3>📊 本周战报</h3><div id="weekRange" style="font-size:12px;color:var(--sepia);font-style:italic;margin-bottom:10px"></div><div style="overflow-x:auto" id="weekTable"></div><div class="summary-card" id="weekSummary"></div></div><div class="card" id="seasonProgressCard"><h3>📈 赛季进度</h3><div id="seasonProgress"></div></div><div class="card"><h3>🔮 上周预测揭晓</h3><div id="lastPredResult" style="font-size:13px;line-height:1.8"></div></div></div>
 
-<div class="page" id="page-predict"><div class="card"><h3>🔮 预测下周总分</h3><div id="predInfo" style="font-size:12px;color:var(--sepia);font-style:italic;margin-bottom:12px;line-height:1.6"></div><div id="predInputs"></div><button class="btn btn-primary btn-block" onclick="savePredictions()" style="margin-top:12px">📝 提交预测</button><div id="revealArea"></div></div><div class="card"><h3>📜 预测历史</h3><div id="predHistory"></div></div></div>
+<div class="page" id="page-predict"><div class="card"><h3>🔮 预测下周总分</h3><div id="predInfo" style="font-size:12px;color:var(--sepia);font-style:italic;margin-bottom:12px;line-height:1.6"></div><div id="predInputs"></div><button class="btn btn-primary btn-block" onclick="savePredictions()" style="margin-top:12px">📝 提交预测</button><div id="revealArea"></div></div><div class="card"><h3>📜 预测历史</h3><div id="predHistory"></div></div><div class="card" id="predStatsCard" style="display:none"><h3>🏅 猜分达人榜</h3><div id="predStats"></div></div></div>
 
 <div class="page" id="page-history"><div id="seasonArchive"></div><div class="card"><h3>📋 导出个人记录</h3><div id="exportList"></div></div><div class="card"><h3>📈 近期记录</h3><div id="historyOverview"></div></div></div>
 
@@ -251,7 +251,7 @@ nav.tabs{height:64px;background:rgba(238,229,212,.97);border-top:1px solid var(-
 // ====== 版本升级自动修复 ======
 // 当检测到版本号变化时，在 SW 接管之前就清理掉旧缓存
 (function(){
-  var EXPECTED=14;
+  var EXPECTED=15;
   var stored=parseInt(localStorage.getItem('wuren_ver')||'0');
   if(stored>0 && stored<EXPECTED){
     // 有旧版本缓存，抢先清理
@@ -442,8 +442,11 @@ async function onDateChange(){renderCheckin();await syncNow(false)}
 function renderFriendStatus(data,ds,user){
   var host=document.getElementById('friendStatus');if(!host)return;
   host.innerHTML=PERSONS.map(function(p){
-    var checked=!!gpc(data,p,ds);var classes='friend-status'+(checked?' checked':'')+(p===user?' current':'');
-    return'<div class="'+classes+'"><span class="person-avatar '+avClass(p)+'">'+(AVATARS[p]||'?')+'</span>'+p+'</div>'
+    var ex=gpc(data,p,ds);var checked=!!ex;
+    var score=checked?((ex.study||0)+(ex.exercise||0)):0;
+    var classes='friend-status'+(checked?' checked':' unchecked')+(p===user?' current':'');
+    var indicator=checked?'<span class="friend-score">'+score.toFixed(1)+'分</span>':'<span class="friend-no-check">待打卡</span>';
+    return'<div class="'+classes+'"><span class="person-avatar '+avClass(p)+'">'+(AVATARS[p]||'?')+'</span>'+indicator+'<span class="friend-name">'+p+'</span></div>'
   }).join('')
 }
 function formatCommentTime(iso){var d=new Date(iso);if(isNaN(d))return'';return(d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
@@ -608,6 +611,30 @@ function renderWeekly(){
   document.getElementById('weekSummary').innerHTML=sum;
   var predSun=new Date(m);predSun.setDate(predSun.getDate()-1);var pd=data.predictions[fd(predSun)];
   document.getElementById('lastPredResult').innerHTML=(pd&&pd.revealed)?'实际：<strong>'+pd.actual.toFixed(1)+'分</strong> 中奖：<strong>'+(pd.winners||[]).join('、')+'</strong>':'本周预测尚未揭晓，周日见~';
+  renderSeasonProgress(data,at);
+}
+
+function renderSeasonProgress(data,weekTotal){
+  var card=document.getElementById('seasonProgressCard');var host=document.getElementById('seasonProgress');if(!card||!host)return;
+  if(!_seasonData||!_seasonData.nextSeason){card.style.display='none';return}
+  var config=_seasonData.nextSeason;var fourth=calculateSeasonFour(data,config);
+  if(fourth.status==='resting'){
+    card.style.display='block';
+    host.innerHTML='<div style="text-align:center;padding:12px;color:var(--sepia);font-size:13px;line-height:1.8">📅 第四季预计 '+config.plannedStart+' 出发<br><span style="font-size:11px;color:var(--faded)">目标：一起走到 '+config.target+' 分</span></div>';
+    return;
+  }
+  card.style.display='block';
+  var pct=Math.min(100,Math.max(0,fourth.total/config.target*100));
+  var weekLabel='';
+  if(weekTotal>=70)weekLabel=' 🔥 本周炸裂！';
+  else if(weekTotal>=50)weekLabel=' 🎉 本周突破50分！';
+  else if(weekTotal>=35)weekLabel=' 💪 稳稳前进中';
+  var html='<div style="margin-bottom:8px;font-size:13px;display:flex;justify-content:space-between"><span>🏔️ 向 '+config.target+' 分前进'+weekLabel+'</span><span style="font-weight:600;color:var(--moss)">'+fourth.total.toFixed(1)+' / '+config.target+'</span></div>';
+  html+='<div class="season-progress" style="height:8px;margin:0 0 8px"><span style="width:'+pct+'%"></span></div>';
+  html+='<div style="font-size:11px;color:var(--sepia)">已走 '+pct.toFixed(0)+'% · 第 '+fourth.weeks+' 周 · 还差 '+Math.max(0,config.target-fourth.total).toFixed(1)+' 分'+(fourth.status==='completed'?' 🏁':'')+'</div>';
+  // 各人贡献小条
+  html+='<div class="season-people" style="margin-top:10px">'+PERSONS.map(function(p){var s=(fourth.people&&fourth.people[p])||0;return'<div class="season-person"><strong>'+s.toFixed(1)+'</strong>'+p.slice(0,1)+'</div>'}).join('')+'</div>';
+  host.innerHTML=html;
 }
 
 function renderPredict(){
@@ -634,6 +661,34 @@ function renderPredict(){
   else{ra.innerHTML=''}
   var hist='';Object.keys(data.predictions).sort().reverse().forEach(function(k){var pd=data.predictions[k];if(!pd||!pd.revealed)return;hist+='<div style="margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #f5f0e8"><div style="font-weight:700">'+k+' 揭晓</div><div style="font-size:12px;color:var(--sub)">预测周：'+pd.weekStart+' 起</div>';if(pd.preds)Object.keys(pd.preds).forEach(function(p){hist+=p+':'+pd.preds[p]+'分 '});hist+='<div style="color:#27ae60">实际：'+pd.actual.toFixed(1)+'分 | 中奖：'+(pd.winners||[]).join('、')+'</div></div>'});
   document.getElementById('predHistory').innerHTML=hist||'<div style="text-align:center;color:var(--sub);padding:20px">还没有已揭晓的预测<br><span style="font-size:12px">周日来猜下周总分！预测保密揭晓日才公开</span></div>';
+  renderPredStats(data);
+}
+
+function renderPredStats(data){
+  var card=document.getElementById('predStatsCard');var host=document.getElementById('predStats');if(!card||!host)return;
+  // 统计所有已揭晓的预测
+  var wins={},parts={};PERSONS.forEach(function(p){wins[p]=0;parts[p]=0});
+  Object.keys(data.predictions||{}).forEach(function(k){
+    var pd=data.predictions[k];if(!pd||!pd.revealed)return;
+    if(pd.winners)pd.winners.forEach(function(w){wins[w]=(wins[w]||0)+1});
+    if(pd.preds)Object.keys(pd.preds).forEach(function(p){parts[p]=(parts[p]||0)+1});
+  });
+  var totalWins=Object.values(wins).reduce(function(a,b){return a+b},0);
+  if(totalWins===0){card.style.display='none';return}
+  card.style.display='block';
+  var winRank=PERSONS.slice().sort(function(a,b){return wins[b]-wins[a]});
+  var partRank=PERSONS.slice().sort(function(a,b){return parts[b]-parts[a]});
+  var html='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12px">';
+  html+='<div><div style="font-weight:600;margin-bottom:6px;color:var(--sepia)">🏆 中奖次数</div>';
+  winRank.forEach(function(p,i){
+    html+='<div style="padding:4px 0;border-bottom:1px dotted var(--thread)">'+(i===0?'🥇':i===1?'🥈':i===2?'🥉':'')+' '+p+'：<strong>'+wins[p]+'次</strong></div>';
+  });
+  html+='</div><div><div style="font-weight:600;margin-bottom:6px;color:var(--sepia)">📝 参与次数</div>';
+  partRank.forEach(function(p,i){
+    html+='<div style="padding:4px 0;border-bottom:1px dotted var(--thread)">'+(i===0?'🔥':i===1?'⭐':'')+' '+p+'：<strong>'+parts[p]+'次</strong></div>';
+  });
+  html+='</div></div>';
+  host.innerHTML=html;
 }
 
 async function savePredictions(){
@@ -742,7 +797,7 @@ async function init(){
     sel.value=saved;
   }
   document.getElementById('checkinDate').value=fd(new Date());
-  document.getElementById('verNum').textContent='15';
+  document.getElementById('verNum').textContent='16';
   // Render immediately with local data, then sync
   renderAll();
   await syncNow(true);
@@ -755,7 +810,7 @@ async function init(){
     setTimeout(function(){renderCheckin();},100);
     setTimeout(function(){renderCheckin();},400);
   }
-  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=15').catch(function(){})}
+  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=16').catch(function(){})}
 }
 init();
 document.addEventListener('visibilitychange',function(){if(!document.hidden&&!window._tmp)syncNow(false)});
