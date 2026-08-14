@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#F7F3EC">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <link rel="manifest" href="./manifest.json">
-<title>F5 · 五人手账</title>
+<title>F5 · 亚洲顶流也得学习和运动</title>
 <style>
 :root{
   --parchment:#F5F1E8; --paper:#FEFCF8; --paper2:#FBF7EF;
@@ -191,13 +191,36 @@ nav.tabs button.active::before{content:'';position:absolute;top:0;width:24px;hei
 :root{--parchment:#EEE5D4;--paper:#FAF5E9;--paper2:#F6EEDF;--ink:#30291F;--sepia:#8B7967;--faded:#AA9985;--sage:#55725D;--moss:#405B49;--rose:#A95742;--thread:#D7C8B1;--thread2:#E5D9C7;--shadow:2px 3px 0 rgba(109,87,55,.08);--sub:#8B7967;--border:#D7C8B1;--accent:#A95742;--accent2:#55725D}
 body{background-color:var(--parchment);background-image:linear-gradient(rgba(255,255,255,.12),rgba(255,255,255,.12)),radial-gradient(rgba(50,40,28,.08) .5px,transparent .7px);background-size:auto,7px 7px;padding-bottom:78px}
 body::before,body::after{display:none}
-header{position:relative;padding:25px 20px 13px;background:rgba(238,229,212,.94);backdrop-filter:blur(12px);border-bottom:0}
-.journal-tape{position:absolute;width:68px;height:17px;top:11px;left:138px;background:rgba(219,198,153,.5);transform:rotate(-3deg)}
-.top-row{display:grid;grid-template-columns:minmax(0,1fr) 76px;gap:12px}.top-row h1{font:500 48px/.9 Georgia,"Times New Roman",serif;letter-spacing:-2px}.top-row h1 .sub{font:10px/1.4 Georgia,serif;letter-spacing:1.7px;margin:0 0 7px;text-transform:uppercase}.date-col{width:68px;height:68px;border:1.5px solid var(--rose);border-radius:50%;display:flex;align-items:center;justify-content:center;text-align:center!important;color:var(--rose)!important;font:10px/1.45 Georgia,"Songti SC",serif!important;transform:rotate(5deg);padding:7px}.version-box{position:absolute;right:17px;top:101px;font-size:9px;color:var(--faded)}
-.sub-line{margin-top:12px}.sub-line select{border-radius:2px;border-color:rgba(167,140,101,.35);box-shadow:none;background:rgba(250,245,233,.72);padding:7px 12px;color:var(--ink)}.streak-badge{border-radius:2px;background:rgba(85,114,93,.08);padding:7px 11px}.sync-bar{text-align:left;margin:7px 0 0;font-size:10px;color:var(--sage)}
-.friend-strip{margin:0 15px;padding:14px 8px 12px;background:rgba(250,245,233,.62);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;border:1px solid rgba(167,140,101,.25);transform:rotate(-.25deg)}
-.friend-status{text-align:center;font-size:8px;color:var(--faded);position:relative;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:2px}.friend-status .person-avatar{display:flex;width:34px;height:34px;margin:0 auto 2px;border-radius:48% 52% 47% 53%;font-size:13px;transition:filter 0.2s,opacity 0.2s}.friend-status.checked::after{content:'✓';position:absolute;top:-5px;right:3px;color:var(--sage);font:bold 14px "Comic Sans MS",cursive}.friend-status.unchecked .person-avatar{filter:grayscale(0.6);opacity:0.5}.friend-status.current{font-weight:700;color:var(--ink)}.friend-status.current .person-avatar{outline:2px solid var(--paper);box-shadow:0 0 0 3px var(--ink)}.friend-score{font-size:10px;color:var(--sage);font-weight:600;line-height:1}.friend-no-check{font-size:8px;color:var(--rose);line-height:1}.friend-name{font-size:9px;color:var(--sepia);line-height:1}
-.page{padding:14px 17px}.section-label{font-family:"Songti SC","STSong",serif;font-size:18px;color:var(--ink);letter-spacing:0;margin:18px 4px 8px;border-bottom:1px solid var(--ink);padding-bottom:7px}.section-label::after{display:none}
+header{position:relative;padding:20px 20px 12px;background:rgba(238,229,212,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--thread)}
+.title-row{display:flex;align-items:flex-end;justify-content:space-between;gap:14px}
+.brand h1{font-family:Georgia,'Times New Roman','Songti SC','STSong','SimSun',serif;font-weight:500;font-size:33px;line-height:1.12;letter-spacing:.5px;color:var(--ink);display:flex;align-items:baseline;flex-wrap:wrap;column-gap:9px}
+.brand h1 em{font-style:italic;letter-spacing:0;line-height:1}
+.brand h1 .cn{font-size:20px;font-weight:600;letter-spacing:.5px}
+.brand .en{display:block;margin-top:6px;font-size:9px;letter-spacing:2.4px;color:var(--faded);text-transform:uppercase;font-family:Georgia,'Times New Roman',serif}
+.date-col{text-align:right;padding-bottom:2px;flex-shrink:0}
+.date-col .d{font-family:Georgia,'Times New Roman','Songti SC','STSong','SimSun',serif;font-size:16px;font-weight:600;color:var(--ink);line-height:1;white-space:nowrap}
+.date-col .d .n{font-size:23px;margin:0 1px}
+.date-col .w{display:block;margin-top:4px;font-size:10px;color:var(--sepia);letter-spacing:1px}
+.meta-row{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap}
+.chip{font-size:10px;color:var(--moss);background:rgba(85,114,93,.09);padding:4px 10px;border-radius:999px;white-space:nowrap;font-weight:500}
+.streak-badge{font-size:10px;color:var(--moss);background:rgba(85,114,93,.09);padding:4px 10px;border-radius:999px;font-weight:600}
+#syncBar{font-size:9px;color:var(--faded);margin-left:auto;white-space:nowrap}
+.sync-line{font-size:9px;color:var(--faded);white-space:nowrap}
+.sync-line b{color:var(--sage);font-weight:600}
+.sync-line .fix{color:var(--rose);cursor:pointer;text-decoration:underline}
+.friend-strip{margin:0 20px 14px;padding:13px 8px 10px;background:rgba(250,245,233,.7);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;border:1px solid rgba(167,140,101,.25);border-radius:14px}
+.friend-status{text-align:center;font-size:8px;color:var(--faded);position:relative;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:3px 0;border-radius:10px;transition:background .15s}
+.friend-status:active{background:rgba(85,114,93,.07)}
+.friend-status .person-avatar{display:flex;width:36px;height:36px;margin:0 auto 2px;font-size:14px;transition:filter 0.2s,opacity 0.2s,transform .15s}
+.friend-status.checked::after{content:'✓';position:absolute;top:-2px;right:10px;color:#fff;background:var(--sage);width:15px;height:15px;line-height:15px;border-radius:50%;font:bold 10px -apple-system,sans-serif;border:2px solid var(--parchment)}
+.friend-status.unchecked .person-avatar{filter:grayscale(0.6);opacity:0.5}
+.friend-status.current{font-weight:700;color:var(--ink);background:rgba(85,114,93,.07)}
+.friend-status.current .person-avatar{outline:2px solid var(--paper);box-shadow:0 0 0 2.5px var(--ink);transform:scale(1.05)}
+.friend-score{font-size:10px;color:var(--sage);font-weight:600;line-height:1}
+.friend-no-check{font-size:8px;color:var(--rose);line-height:1}
+.friend-name{font-size:9px;color:var(--sepia);line-height:1}
+.friend-status.current .friend-name{color:var(--ink);font-weight:700}
+.page{padding:14px 20px}.section-label{font-family:"Songti SC","STSong",serif;font-size:18px;color:var(--ink);letter-spacing:0;margin:18px 4px 8px;border-bottom:1px solid var(--ink);padding-bottom:7px}.section-label::after{display:none}
 .card{border:0;border-top:1px dashed var(--thread);border-radius:0;padding:15px 5px;margin:0;background:rgba(250,245,233,.35);box-shadow:none}.card.self{border:0;border-top:1.5px solid var(--ink);background:rgba(250,245,233,.72)}.card h3{font-family:"Songti SC","STSong",serif;font-size:18px}.person-name{font-family:"Songti SC","STSong",serif}.person-avatar{border-radius:48% 52% 50% 46%}.done-badge{font-family:Georgia,serif;font-size:12px;font-style:italic}.done-detail{padding-left:44px;margin-top:-6px;display:grid;grid-template-columns:1fr 1fr;gap:10px}.done-detail .nt{max-width:none;font-family:"Songti SC","STSong",serif;font-style:normal;line-height:1.55}.done-detail .v{font-style:italic}.me-tag{border:1px solid var(--rose);color:var(--rose);padding:1px 6px;border-radius:0}
 .score-btns button,.note-input,.btn,.pred-input-row input{border-radius:2px;box-shadow:none}.score-btns button{background:rgba(250,245,233,.7)}.note-input{background:rgba(250,245,233,.72);font-style:normal}.btn-primary{background:var(--rose);box-shadow:3px 4px 0 rgba(67,43,27,.14)}.btn-primary:hover{background:#914B3B}.btn-outline{border-radius:2px}.sunday-lock,.sunday-winner{border-radius:2px;background:rgba(250,245,233,.7);border:1px dashed var(--thread)}
 .week-table th,.week-table td{border-bottom:1px dashed var(--thread)}.week-table th{font-family:"Songti SC",serif}.summary-card .total-line{font-family:Georgia,"Songti SC",serif}.pred-input-row{border-bottom:1px dashed var(--thread);padding:7px 0}.summary-card .person-line{border-bottom:1px dashed var(--thread)}
@@ -205,23 +228,26 @@ nav.tabs{height:64px;background:rgba(238,229,212,.97);border-top:1px solid var(-
 #page-weekly>.card,#page-predict>.card,#page-history>.card{margin-bottom:15px;border:1px solid rgba(167,140,101,.25);padding:17px;background:rgba(250,245,233,.62);transform:rotate(-.1deg)}
 .comment-box{margin:13px 0 0 44px;padding-top:10px;border-top:1px dotted var(--thread)}.comment-title{font-size:10px;color:var(--sepia);letter-spacing:1px;margin-bottom:7px}.comment-item{display:grid;grid-template-columns:25px 1fr auto auto;gap:7px;align-items:start;padding:6px 0}.comment-item.comment-reply-item{margin-left:28px;padding:4px 0 4px 8px;border-left:1.5px solid var(--thread);font-size:11px}.comment-item.comment-reply-item .comment-body strong{font-size:10px}.comment-avatar{width:23px;height:23px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-family:"Songti SC",serif;font-size:10px}.comment-body{font-size:12px;line-height:1.55}.comment-body strong{font-size:11px;margin-right:5px}.comment-time{display:block;color:var(--faded);font-size:9px;margin-top:2px}.comment-reply{border:0;background:none;color:var(--sepia);font-size:10px;padding:3px 4px;cursor:pointer;white-space:nowrap}.comment-delete{border:0;background:none;color:var(--faded);font-size:10px;padding:3px;cursor:pointer}.reply-indicator{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--rose);margin-bottom:2px}.reply-indicator button{border:0;background:none;color:var(--faded);font-size:10px;cursor:pointer;padding:0}.comment-compose{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap}.comment-compose input{flex:1;min-width:0;border:1px solid var(--thread);border-radius:2px;background:rgba(250,245,233,.7);padding:8px 9px;font-family:inherit;font-size:12px;color:var(--ink);outline:none}.comment-compose input:focus{border-color:var(--rose)}.comment-compose button{border:1px solid var(--rose);background:transparent;color:var(--rose);padding:7px 10px;font-family:inherit;font-size:11px;cursor:pointer;white-space:nowrap}.comment-hint{font-size:10px;color:var(--faded);font-style:italic}
 .season-card{border:1px solid rgba(167,140,101,.25);background:rgba(250,245,233,.62);padding:16px;margin-bottom:13px}.season-head{display:flex;justify-content:space-between;align-items:start;gap:10px}.season-title{font-family:"Songti SC",serif;font-size:19px;font-weight:600}.season-meta{font-size:10px;color:var(--sepia);margin-top:4px}.season-total{text-align:right;font:italic 25px/1 Georgia,serif;color:var(--sage)}.season-total small{display:block;font:9px sans-serif;color:var(--faded);margin-top:4px}.season-progress{height:5px;background:var(--thread2);margin:14px 0 8px;overflow:hidden}.season-progress span{display:block;height:100%;background:var(--rose)}.season-progress-note{display:flex;justify-content:space-between;font-size:9px;color:var(--faded)}.season-people{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-top:13px}.season-person{text-align:center;border-right:1px dotted var(--thread);font-size:9px;color:var(--faded)}.season-person:last-child{border-right:0}.season-person strong{display:block;font:italic 15px Georgia,serif;color:var(--ink);margin-bottom:3px}.season-chart{width:100%;height:64px;margin-top:13px;display:block}.season-chart .grid{stroke:var(--thread);stroke-width:1}.season-chart .line{fill:none;stroke:var(--sage);stroke-width:2}.season-chart .dot{fill:var(--rose)}.season-note{font-family:"Kaiti SC","STKaiti",serif;font-size:11px;color:var(--rose);margin-top:8px}.season-segments{display:flex;gap:7px;margin-top:10px}.season-segment{flex:1;padding:8px;border:1px dashed var(--thread);font-size:10px;color:var(--sepia)}.season-segment strong{display:block;color:var(--ink);font-family:"Songti SC",serif;font-size:13px;margin-bottom:3px}.season-empty{text-align:center;padding:14px 5px;color:var(--sepia);font-size:12px;line-height:1.7}.archive-heading{font-family:"Songti SC",serif;font-size:19px;margin:0 0 12px}.archive-sub{font-size:11px;color:var(--sepia);line-height:1.7;margin:-6px 0 14px}
-@media(min-width:600px){body{max-width:480px;margin:0 auto;box-shadow:0 0 50px rgba(48,41,31,.12)}.friend-strip{margin-left:18px;margin-right:18px}}
+@media(min-width:600px){body{max-width:480px;margin:0 auto;box-shadow:0 0 50px rgba(48,41,31,.12)}.friend-strip{margin-left:20px;margin-right:20px}}
 </style>
 </head>
 <body>
 
 <header>
-<div class="journal-tape"></div>
-<div class="top-row">
-  <h1><span class="sub">FIVE FRIENDS · WEEKLY JOURNAL</span><span id="headerName">F5</span></h1>
-  <div class="date-col" id="headerDate"></div><div class="version-box">v<span id="verNum">5</span> <span onclick="repairApp()" style="cursor:pointer;color:var(--rose);" title="修复加载问题">修复</span></div>
-</div>
-<div class="sub-line">
-  <select id="currentUser" onchange="onUserSwitch()"><option value="">切换成员 ▾</option></select>
-  <span class="dot"></span>
-  <span class="streak-badge" id="streakBadge"></span>
-</div>
-<div class="sync-bar" id="syncBar"></div>
+  <div class="title-row">
+    <div class="brand">
+      <h1><em>F5</em><span class="cn">亚洲顶流也得学习和运动</span></h1>
+      <span class="en">Five Friends · Weekly Journal</span>
+    </div>
+    <div class="date-col" id="headerDate"></div>
+  </div>
+  <div class="meta-row">
+    <span class="chip" id="seasonChip"></span>
+    <span class="streak-badge" id="streakBadge"></span>
+    <span id="syncBar"></span>
+    <span class="sync-line">v<b id="verNum">17</b> <span class="fix" onclick="repairApp()" title="修复加载问题">修复</span></span>
+    <select id="currentUser" onchange="onUserSwitch()" style="display:none"><option value="">切换成员 ▾</option></select>
+  </div>
 </header>
 <section class="friend-strip" id="friendStatus"></section>
 <div class="toast" id="toast"></div>
@@ -251,7 +277,7 @@ nav.tabs{height:64px;background:rgba(238,229,212,.97);border-top:1px solid var(-
 // ====== 版本升级自动修复 ======
 // 当检测到版本号变化时，在 SW 接管之前就清理掉旧缓存
 (function(){
-  var EXPECTED=15;
+  var EXPECTED=17;
   var stored=parseInt(localStorage.getItem('wuren_ver')||'0');
   if(stored>0 && stored<EXPECTED){
     // 有旧版本缓存，抢先清理
@@ -438,6 +464,7 @@ async function saveAndSync(data,deletedPaths,changedPaths){
   return ok;
 }
 function onUserSwitch(){var u=cu();localStorage.setItem('wuren_me',u);renderCheckin()}
+function switchToMe(p){var sel=document.getElementById('currentUser');if(!sel||sel.value===p)return;sel.value=p;onUserSwitch()}
 async function onDateChange(){renderCheckin();await syncNow(false)}
 function renderFriendStatus(data,ds,user){
   var host=document.getElementById('friendStatus');if(!host)return;
@@ -446,7 +473,7 @@ function renderFriendStatus(data,ds,user){
     var score=checked?((ex.study||0)+(ex.exercise||0)):0;
     var classes='friend-status'+(checked?' checked':' unchecked')+(p===user?' current':'');
     var indicator=checked?'<span class="friend-score">'+score.toFixed(1)+'分</span>':'<span class="friend-no-check">待打卡</span>';
-    return'<div class="'+classes+'"><span class="person-avatar '+avClass(p)+'">'+(AVATARS[p]||'?')+'</span>'+indicator+'<span class="friend-name">'+p+'</span></div>'
+    return'<div class="'+classes+'" onclick="switchToMe(\''+p+'\')"><span class="person-avatar '+avClass(p)+'">'+(AVATARS[p]||'?')+'</span>'+indicator+'<span class="friend-name">'+p+'</span></div>'
   }).join('')
 }
 function formatCommentTime(iso){var d=new Date(iso);if(isNaN(d))return'';return(d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
@@ -522,8 +549,7 @@ function renderCheckin(){
   var ts=fd(today);var m=gm(dd);var sun=gs(m);var isS=isSunday(dd);
   var isToday=(ds===ts);var user=cu();
 
-  var monthNames=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-  document.getElementById('headerDate').innerHTML='<strong>'+String(today.getDate()).padStart(2,'0')+' '+monthNames[today.getMonth()]+'</strong>星期'+DAYS[today.getDay()===0?6:today.getDay()-1]+'<br>'+today.getFullYear();
+  document.getElementById('headerDate').innerHTML='<div class="d"><span class="dm">'+(today.getMonth()+1)+'月</span><span class="n">'+today.getDate()+'</span>日</div><span class="w">星期'+DAYS[today.getDay()===0?6:today.getDay()-1]+'</span>';
   document.getElementById('dateBadge').textContent=isToday?'':'补打卡';
   renderFriendStatus(data,ds,user);
 
@@ -550,7 +576,7 @@ function renderCheckin(){
       var st=ex.study||0,et=ex.exercise||0;
       html+='<div class="'+cc+'"><div class="person-name"><span class="person-avatar '+avClass+'">'+av+'</span>'+p+(isMe?' <span class="me-tag">我</span>':'')+'<span class="done-badge">✓ 已打卡 · '+(st+et).toFixed(1)+'分</span></div><div class="done-detail"><span><span class="k">学习</span><span class="v s">'+(st>0?st.toFixed(1):'—')+'</span>'+(ex.sNote?'<div class="nt">'+esc(ex.sNote)+'</div>':'')+'</span><span><span class="k">运动</span><span class="v e">'+(et>0?et.toFixed(1):'—')+'</span>'+(ex.eNote?'<div class="nt">'+esc(ex.eNote)+'</div>':'')+'</span></div>'+(isMe?'<div class="btn-row"><button class="btn btn-outline btn-small" onclick="editMy()">修改</button><button class="btn btn-outline btn-small" onclick="deleteMy()" style="color:var(--rose);border-color:var(--rose)">撤销</button></div>':'')+renderComments(data,ds,p,user)+'</div>';
     }else if(isMe&&can){
-      html+='<div class="card self" id="myCard"><div class="person-name"><span class="person-avatar '+avClass+'">'+av+'</span>'+p+' <span class="me-tag">我</span></div><div class="score-row"><div class="score-block"><div class="label"><span class="dot s"></span>学习 (0–2分)</div><div class="score-btns">'+scoreBtns('study')+'</div><textarea class="note-input" id="sNote" placeholder="学了什么？多行输入…"></textarea></div></div><div class="score-row"><div class="score-block"><div class="label"><span class="dot e"></span>运动 (0–2分)</div><div class="score-btns">'+scoreBtns('exercise')+'</div><textarea class="note-input" id="eNote" placeholder="做了什么运动？…"></textarea></div></div><button class="btn btn-primary btn-block" id="btnSave" onclick="saveMy()" style="margin-top:10px">保存打卡</button></div>';
+      html+='<div class="card self" id="myCard"><div class="person-name"><span class="person-avatar '+avClass+'">'+av+'</span>'+p+' <span class="me-tag">我</span></div><div class="score-row"><div class="score-block"><div class="label"><span class="dot s"></span>学习 (0–2分)</div><div class="score-btns">'+scoreBtns('study')+'</div><div class="label"><span class="dot s"></span>学习备注</div><textarea class="note-input" id="sNote" placeholder="学了什么？多行输入…"></textarea></div></div><div class="score-row"><div class="score-block"><div class="label"><span class="dot e"></span>运动 (0–2分)</div><div class="score-btns">'+scoreBtns('exercise')+'</div><div class="label"><span class="dot e"></span>运动备注</div><textarea class="note-input" id="eNote" placeholder="做了什么运动？…"></textarea></div></div><button class="btn btn-primary btn-block" id="btnSave" onclick="saveMy()" style="margin-top:10px">保存打卡</button></div>';
     }else if(isMe&&!can){
       html+='<div class="card self"><div class="person-name"><span class="person-avatar '+avClass+'">'+av+'</span>'+p+' <span class="me-tag">我</span></div><div style="font-size:13px;color:var(--rose)">今天不是你的打卡日</div></div>';
     }
@@ -791,13 +817,15 @@ async function checkVersion(){
 
 async function init(){
   await loadSeasonData();
+  var chip=document.getElementById('seasonChip');
+  if(chip){var cfg=_seasonData&&_seasonData.nextSeason;var t='';if(cfg&&cfg.plannedStart){var p=new Date(cfg.plannedStart+'T00:00:00');t=cfg.name+' '+(isNaN(p.getTime())?cfg.plannedStart:(p.getMonth()+1)+'月'+p.getDate()+'日')+' 开赛 · 目标 '+cfg.target+' 分'}chip.textContent=t}
   var sel=document.getElementById('currentUser');sel.innerHTML='<option value="">切换成员</option>'+PERSONS.map(function(p){return'<option value="'+p+'">'+p+'</option>'}).join('');
   var saved=localStorage.getItem('wuren_me');
   if(saved&&PERSONS.indexOf(saved)>-1){
     sel.value=saved;
   }
   document.getElementById('checkinDate').value=fd(new Date());
-  document.getElementById('verNum').textContent='16';
+  document.getElementById('verNum').textContent='17';
   // Render immediately with local data, then sync
   renderAll();
   await syncNow(true);
@@ -810,7 +838,7 @@ async function init(){
     setTimeout(function(){renderCheckin();},100);
     setTimeout(function(){renderCheckin();},400);
   }
-  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=16').catch(function(){})}
+  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=17').catch(function(){})}
 }
 init();
 document.addEventListener('visibilitychange',function(){if(!document.hidden&&!window._tmp)syncNow(false)});
