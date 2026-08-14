@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="五仁打卡">
+<meta name="apple-mobile-web-app-title" content="F5 亚洲顶流">
 <link rel="apple-touch-icon" href="./icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
 <meta name="theme-color" content="#F7F3EC">
@@ -245,7 +245,7 @@ nav.tabs{height:64px;background:rgba(238,229,212,.97);border-top:1px solid var(-
     <span class="chip" id="seasonChip"></span>
     <span class="streak-badge" id="streakBadge"></span>
     <span id="syncBar"></span>
-    <span class="sync-line">v<b id="verNum">18</b> <span class="fix" onclick="repairApp()" title="修复加载问题">修复</span></span>
+    <span class="sync-line">v<b id="verNum">19</b> <span class="fix" onclick="repairApp()" title="修复加载问题">修复</span></span>
     <select id="currentUser" onchange="onUserSwitch()" style="display:none"><option value="">切换成员 ▾</option></select>
   </div>
 </header>
@@ -277,7 +277,7 @@ nav.tabs{height:64px;background:rgba(238,229,212,.97);border-top:1px solid var(-
 // ====== 版本升级自动修复 ======
 // 当检测到版本号变化时，在 SW 接管之前就清理掉旧缓存
 (function(){
-  var EXPECTED=18;
+  var EXPECTED=19;
   var stored=parseInt(localStorage.getItem('wuren_ver')||'0');
   if(stored>0 && stored<EXPECTED){
     // 有旧版本缓存，抢先清理
@@ -646,7 +646,7 @@ function renderSeasonProgress(data,weekTotal){
   var config=_seasonData.nextSeason;var fourth=calculateSeasonFour(data,config);
   if(fourth.status==='resting'){
     card.style.display='block';
-    host.innerHTML='<div style="text-align:center;padding:12px;color:var(--sepia);font-size:13px;line-height:1.8">📅 第四季预计 '+config.plannedStart+' 出发<br><span style="font-size:11px;color:var(--faded)">目标：一起走到 '+config.target+' 分</span></div>';
+    host.innerHTML='<div style="text-align:center;padding:12px;color:var(--sepia);font-size:13px;line-height:1.8">📅 第四季预计 '+(config.plannedStartLabel||config.plannedStart||'')+' 出发<br><span style="font-size:11px;color:var(--faded)">目标：一起走到 '+config.target+' 分</span></div>';
     return;
   }
   card.style.display='block';
@@ -836,14 +836,14 @@ async function checkVersion(){
 async function init(){
   await loadSeasonData();
   var chip=document.getElementById('seasonChip');
-  if(chip){var cfg=_seasonData&&_seasonData.nextSeason;var t='';if(cfg&&cfg.plannedStart){var p=new Date(cfg.plannedStart+'T00:00:00');t=cfg.name+' '+(isNaN(p.getTime())?cfg.plannedStart:(p.getMonth()+1)+'月'+p.getDate()+'日')+' 开赛 · 目标 '+cfg.target+' 分'}chip.textContent=t}
+  if(chip){var cfg=_seasonData&&_seasonData.nextSeason;chip.textContent=cfg?(cfg.name+' '+(cfg.plannedStartLabel||cfg.plannedStart||'')+' 开赛 · 目标 '+cfg.target+' 分'):''}
   var sel=document.getElementById('currentUser');sel.innerHTML='<option value="">切换成员</option>'+PERSONS.map(function(p){return'<option value="'+p+'">'+p+'</option>'}).join('');
   var saved=localStorage.getItem('wuren_me');
   if(saved&&PERSONS.indexOf(saved)>-1){
     sel.value=saved;
   }
   document.getElementById('checkinDate').value=fd(new Date());
-  document.getElementById('verNum').textContent='18';
+  document.getElementById('verNum').textContent='19';
   // Render immediately with local data, then sync
   renderAll();
   await syncNow(true);
@@ -856,7 +856,7 @@ async function init(){
     setTimeout(function(){renderCheckin();},100);
     setTimeout(function(){renderCheckin();},400);
   }
-  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=18').catch(function(){})}
+  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=19').catch(function(){})}
 }
 init();
 document.addEventListener('visibilitychange',function(){if(!document.hidden&&!window._tmp)syncNow(false)});
