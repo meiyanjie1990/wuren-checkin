@@ -245,7 +245,7 @@ nav.tabs{height:64px;background:rgba(238,229,212,.97);border-top:1px solid var(-
     <span class="chip" id="seasonChip"></span>
     <span class="streak-badge" id="streakBadge"></span>
     <span id="syncBar"></span>
-    <span class="sync-line">v<b id="verNum">17</b> <span class="fix" onclick="repairApp()" title="修复加载问题">修复</span></span>
+    <span class="sync-line">v<b id="verNum">18</b> <span class="fix" onclick="repairApp()" title="修复加载问题">修复</span></span>
     <select id="currentUser" onchange="onUserSwitch()" style="display:none"><option value="">切换成员 ▾</option></select>
   </div>
 </header>
@@ -277,7 +277,7 @@ nav.tabs{height:64px;background:rgba(238,229,212,.97);border-top:1px solid var(-
 // ====== 版本升级自动修复 ======
 // 当检测到版本号变化时，在 SW 接管之前就清理掉旧缓存
 (function(){
-  var EXPECTED=17;
+  var EXPECTED=18;
   var stored=parseInt(localStorage.getItem('wuren_ver')||'0');
   if(stored>0 && stored<EXPECTED){
     // 有旧版本缓存，抢先清理
@@ -811,7 +811,25 @@ function repairApp(){
 async function checkVersion(){
   try{
     var resp=await fetch('https://api.github.com/repos/'+REPO+'/contents/version.json?t='+Date.now(),{headers:{Authorization:'token '+TK,Accept:'application/vnd.github.v3+json'},cache:'no-cache'});
-    if(resp.ok){var json=await resp.json();var rv=JSON.parse(b64Decode(json.content)).version;var lv=parseInt(localStorage.getItem('wuren_ver')||'0');document.getElementById('verNum').textContent=rv;if(rv>lv){var b=document.createElement('div');b.style.cssText='position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:300;background:#7A9B7C;color:#fff;padding:10px 22px;border-radius:0 0 16px 16px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);animation:bounce 0.5s ease';b.textContent='✨ 新版界面来啦 · 点我更新';b.onclick=function(){localStorage.setItem('wuren_ver',String(rv));if('serviceWorker'in navigator){navigator.serviceWorker.getRegistrations().then(function(regs){regs.forEach(function(r){r.unregister()})})}if('caches'in window){caches.keys().then(function(keys){keys.forEach(function(k){caches.delete(k)})})}location.reload(true)};document.body.appendChild(b);setTimeout(function(){if(b.parentNode)b.remove()},30000)}else{localStorage.setItem('wuren_ver',String(rv));document.getElementById('verNum').textContent=rv}}
+    if(resp.ok){var json=await resp.json();var rv=JSON.parse(b64Decode(json.content)).version;var lv=parseInt(localStorage.getItem('wuren_ver')||'0');document.getElementById('verNum').textContent=rv;if(rv>lv){
+      // 更新标识：用真正的 button，手机上点击不会再触发选字，点一下立即更新
+      var b=document.createElement('button');
+      b.type='button';
+      b.style.cssText='position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:300;background:#7A9B7C;color:#fff;padding:10px 22px;border:none;border-radius:0 0 16px 16px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.2);font-family:inherit;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;animation:bounce 0.5s ease';
+      b.textContent='✨ 新版界面来啦 · 点我更新';
+      b.addEventListener('click',function(){
+        if(b.getAttribute('data-updating'))return;
+        b.setAttribute('data-updating','1');
+        b.textContent='✨ 正在更新…';
+        localStorage.setItem('wuren_ver',String(rv));
+        var clear=Promise.resolve();
+        if('serviceWorker'in navigator){clear=clear.then(function(){return navigator.serviceWorker.getRegistrations().then(function(regs){return Promise.all(regs.map(function(r){return r.unregister()}))})})}
+        if('caches'in window){clear=clear.then(function(){return caches.keys().then(function(keys){return Promise.all(keys.map(function(k){return caches.delete(k)}))})})}
+        clear.then(function(){location.reload(true)}).catch(function(){location.reload(true)});
+      });
+      document.body.appendChild(b);
+      // 不再 30 秒自动消失：一直留到点掉，保证随时一点即更新
+    }else{localStorage.setItem('wuren_ver',String(rv));document.getElementById('verNum').textContent=rv}}
   }catch(e){}
 }
 
@@ -825,7 +843,7 @@ async function init(){
     sel.value=saved;
   }
   document.getElementById('checkinDate').value=fd(new Date());
-  document.getElementById('verNum').textContent='17';
+  document.getElementById('verNum').textContent='18';
   // Render immediately with local data, then sync
   renderAll();
   await syncNow(true);
@@ -838,7 +856,7 @@ async function init(){
     setTimeout(function(){renderCheckin();},100);
     setTimeout(function(){renderCheckin();},400);
   }
-  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=17').catch(function(){})}
+  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=18').catch(function(){})}
 }
 init();
 document.addEventListener('visibilitychange',function(){if(!document.hidden&&!window._tmp)syncNow(false)});
