@@ -225,6 +225,16 @@
         "师旌议"
       ],
       "revealed": true
+    },
+    "2026-09-06": {
+      "weekStart": "2026-09-07",
+      "weekEnd": "2026-09-13",
+      "preds": {
+        "王珂": 40
+      },
+      "actual": null,
+      "winners": [],
+      "revealed": false
     }
   },
   "comments": {
