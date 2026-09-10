@@ -235,6 +235,7 @@ header{position:relative;padding:20px 20px 12px;background:rgba(238,229,212,.97)
 .badge-head{font-size:11px;color:var(--sepia);margin-bottom:10px}
 .badge-group-title{font-size:11px;color:var(--ink);font-family:"Songti SC","STSong",serif;font-weight:600;margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--thread)}
 .badge-group-title:first-of-type{margin-top:2px}
+.badge-note{font-size:9px;color:var(--faded);margin:-3px 0 8px;line-height:1.5}
 .badge-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
 .badge{border:1px dashed var(--thread);padding:9px 5px;text-align:center;background:rgba(250,245,233,.5)}
 .badge .bi{display:block;font-size:19px;filter:grayscale(1);opacity:.45}
@@ -281,7 +282,7 @@ nav.tabs{height:64px;background:rgba(238,229,212,.97);border-top:1px solid var(-
   <div class="meta-row">
     <span class="chip" id="seasonChip"></span>
     <span id="syncBar"></span>
-    <span class="sync-line">v<b id="verNum">24</b> <span class="fix" onclick="repairApp()" title="修复加载问题">修复</span></span>
+    <span class="sync-line">v<b id="verNum">25</b> <span class="fix" onclick="repairApp()" title="修复加载问题">修复</span></span>
     <select id="currentUser" onchange="onUserSwitch()" style="display:none"><option value="">切换成员 ▾</option></select>
   </div>
 </header>
@@ -313,7 +314,7 @@ nav.tabs{height:64px;background:rgba(238,229,212,.97);border-top:1px solid var(-
 // ====== 版本升级自动修复 ======
 // 当检测到版本号变化时，在 SW 接管之前就清理掉旧缓存
 (function(){
-  var EXPECTED=24;
+  var EXPECTED=25;
   var stored=parseInt(localStorage.getItem('wuren_ver')||'0');
   if(stored>0 && stored<EXPECTED){
     // 有旧版本缓存，抢先清理
@@ -880,32 +881,37 @@ function personStats(data,person,since){
   var recs=data.checkins[person]||{};
   function sc(k){var c=recs[k];return c?((c.study||0)+(c.exercise||0)):0}
   var days=Object.keys(recs).filter(function(k){return (!since||k>=since)&&sc(k)>0}).sort();
-  var total=0,study=0,exercise=0,cum=[],cumStudy=[],cumEx=[],perfectFirst=null,perfectCount=0;
+  var total=0,study=0,exercise=0,cum=[],cumStudy=[],cumEx=[],perfectDays=[];
   days.forEach(function(k){
     var c=recs[k];var s=sc(k);
     total+=s;study+=(c.study||0);exercise+=(c.exercise||0);
     cum.push({d:k,c:total});cumStudy.push({d:k,c:study});cumEx.push({d:k,c:exercise});
-    if(s>=4){perfectCount++;if(!perfectFirst)perfectFirst=k}
+    if(s>=4)perfectDays.push(k)
   });
-  var weekScore={},bestWeek=0,fullCount=0,fullFirst=null,week20First=null;
+  var weekScore={},bestWeek=0;
   days.forEach(function(k){var mk=fd(gm(new Date(k+'T00:00:00')));weekScore[mk]=(weekScore[mk]||0)+sc(k)});
-  Object.keys(weekScore).sort().forEach(function(mk){
+  var weekEnds=Object.keys(weekScore).sort().map(function(mk){
     if(weekScore[mk]>bestWeek)bestWeek=weekScore[mk];
-    var sat=new Date(mk+'T00:00:00');sat.setDate(sat.getDate()+5);var satKey=fd(sat);
-    if(!week20First&&weekScore[mk]>=20)week20First=satKey;
-    var ok=true;
-    for(var j=0;j<6;j++){var d=new Date(mk+'T00:00:00');d.setDate(d.getDate()+j);if(sc(fd(d))<=0){ok=false;break}}
-    if(ok){fullCount++;if(!fullFirst)fullFirst=satKey}
+    var sat=new Date(mk+'T00:00:00');sat.setDate(sat.getDate()+5);
+    return {sat:fd(sat),score:weekScore[mk]}
   });
   function dateAt(arr,t){for(var i=0;i<arr.length;i++){if(arr[i].c>=t-1e-9)return arr[i].d}return null}
   return {
-    days:days.length,total:total,study:study,exercise:exercise,perfectCount:perfectCount,perfectFirst:perfectFirst,
-    bestWeek:bestWeek,fullWeeks:fullCount,fullWeekFirst:fullFirst,week20First:week20First,
+    days:days.length,total:total,study:study,exercise:exercise,
+    perfectCount:perfectDays.length,perfectFirst:perfectDays[0]||null,
+    bestWeek:bestWeek,
     dateForTotal:function(t){return dateAt(cum,t)},
     dateForStudy:function(t){return dateAt(cumStudy,t)},
     dateForExercise:function(t){return dateAt(cumEx,t)},
-    dateForDays:function(t){return days.length>=t?days[t-1]:null}
+    dateForWeek:function(t){for(var i=0;i<weekEnds.length;i++){if(weekEnds[i].score>=t-1e-9)return weekEnds[i].sat}return null},
+    dateForPerfectN:function(n){return perfectDays.length>=n?perfectDays[n-1]:null}
   }
+}
+// 前三季历史汇总（来自 seasons.json），+ 本季累计 = 生涯总量
+function historyTotal(person){
+  var base=0;
+  if(_seasonData&&_seasonData.seasons){_seasonData.seasons.forEach(function(s){base+=Number((s.people&&s.people[person])||0)})}
+  return base
 }
 function renderBadges(data){
   var host=document.getElementById('badgeWall');if(!host)return;
@@ -914,32 +920,42 @@ function renderBadges(data){
   var cfg=(_seasonData&&_seasonData.nextSeason)||null;
   var sName=cfg?cfg.name:'本季';
   var sStart=cfg?seasonStartDate(data,cfg):null;
-  var S=personStats(data,user,sStart);
-  var L=personStats(data,user,null);
+  var S=personStats(data,user,sStart);      // 本季
+  var A=personStats(data,user,null);        // App 上线以来
+  var base=historyTotal(user),life=base+S.total;
   var wins=[];Object.keys(data.predictions||{}).forEach(function(k){var pd=data.predictions[k];if(pd&&pd.revealed&&pd.winners&&pd.winners.indexOf(user)>-1)wins.push(k)});
   wins.sort();
   var cmts=[];
   Object.keys(data.comments||{}).forEach(function(ds){Object.keys(data.comments[ds]||{}).forEach(function(t){Object.keys(data.comments[ds][t]||{}).forEach(function(id){var c=data.comments[ds][t][id];if(c&&c.author===user)cmts.push(String(c.createdAt||'').slice(0,10))})})});
   cmts.sort();
+  // 生涯累计：历史已达成则无具体日期；本季跨过则给出日期
+  function lifeBadge(icon,name,target){
+    var ok=life>=target-1e-9;
+    return {i:icon,n:name,ok:ok,p:'累计 '+life.toFixed(1)+'/'+target,
+            d:(ok&&base<target)?S.dateForTotal(target-base):null}
+  }
   var groups=[
-    {t:'🏅 '+sName+'徽章'+(sStart?('（'+fmtMD(sStart)+' 起）'):''),items:[
-      {i:'🌱',n:'本季起步',ok:S.total>=10,p:'本季 '+S.total.toFixed(1)+'/10',d:S.dateForTotal(10)},
+    {t:'🏅 '+sName+'徽章'+(sStart?('（'+fmtMD(sStart)+' 起）'):''),
+     note:'赛季目标：历史上一季平均 204 分、单周平均 10.5 分',
+     items:[
+      {i:'🌱',n:'本季起步',ok:S.total>=30,p:'本季 '+S.total.toFixed(1)+'/30',d:S.dateForTotal(30)},
       {i:'💯',n:'本季百分',ok:S.total>=100,p:'本季 '+S.total.toFixed(1)+'/100',d:S.dateForTotal(100)},
-      {i:'💪',n:'本季坚持 20 天',ok:S.days>=20,p:'本季打卡 '+S.days+'/20 天',d:S.dateForDays(20)},
-      {i:'🌟',n:'本季满分日',ok:S.perfectCount>0,p:'单日拿 4 分',d:S.perfectFirst},
-      {i:'🗓️',n:'本季满勤周',ok:S.fullWeeks>0,p:'周一至周六全打卡',d:S.fullWeekFirst},
-      {i:'🚀',n:'本季单周 20 分',ok:S.bestWeek>=20,p:'本季最好 '+S.bestWeek.toFixed(1)+' 分',d:S.week20First}
-    ]},
-    {t:'🎖️ 生涯徽章（全部历史）',items:[
-      {i:'🌱',n:'生涯起步',ok:L.total>=10,p:'累计 '+L.total.toFixed(1)+'/10',d:L.dateForTotal(10)},
-      {i:'💯',n:'生涯百分',ok:L.total>=100,p:'累计 '+L.total.toFixed(1)+'/100',d:L.dateForTotal(100)},
-      {i:'🏔️',n:'生涯五百分',ok:L.total>=500,p:'累计 '+L.total.toFixed(1)+'/500',d:L.dateForTotal(500)},
-      {i:'📚',n:'学习达人',ok:L.study>=50,p:'学习累计 '+L.study.toFixed(1)+'/50',d:L.dateForStudy(50)},
-      {i:'🏃',n:'运动达人',ok:L.exercise>=50,p:'运动累计 '+L.exercise.toFixed(1)+'/50',d:L.dateForExercise(50)},
-      {i:'🗓️',n:'满勤 1 周',ok:L.fullWeeks>=1,p:'已 '+L.fullWeeks+' 周',d:L.fullWeekFirst},
-      {i:'📆',n:'满勤 3 周',ok:L.fullWeeks>=3,p:'已 '+L.fullWeeks+' 周',d:null},
-      {i:'🌟',n:'满分日 1 次',ok:L.perfectCount>=1,p:'已 '+L.perfectCount+' 次',d:L.perfectFirst},
-      {i:'💫',n:'满分日 5 次',ok:L.perfectCount>=5,p:'已 '+L.perfectCount+' 次',d:null},
+      {i:'🏔️',n:'本季双百',ok:S.total>=200,p:'本季 '+S.total.toFixed(1)+'/200',d:S.dateForTotal(200)},
+      {i:'🚀',n:'单周 12 分',ok:S.bestWeek>=12,p:'本季最好 '+S.bestWeek.toFixed(1)+' 分',d:S.dateForWeek(12)},
+      {i:'⚡',n:'单周 15 分',ok:S.bestWeek>=15,p:'本季最好 '+S.bestWeek.toFixed(1)+' 分',d:S.dateForWeek(15)},
+      {i:'🌟',n:'满分日 10 次',ok:S.perfectCount>=10,p:'本季 '+S.perfectCount+'/10 天',d:S.dateForPerfectN(10)}
+     ]},
+    {t:'🎖️ 生涯徽章（含前三季历史）',
+     note:'「App 期间」指 2026 年 6 月底开始用 App 之后的记录',
+     items:[
+      lifeBadge('🌱','生涯 300 分',300),
+      lifeBadge('💯','生涯 500 分',500),
+      lifeBadge('🏔️','生涯 700 分',700),
+      lifeBadge('🏆','生涯 1000 分',1000),
+      {i:'🥇',n:'单周 18 分',ok:A.bestWeek>=18,p:'App 期间最好 '+A.bestWeek.toFixed(1)+' 分',d:A.dateForWeek(18)},
+      {i:'💫',n:'满分日 5 次',ok:A.perfectCount>=5,p:'App 期间 '+A.perfectCount+'/5 天',d:A.dateForPerfectN(5)},
+      {i:'📚',n:'学习达人',ok:A.study>=50,p:'App 期间学习 '+A.study.toFixed(1)+'/50',d:A.dateForStudy(50)},
+      {i:'🏃',n:'运动达人',ok:A.exercise>=50,p:'App 期间运动 '+A.exercise.toFixed(1)+'/50',d:A.dateForExercise(50)},
       {i:'🔮',n:'猜分达人',ok:wins.length>=1,p:'猜中 '+wins.length+' 次',d:wins[0]||null},
       {i:'🎯',n:'神算子',ok:wins.length>=3,p:'猜中 '+wins.length+'/3 次',d:wins[2]||null},
       {i:'💬',n:'留言达人',ok:cmts.length>=20,p:'已发 '+cmts.length+'/20 条',d:cmts[19]||null}
@@ -950,7 +966,7 @@ function renderBadges(data){
   var html='<div class="badge-head">'+user+'：本季 <strong>'+gotS+'</strong>/'+groups[0].items.length+' · 生涯 <strong>'+gotL+'</strong>/'+groups[1].items.length+'</div>';
   groups.forEach(function(g){
     var got=g.items.filter(function(x){return x.ok}).length;
-    html+='<div class="badge-group-title">'+g.t+' · '+got+'/'+g.items.length+'</div><div class="badge-grid">';
+    html+='<div class="badge-group-title">'+g.t+' · '+got+'/'+g.items.length+'</div>'+(g.note?('<div class="badge-note">'+g.note+'</div>'):'')+'<div class="badge-grid">';
     g.items.forEach(function(x){
       html+='<div class="badge'+(x.ok?' got':'')+'"><span class="bi">'+x.i+'</span><span class="bn">'+x.n+'</span><span class="bp">'+(x.ok?(fmtMD(x.d)?fmtMD(x.d)+' 达成':'已达成'):x.p)+'</span></div>'
     });
@@ -1064,7 +1080,7 @@ async function init(){
     sel.value=saved;
   }
   document.getElementById('checkinDate').value=fd(new Date());
-  document.getElementById('verNum').textContent='24';
+  document.getElementById('verNum').textContent='25';
   // Render immediately with local data, then sync
   renderAll();
   await syncNow(true);
@@ -1077,7 +1093,7 @@ async function init(){
     setTimeout(function(){renderCheckin();},100);
     setTimeout(function(){renderCheckin();},400);
   }
-  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=24').catch(function(){})}
+  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=25').catch(function(){})}
 }
 init();
 document.addEventListener('visibilitychange',function(){if(!document.hidden&&!window._tmp)syncNow(false)});
