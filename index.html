@@ -191,6 +191,8 @@ nav.tabs button.active::before{content:'';position:absolute;top:0;width:24px;hei
 :root{--parchment:#EEE5D4;--paper:#FAF5E9;--paper2:#F6EEDF;--ink:#30291F;--sepia:#8B7967;--faded:#AA9985;--sage:#55725D;--moss:#405B49;--rose:#A95742;--thread:#D7C8B1;--thread2:#E5D9C7;--shadow:2px 3px 0 rgba(109,87,55,.08);--sub:#8B7967;--border:#D7C8B1;--accent:#A95742;--accent2:#55725D}
 body{background-color:var(--parchment);background-image:linear-gradient(rgba(255,255,255,.12),rgba(255,255,255,.12)),radial-gradient(rgba(50,40,28,.08) .5px,transparent .7px);background-size:auto,7px 7px;padding-bottom:78px}
 body::before,body::after{display:none}
+/* 手机端通则：所有可点元素禁选字、去点击延迟（避免"一点就选中文字、要点好几次"） */
+button,[onclick],.friend-status,.tab-label{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
 header{position:relative;padding:20px 20px 12px;background:rgba(238,229,212,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--thread)}
 .title-row{display:flex;align-items:flex-end;justify-content:space-between;gap:14px}
 .brand h1{font-family:Georgia,'Times New Roman','Songti SC','STSong','SimSun',serif;font-weight:500;font-size:33px;line-height:1.12;letter-spacing:.5px;color:var(--ink);display:flex;align-items:baseline;flex-wrap:wrap;column-gap:9px}
@@ -222,6 +224,38 @@ header{position:relative;padding:20px 20px 12px;background:rgba(238,229,212,.97)
 .friend-status.current .friend-name{color:var(--ink);font-weight:700}
 .tab-badge{display:inline-flex;align-items:center;justify-content:center;min-width:15px;height:15px;padding:0 4px;margin-left:3px;background:var(--rose);color:#fff;font-size:9px;font-weight:700;border-radius:8px;line-height:1}
 .tab-badge:empty{display:none}
+/* ---------- 赛季里程碑庆祝 ---------- */
+.ms-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(48,41,31,.55);display:flex;align-items:center;justify-content:center;z-index:400;padding:24px}
+.ms-card{background:var(--paper);border:1px solid var(--thread);border-radius:16px;padding:24px 20px;text-align:center;max-width:320px;width:100%;box-shadow:0 14px 40px rgba(0,0,0,.28);animation:fadeIn .3s ease}
+.ms-emoji{font-size:44px;line-height:1}
+.ms-title{font-family:"Songti SC","STSong",serif;font-size:22px;font-weight:600;color:var(--rose);margin-top:8px}
+.ms-sub{font-size:12px;color:var(--sepia);margin-top:8px}
+.ms-note{font-size:11px;color:var(--faded);margin-top:8px;line-height:1.6}
+.ms-btn{margin-top:16px;padding:11px 26px;border:none;border-radius:2px;background:var(--rose);color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer}
+/* ---------- 成就徽章 ---------- */
+.badge-head{font-size:11px;color:var(--sepia);margin-bottom:10px}
+.badge-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.badge{border:1px dashed var(--thread);padding:9px 5px;text-align:center;background:rgba(250,245,233,.5)}
+.badge .bi{display:block;font-size:19px;filter:grayscale(1);opacity:.45}
+.badge .bn{display:block;font-size:10px;color:var(--sepia);margin-top:3px;font-family:"Songti SC",serif;line-height:1.3}
+.badge .bp{display:block;font-size:9px;color:var(--faded);margin-top:3px}
+.badge.got{border:1px solid var(--rose);background:rgba(169,87,66,.06)}
+.badge.got .bi{filter:none;opacity:1}
+.badge.got .bn{color:var(--ink);font-weight:600}
+.badge.got .bp{color:var(--rose)}
+.badge-hint{font-size:11px;color:var(--faded);text-align:center;padding:10px;line-height:1.6}
+/* ---------- 本季实时榜 ---------- */
+.board-total{font-size:12px;color:var(--sepia);margin-bottom:11px}
+.board-total strong{font-family:Georgia,serif;font-size:17px;color:var(--moss)}
+.board-list{display:flex;flex-direction:column;gap:8px}
+.board-row{display:grid;grid-template-columns:18px 44px 1fr 42px 52px;align-items:center;gap:6px}
+.br-medal{font-size:12px}
+.br-name{font-weight:600;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.br-bar{display:block;height:6px;background:var(--thread2);overflow:hidden}
+.br-bar i{display:block;height:100%;background:var(--sage)}
+.br-score{font-family:Georgia,serif;font-style:italic;font-size:14px;text-align:right}
+.br-week{font-size:9px;color:var(--faded);text-align:right;white-space:nowrap}
+.board-hint{font-size:11px;color:var(--faded);text-align:center;padding:10px}
 .page{padding:14px 20px}.section-label{font-family:"Songti SC","STSong",serif;font-size:18px;color:var(--ink);letter-spacing:0;margin:18px 4px 8px;border-bottom:1px solid var(--ink);padding-bottom:7px}.section-label::after{display:none}
 .card{border:0;border-top:1px dashed var(--thread);border-radius:0;padding:15px 5px;margin:0;background:rgba(250,245,233,.35);box-shadow:none}.card.self{border:0;border-top:1.5px solid var(--ink);background:rgba(250,245,233,.72)}.card h3{font-family:"Songti SC","STSong",serif;font-size:18px}.person-name{font-family:"Songti SC","STSong",serif}.person-avatar{border-radius:48% 52% 50% 46%}.done-badge{font-family:Georgia,serif;font-size:12px;font-style:italic}.done-detail{padding-left:44px;margin-top:-6px;display:grid;grid-template-columns:1fr 1fr;gap:10px}.done-detail .nt{max-width:none;font-family:"Songti SC","STSong",serif;font-style:normal;line-height:1.55}.done-detail .v{font-style:italic}.me-tag{border:1px solid var(--rose);color:var(--rose);padding:1px 6px;border-radius:0}
 .score-btns button,.note-input,.btn,.pred-input-row input{border-radius:2px;box-shadow:none}.score-btns button{background:rgba(250,245,233,.7)}.note-input{background:rgba(250,245,233,.72);font-style:normal}.btn-primary{background:var(--rose);box-shadow:3px 4px 0 rgba(67,43,27,.14)}.btn-primary:hover{background:#914B3B}.btn-outline{border-radius:2px}.sunday-lock,.sunday-winner{border-radius:2px;background:rgba(250,245,233,.7);border:1px dashed var(--thread)}
@@ -247,7 +281,7 @@ nav.tabs{height:64px;background:rgba(238,229,212,.97);border-top:1px solid var(-
     <span class="chip" id="seasonChip"></span>
     <span class="streak-badge" id="streakBadge"></span>
     <span id="syncBar"></span>
-    <span class="sync-line">v<b id="verNum">21</b> <span class="fix" onclick="repairApp()" title="修复加载问题">修复</span></span>
+    <span class="sync-line">v<b id="verNum">22</b> <span class="fix" onclick="repairApp()" title="修复加载问题">修复</span></span>
     <select id="currentUser" onchange="onUserSwitch()" style="display:none"><option value="">切换成员 ▾</option></select>
   </div>
 </header>
@@ -266,7 +300,7 @@ nav.tabs{height:64px;background:rgba(238,229,212,.97);border-top:1px solid var(-
 
 <div class="page" id="page-predict"><div class="card"><h3>🔮 预测下周总分</h3><div id="predInfo" style="font-size:12px;color:var(--sepia);font-style:italic;margin-bottom:12px;line-height:1.6"></div><div id="predInputs"></div><button class="btn btn-primary btn-block" onclick="savePredictions()" style="margin-top:12px">📝 提交预测</button><div id="revealArea"></div></div><div class="card"><h3>📜 预测历史</h3><div id="predHistory"></div></div><div class="card" id="predStatsCard" style="display:none"><h3>🏅 猜分达人榜</h3><div id="predStats"></div></div></div>
 
-<div class="page" id="page-history"><div id="seasonArchive"></div><div class="card"><h3>📋 导出个人记录</h3><div id="exportList"></div></div><div class="card"><h3>📈 近期记录</h3><div id="historyOverview"></div></div></div>
+<div class="page" id="page-history"><div id="seasonArchive"></div><div class="card"><h3>🏔️ 本季实时榜</h3><div id="seasonBoard"></div></div><div class="card"><h3>🏅 成就徽章</h3><div id="badgeWall"></div></div><div class="card"><h3>📋 导出个人记录</h3><div id="exportList"></div></div><div class="card"><h3>📈 近期记录</h3><div id="historyOverview"></div></div></div>
 
 <nav class="tabs">
 <button class="active" onclick="switchTab(0)"><span class="ico">✎</span><span class="tab-label">今日<span class="tab-badge" id="commentBadge"></span></span></button>
@@ -279,7 +313,7 @@ nav.tabs{height:64px;background:rgba(238,229,212,.97);border-top:1px solid var(-
 // ====== 版本升级自动修复 ======
 // 当检测到版本号变化时，在 SW 接管之前就清理掉旧缓存
 (function(){
-  var EXPECTED=21;
+  var EXPECTED=22;
   var stored=parseInt(localStorage.getItem('wuren_ver')||'0');
   if(stored>0 && stored<EXPECTED){
     // 有旧版本缓存，抢先清理
@@ -300,6 +334,7 @@ nav.tabs{height:64px;background:rgba(238,229,212,.97);border-top:1px solid var(-
 })();
 
 var PERSONS=['石维婧','梅妍洁','单兰迪','王珂','师旌议'];
+var MILESTONES=[100,200,300,400,500,600,700,800,900,1000];
 var DAYS=['一','二','三','四','五','六','日'];
 var AVATARS={石维婧:'婧',梅妍洁:'洁',单兰迪:'迪',王珂:'珂',师旌议:'议'};
 var TK='ghp_FcDaU2QoRwXlfLBs7gUX'+'gcfMv9qjpE43aYys';
@@ -551,7 +586,35 @@ async function deleteComment(ds,person,id){
   if(!confirm('删除这条留言吗？'))return;delete data.comments[ds][person][id];var ok=await saveAndSync(data,[['comments',ds,person,id]]);toast(ok?'留言已删除':'已在本机删除，等待同步');renderCheckin()
 }
 
-function countStreak(data,person){var s=0;var d=new Date();d.setDate(d.getDate()-1);while(d.getFullYear()>=2026){var c=gpc(data,person,fd(d));if(!c||((c.study||0)+(c.exercise||0))===0)break;s++;d.setDate(d.getDate()-1)}return s}
+// 连续打卡天数：跳过周日休息日（周日既不算打卡也不断链），今天已打卡则从今天算起
+function countStreak(data,person){
+  var d=new Date();d.setHours(0,0,0,0);
+  var t=gpc(data,person,fd(d));
+  if(!t||((t.study||0)+(t.exercise||0))===0)d.setDate(d.getDate()-1);
+  var s=0;
+  while(d.getFullYear()>=2026){
+    if(d.getDay()===0){d.setDate(d.getDate()-1);continue}
+    var c=gpc(data,person,fd(d));
+    if(!c||((c.study||0)+(c.exercise||0))===0)break;
+    s++;d.setDate(d.getDate()-1)
+  }
+  return s
+}
+// 历史最长连续打卡天数（同样跳过周日）
+function maxStreak(data,person){
+  var recs=data.checkins[person]||{};
+  var days=Object.keys(recs).filter(function(k){var c=recs[k];return ((c.study||0)+(c.exercise||0))>0}).sort();
+  var best=0,cur=0,prev=null;
+  days.forEach(function(k){
+    if(prev){
+      var x=new Date(prev+'T00:00:00');x.setDate(x.getDate()+1);
+      while(x.getDay()===0)x.setDate(x.getDate()+1);
+      cur=(fd(x)===k)?cur+1:1
+    }else{cur=1}
+    if(cur>best)best=cur;prev=k
+  });
+  return best
+}
 
 function renderCheckin(){
   var data=getLocal();var ds=cd();
@@ -563,6 +626,7 @@ function renderCheckin(){
   document.getElementById('dateBadge').textContent=isToday?'':'补打卡';
   renderFriendStatus(data,ds,user);
   renderSeasonChip(data);
+  checkMilestone(data);
 
   var sw=[];
   if(isS){var two=new Date(dd);two.setDate(two.getDate()-14);var pd=data.predictions[fd(two)];if(pd&&pd.winners)sw=pd.winners}
@@ -668,7 +732,9 @@ function renderSeasonProgress(data,weekTotal){
   else if(weekTotal>=35)weekLabel=' 💪 稳稳前进中';
   var html='<div style="margin-bottom:8px;font-size:13px;display:flex;justify-content:space-between"><span>🏔️ 向 '+config.target+' 分前进'+weekLabel+'</span><span style="font-weight:600;color:var(--moss)">'+fourth.total.toFixed(1)+' / '+config.target+'</span></div>';
   html+='<div class="season-progress" style="height:8px;margin:0 0 8px"><span style="width:'+pct+'%"></span></div>';
+  var nextM=null;MILESTONES.forEach(function(mm){if(nextM===null&&fourth.total<mm)nextM=mm});
   html+='<div style="font-size:11px;color:var(--sepia)">已走 '+pct.toFixed(0)+'% · 第 '+fourth.weeks+' 周 · 还差 '+Math.max(0,config.target-fourth.total).toFixed(1)+' 分'+(fourth.status==='completed'?' 🏁':'')+'</div>';
+  if(nextM)html+='<div style="font-size:11px;color:var(--rose);margin-top:4px">🎯 下一站 '+nextM+' 分（还差 '+(nextM-fourth.total).toFixed(1)+' 分）</div>';
   // 各人贡献小条
   html+='<div class="season-people" style="margin-top:10px">'+PERSONS.map(function(p){var s=(fourth.people&&fourth.people[p])||0;return'<div class="season-person"><strong>'+s.toFixed(1)+'</strong>'+p.slice(0,1)+'</div>'}).join('')+'</div>';
   host.innerHTML=html;
@@ -790,8 +856,117 @@ function renderSeasonArchive(data){
   host.innerHTML='<h2 class="archive-heading">F5 历季档案</h2><div class="archive-sub">每季共同走到 1000 分，然后休息，再重新出发。前三季来自原始 Excel；第四季起由 App 自动汇总。</div>'+all.map(function(s){return renderSeasonCard(s,_seasonData.target)}).join('')
 }
 
+// ====== 赛季里程碑：团队每跨 100 分庆祝一次 ======
+function milestoneTitle(m){
+  var t={100:'破百小队',200:'两百达成',300:'三百俱乐部',400:'四百火力全开',500:'半程王',600:'六百分达成',700:'七百在望',800:'八百冲鸭',900:'只差最后一百',1000:'千分俱乐部'};
+  return t[m]||(m+' 分达成')
+}
+function checkMilestone(data){
+  if(window._tmp)return;
+  if(!_seasonData||!_seasonData.nextSeason)return;
+  var cfg=_seasonData.nextSeason;
+  var fourth=calculateSeasonFour(data,cfg);
+  if(fourth.status!=='active'&&fourth.status!=='completed')return;
+  var key=String(cfg.id||4);
+  var store={};try{store=JSON.parse(localStorage.getItem('wuren_milestones')||'{}')}catch(e){store={}}
+  var crossed=MILESTONES.filter(function(m){return fourth.total>=m});
+  var done=store[key];
+  if(!done){// 首次建立基线：过去已经跨过的里程碑不补弹
+    store[key]=crossed;try{localStorage.setItem('wuren_milestones',JSON.stringify(store))}catch(e){}
+    return
+  }
+  var fresh=crossed.filter(function(m){return done.indexOf(m)===-1});
+  if(!fresh.length)return;
+  store[key]=crossed.slice();
+  try{localStorage.setItem('wuren_milestones',JSON.stringify(store))}catch(e){}
+  showMilestone(fresh[fresh.length-1],fourth.total,cfg);
+}
+function showMilestone(m,total,cfg){
+  var big=(m>=1000);
+  var ov=document.createElement('div');ov.className='ms-overlay';
+  ov.innerHTML='<div class="ms-card"><div class="ms-emoji">'+(big?'🏆':'🎉')+'</div><div class="ms-title">'+milestoneTitle(m)+'</div><div class="ms-sub">团队'+cfg.name+'累计 '+total.toFixed(1)+' 分 · 跨过 '+m+' 分</div><div class="ms-note">'+(big?('一季 '+cfg.target+' 分达成，你们是真·亚洲顶流！'):('离 '+cfg.target+' 分还差 '+Math.max(0,cfg.target-total).toFixed(1)+' 分，继续冲！'))+'</div><button type="button" class="ms-btn">继续加油</button></div>';
+  document.body.appendChild(ov);
+  var closed=false;
+  function close(){if(closed)return;closed=true;if(ov.parentNode)ov.remove()}
+  ov.querySelector('.ms-btn').addEventListener('click',close);
+  ov.addEventListener('click',function(e){if(e.target===ov)close()});
+  setTimeout(close,9000);
+}
+
+// ====== 个人成就徽章 ======
+function badgeStats(data,person){
+  var recs=data.checkins[person]||{};
+  var total=0,perfect=0,weeks={};
+  Object.keys(recs).forEach(function(k){
+    var c=recs[k];var s=(c.study||0)+(c.exercise||0);total+=s;
+    if(s>=4)perfect++;
+    if(s>0){var mk=fd(gm(new Date(k+'T00:00:00')));weeks[mk]=(weeks[mk]||0)+s}
+  });
+  var bestWeek=0;Object.keys(weeks).forEach(function(k){if(weeks[k]>bestWeek)bestWeek=weeks[k]});
+  var fullWeeks=0;
+  Object.keys(weeks).forEach(function(mk){
+    var ok=true;
+    for(var i=0;i<6;i++){var d=new Date(mk+'T00:00:00');d.setDate(d.getDate()+i);var c=recs[fd(d)];if(!c||((c.study||0)+(c.exercise||0))<=0){ok=false;break}}
+    if(ok)fullWeeks++
+  });
+  var wins=0;Object.keys(data.predictions||{}).forEach(function(k){var pd=data.predictions[k];if(pd&&pd.revealed&&pd.winners&&pd.winners.indexOf(person)>-1)wins++});
+  var cmts=0;
+  Object.keys(data.comments||{}).forEach(function(ds){Object.keys(data.comments[ds]||{}).forEach(function(t){Object.keys(data.comments[ds][t]||{}).forEach(function(id){var c=data.comments[ds][t][id];if(c&&c.author===person)cmts++})})});
+  var seasonTotal=0;
+  if(_seasonData&&_seasonData.nextSeason){var f=calculateSeasonFour(data,_seasonData.nextSeason);seasonTotal=(f.people&&f.people[person])||0}
+  return {total:total,perfect:perfect,bestWeek:bestWeek,fullWeeks:fullWeeks,wins:wins,comments:cmts,best:maxStreak(data,person),seasonTotal:seasonTotal}
+}
+function renderBadges(data){
+  var host=document.getElementById('badgeWall');if(!host)return;
+  var user=cu();
+  if(!user){host.innerHTML='<div class="badge-hint">先在顶部点一下自己的头像，就能看到你的成就徽章</div>';return}
+  var b=badgeStats(data,user);
+  var seasonName=(_seasonData&&_seasonData.nextSeason)?_seasonData.nextSeason.name:'本季';
+  var list=[
+    {i:'🌱',n:'起步者',ok:b.total>=10,p:'累计 '+b.total.toFixed(1)+'/10'},
+    {i:'💯',n:'百分达成',ok:b.total>=100,p:'累计 '+b.total.toFixed(1)+'/100'},
+    {i:'🏔️',n:'五百分',ok:b.total>=500,p:'累计 '+b.total.toFixed(1)+'/500'},
+    {i:'🔥',n:'连续 7 天',ok:b.best>=7,p:'最长 '+b.best+' 天'},
+    {i:'⚡',n:'连续 21 天',ok:b.best>=21,p:'最长 '+b.best+' 天'},
+    {i:'👑',n:'连续 30 天',ok:b.best>=30,p:'最长 '+b.best+' 天'},
+    {i:'🌟',n:'单日满分',ok:b.perfect>0,p:b.perfect?b.perfect+' 次':'拿到 4 分'},
+    {i:'🗓️',n:'满勤一周',ok:b.fullWeeks>0,p:b.fullWeeks?b.fullWeeks+' 周':'周一至周六全打卡'},
+    {i:'🚀',n:'单周 20 分',ok:b.bestWeek>=20,p:'最好 '+b.bestWeek.toFixed(1)+' 分'},
+    {i:'🔮',n:'猜分达人',ok:b.wins>0,p:b.wins?b.wins+' 次':'猜中 1 次'},
+    {i:'💬',n:'留言达人',ok:b.comments>=20,p:'已发 '+b.comments+'/20 条'},
+    {i:'🏅',n:seasonName+' 100 分',ok:b.seasonTotal>=100,p:'本季 '+b.seasonTotal.toFixed(1)+'/100'}
+  ];
+  var got=list.filter(function(x){return x.ok}).length;
+  var html='<div class="badge-head">'+user+'：已点亮 <strong>'+got+'</strong> / '+list.length+' 枚徽章</div><div class="badge-grid">';
+  list.forEach(function(x){
+    html+='<div class="badge'+(x.ok?' got':'')+'"><span class="bi">'+x.i+'</span><span class="bn">'+x.n+'</span><span class="bp">'+(x.ok?'已达成':x.p)+'</span></div>'
+  });
+  html+='</div>';
+  host.innerHTML=html;
+}
+
+// ====== 本季实时榜 ======
+function renderSeasonBoard(data){
+  var host=document.getElementById('seasonBoard');if(!host)return;
+  if(!_seasonData||!_seasonData.nextSeason){host.innerHTML='<div class="board-hint">赛季数据还没加载好</div>';return}
+  var cfg=_seasonData.nextSeason;var four=calculateSeasonFour(data,cfg);
+  if(four.status==='resting'){host.innerHTML='<div class="board-hint">'+cfg.name+'还没开始，休息中～</div>';return}
+  var m=gm(new Date());
+  var rows=PERSONS.map(function(p){return{p:p,season:(four.people&&four.people[p])||0,week:getWeekTotal(data,p,m)}});
+  rows.sort(function(a,b){return b.season-a.season});
+  var total=rows.reduce(function(a,r){return a+r.season},0);
+  var html='<div class="board-total">团队 <strong>'+total.toFixed(1)+'</strong> / '+cfg.target+' 分 · 第 '+four.weeks+' 周</div><div class="board-list">';
+  rows.forEach(function(r,i){
+    var pct=total>0?(r.season/total*100):0;
+    var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+    html+='<div class="board-row"><span class="br-medal">'+medal+'</span><span class="br-name">'+r.p+'</span><span class="br-bar"><i style="width:'+pct.toFixed(1)+'%"></i></span><span class="br-score">'+r.season.toFixed(1)+'</span><span class="br-week">本周 +'+r.week.toFixed(1)+'</span></div>'
+  });
+  html+='</div>';
+  host.innerHTML=html;
+}
+
 function renderHistory(){
-  var data=getLocal();renderSeasonArchive(data);var exp='';PERSONS.forEach(function(p){exp+='<div style="margin-bottom:8px"><button class="btn btn-outline btn-small" onclick="exportPerson(\''+p+'\')">'+p+'</button></div>'});exp+='<button class="btn btn-outline btn-small" onclick="exportAll()">导出全部</button>';document.getElementById('exportList').innerHTML=exp;
+  var data=getLocal();renderSeasonArchive(data);renderSeasonBoard(data);renderBadges(data);var exp='';PERSONS.forEach(function(p){exp+='<div style="margin-bottom:8px"><button class="btn btn-outline btn-small" onclick="exportPerson(\''+p+'\')">'+p+'</button></div>'});exp+='<button class="btn btn-outline btn-small" onclick="exportAll()">导出全部</button>';document.getElementById('exportList').innerHTML=exp;
   var ads=new Set();PERSONS.forEach(function(p){if(data.checkins[p])Object.keys(data.checkins[p]).forEach(function(d){ads.add(d)})});var sorted=Array.from(ads).sort().reverse().slice(0,30);
   if(sorted.length===0){document.getElementById('historyOverview').innerHTML='<div style="text-align:center;color:var(--sub);padding:30px">还没有打卡记录</div>'}
   else{var tbl='<table class="week-table"><thead><tr><th>日期</th>';PERSONS.forEach(function(p){tbl+='<th>'+p.slice(0,2)+'</th>'});tbl+='<th>日总</th></tr></thead><tbody>';sorted.forEach(function(ds){tbl+='<tr><td>'+ds.slice(5)+'</td>';var dt=0;PERSONS.forEach(function(p){var c=gpc(data,p,ds);var sc=c?(c.study||0)+(c.exercise||0):0;dt+=sc;tbl+='<td>'+(sc>0?sc.toFixed(1):'-')+'</td>'});tbl+='<td><strong>'+dt.toFixed(1)+'</strong></td></tr>'});tbl+='</tbody></table>';document.getElementById('historyOverview').innerHTML=tbl}
@@ -875,7 +1050,7 @@ async function init(){
     sel.value=saved;
   }
   document.getElementById('checkinDate').value=fd(new Date());
-  document.getElementById('verNum').textContent='21';
+  document.getElementById('verNum').textContent='22';
   // Render immediately with local data, then sync
   renderAll();
   await syncNow(true);
@@ -888,7 +1063,7 @@ async function init(){
     setTimeout(function(){renderCheckin();},100);
     setTimeout(function(){renderCheckin();},400);
   }
-  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=21').catch(function(){})}
+  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=22').catch(function(){})}
 }
 init();
 document.addEventListener('visibilitychange',function(){if(!document.hidden&&!window._tmp)syncNow(false)});
