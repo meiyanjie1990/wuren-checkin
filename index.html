@@ -220,6 +220,8 @@ header{position:relative;padding:20px 20px 12px;background:rgba(238,229,212,.97)
 .friend-no-check{font-size:8px;color:var(--rose);line-height:1}
 .friend-name{font-size:9px;color:var(--sepia);line-height:1}
 .friend-status.current .friend-name{color:var(--ink);font-weight:700}
+.tab-badge{display:inline-flex;align-items:center;justify-content:center;min-width:15px;height:15px;padding:0 4px;margin-left:3px;background:var(--rose);color:#fff;font-size:9px;font-weight:700;border-radius:8px;line-height:1}
+.tab-badge:empty{display:none}
 .page{padding:14px 20px}.section-label{font-family:"Songti SC","STSong",serif;font-size:18px;color:var(--ink);letter-spacing:0;margin:18px 4px 8px;border-bottom:1px solid var(--ink);padding-bottom:7px}.section-label::after{display:none}
 .card{border:0;border-top:1px dashed var(--thread);border-radius:0;padding:15px 5px;margin:0;background:rgba(250,245,233,.35);box-shadow:none}.card.self{border:0;border-top:1.5px solid var(--ink);background:rgba(250,245,233,.72)}.card h3{font-family:"Songti SC","STSong",serif;font-size:18px}.person-name{font-family:"Songti SC","STSong",serif}.person-avatar{border-radius:48% 52% 50% 46%}.done-badge{font-family:Georgia,serif;font-size:12px;font-style:italic}.done-detail{padding-left:44px;margin-top:-6px;display:grid;grid-template-columns:1fr 1fr;gap:10px}.done-detail .nt{max-width:none;font-family:"Songti SC","STSong",serif;font-style:normal;line-height:1.55}.done-detail .v{font-style:italic}.me-tag{border:1px solid var(--rose);color:var(--rose);padding:1px 6px;border-radius:0}
 .score-btns button,.note-input,.btn,.pred-input-row input{border-radius:2px;box-shadow:none}.score-btns button{background:rgba(250,245,233,.7)}.note-input{background:rgba(250,245,233,.72);font-style:normal}.btn-primary{background:var(--rose);box-shadow:3px 4px 0 rgba(67,43,27,.14)}.btn-primary:hover{background:#914B3B}.btn-outline{border-radius:2px}.sunday-lock,.sunday-winner{border-radius:2px;background:rgba(250,245,233,.7);border:1px dashed var(--thread)}
@@ -245,7 +247,7 @@ nav.tabs{height:64px;background:rgba(238,229,212,.97);border-top:1px solid var(-
     <span class="chip" id="seasonChip"></span>
     <span class="streak-badge" id="streakBadge"></span>
     <span id="syncBar"></span>
-    <span class="sync-line">v<b id="verNum">20</b> <span class="fix" onclick="repairApp()" title="修复加载问题">修复</span></span>
+    <span class="sync-line">v<b id="verNum">21</b> <span class="fix" onclick="repairApp()" title="修复加载问题">修复</span></span>
     <select id="currentUser" onchange="onUserSwitch()" style="display:none"><option value="">切换成员 ▾</option></select>
   </div>
 </header>
@@ -267,7 +269,7 @@ nav.tabs{height:64px;background:rgba(238,229,212,.97);border-top:1px solid var(-
 <div class="page" id="page-history"><div id="seasonArchive"></div><div class="card"><h3>📋 导出个人记录</h3><div id="exportList"></div></div><div class="card"><h3>📈 近期记录</h3><div id="historyOverview"></div></div></div>
 
 <nav class="tabs">
-<button class="active" onclick="switchTab(0)"><span class="ico">✎</span>今日</button>
+<button class="active" onclick="switchTab(0)"><span class="ico">✎</span><span class="tab-label">今日<span class="tab-badge" id="commentBadge"></span></span></button>
 <button onclick="switchTab(1)"><span class="ico">⌁</span>周记</button>
 <button onclick="switchTab(2)"><span class="ico">◇</span>猜分</button>
 <button onclick="switchTab(3)"><span class="ico">≡</span>档案</button>
@@ -277,7 +279,7 @@ nav.tabs{height:64px;background:rgba(238,229,212,.97);border-top:1px solid var(-
 // ====== 版本升级自动修复 ======
 // 当检测到版本号变化时，在 SW 接管之前就清理掉旧缓存
 (function(){
-  var EXPECTED=20;
+  var EXPECTED=21;
   var stored=parseInt(localStorage.getItem('wuren_ver')||'0');
   if(stored>0 && stored<EXPECTED){
     // 有旧版本缓存，抢先清理
@@ -798,8 +800,31 @@ function exportPerson(p){var data=getLocal();var rs=data.checkins[p]||{};var ds=
 function exportAll(){var data=getLocal();var txt='五仁打卡汇总\n'+'='.repeat(50)+'\n\n';PERSONS.forEach(function(p){var rs=data.checkins[p]||{};var ds=Object.keys(rs).sort();var t=0;ds.forEach(function(d){t+=(rs[d].study||0)+(rs[d].exercise||0)});txt+=p+'：'+t.toFixed(1)+'分 | '+ds.length+'天\n'});txt+='\n导出：'+new Date().toLocaleString()+'\n';downloadFile('五仁打卡_汇总.txt',txt)}
 function downloadFile(fn,c){var b=new Blob(['﻿'+c],{type:'text/plain;charset=utf-8'});var u=URL.createObjectURL(b);var a=document.createElement('a');a.href=u;a.download=fn;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);toast('已导出：'+fn)}
 
-function switchTab(idx){document.querySelectorAll('.page').forEach(function(p,i){p.classList.toggle('active',i===idx)});document.querySelectorAll('nav.tabs button').forEach(function(b,i){b.classList.toggle('active',i===idx)});if(idx===0)renderCheckin();if(idx===1)renderWeekly();if(idx===2)renderPredict();if(idx===3)renderHistory()}
-function renderAll(){renderCheckin();renderWeekly();renderPredict();renderHistory()}
+function countComments(data){
+  var n=0;var cs=(data&&data.comments)||{};
+  Object.keys(cs).forEach(function(ds){Object.keys(cs[ds]||{}).forEach(function(p){n+=Object.keys(cs[ds][p]||{}).length})});
+  return n;
+}
+function updateCommentBadge(data){
+  var b=document.getElementById('commentBadge');if(!b)return;
+  var n=countComments(data);
+  var seenRaw=localStorage.getItem('wuren_seen_comments');
+  if(seenRaw===null){localStorage.setItem('wuren_seen_comments',String(n));return}
+  var seen=parseInt(seenRaw)||0;
+  if(n>seen){b.textContent=(n-seen)>99?'99+':String(n-seen)}
+  else if(n<seen){localStorage.setItem('wuren_seen_comments',String(n));b.textContent=''}
+}
+function switchTab(idx){
+  document.querySelectorAll('.page').forEach(function(p,i){p.classList.toggle('active',i===idx)});
+  document.querySelectorAll('nav.tabs button').forEach(function(b,i){b.classList.toggle('active',i===idx)});
+  if(idx===0){
+    renderCheckin();
+    var b=document.getElementById('commentBadge');if(b)b.textContent='';
+    localStorage.setItem('wuren_seen_comments',String(countComments(getLocal())));
+  }
+  if(idx===1)renderWeekly();if(idx===2)renderPredict();if(idx===3)renderHistory()
+}
+function renderAll(){renderCheckin();renderWeekly();renderPredict();renderHistory();updateCommentBadge(getLocal())}
 
 function repairApp(){
   toast('正在清理缓存…');
@@ -850,7 +875,7 @@ async function init(){
     sel.value=saved;
   }
   document.getElementById('checkinDate').value=fd(new Date());
-  document.getElementById('verNum').textContent='20';
+  document.getElementById('verNum').textContent='21';
   // Render immediately with local data, then sync
   renderAll();
   await syncNow(true);
@@ -863,7 +888,7 @@ async function init(){
     setTimeout(function(){renderCheckin();},100);
     setTimeout(function(){renderCheckin();},400);
   }
-  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=20').catch(function(){})}
+  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=21').catch(function(){})}
 }
 init();
 document.addEventListener('visibilitychange',function(){if(!document.hidden&&!window._tmp)syncNow(false)});
