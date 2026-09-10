@@ -245,7 +245,7 @@ nav.tabs{height:64px;background:rgba(238,229,212,.97);border-top:1px solid var(-
     <span class="chip" id="seasonChip"></span>
     <span class="streak-badge" id="streakBadge"></span>
     <span id="syncBar"></span>
-    <span class="sync-line">v<b id="verNum">19</b> <span class="fix" onclick="repairApp()" title="修复加载问题">修复</span></span>
+    <span class="sync-line">v<b id="verNum">20</b> <span class="fix" onclick="repairApp()" title="修复加载问题">修复</span></span>
     <select id="currentUser" onchange="onUserSwitch()" style="display:none"><option value="">切换成员 ▾</option></select>
   </div>
 </header>
@@ -277,7 +277,7 @@ nav.tabs{height:64px;background:rgba(238,229,212,.97);border-top:1px solid var(-
 // ====== 版本升级自动修复 ======
 // 当检测到版本号变化时，在 SW 接管之前就清理掉旧缓存
 (function(){
-  var EXPECTED=19;
+  var EXPECTED=20;
   var stored=parseInt(localStorage.getItem('wuren_ver')||'0');
   if(stored>0 && stored<EXPECTED){
     // 有旧版本缓存，抢先清理
@@ -463,6 +463,14 @@ async function saveAndSync(data,deletedPaths,changedPaths){
   setSyncStatus(document.getElementById('syncBar')?document.getElementById('syncBar').textContent:'',5000);
   return ok;
 }
+function renderSeasonChip(data){
+  var chip=document.getElementById('seasonChip');if(!chip)return;
+  if(!_seasonData||!_seasonData.nextSeason){chip.textContent='';return}
+  var cfg=_seasonData.nextSeason;var fourth=calculateSeasonFour(data,cfg);
+  if(fourth.status==='completed'){chip.textContent=cfg.name+'已完成 🏁 '+fourth.total.toFixed(1)+' 分';chip.classList.remove('rest')}
+  else if(fourth.status==='active'){chip.textContent=cfg.name+'进行中 · '+fourth.total.toFixed(1)+'/'+cfg.target+' 分';chip.classList.remove('rest')}
+  else{chip.textContent=cfg.name+' '+(cfg.plannedStartLabel||cfg.plannedStart||'')+' 开赛 · 目标 '+cfg.target+' 分';chip.classList.add('rest')}
+}
 function onUserSwitch(){var u=cu();localStorage.setItem('wuren_me',u);renderCheckin()}
 function switchToMe(p){var sel=document.getElementById('currentUser');if(!sel||sel.value===p)return;sel.value=p;onUserSwitch()}
 async function onDateChange(){renderCheckin();await syncNow(false)}
@@ -552,6 +560,7 @@ function renderCheckin(){
   document.getElementById('headerDate').innerHTML='<div class="d"><span class="dm">'+(today.getMonth()+1)+'月</span><span class="n">'+today.getDate()+'</span>日</div><span class="w">星期'+DAYS[today.getDay()===0?6:today.getDay()-1]+'</span>';
   document.getElementById('dateBadge').textContent=isToday?'':'补打卡';
   renderFriendStatus(data,ds,user);
+  renderSeasonChip(data);
 
   var sw=[];
   if(isS){var two=new Date(dd);two.setDate(two.getDate()-14);var pd=data.predictions[fd(two)];if(pd&&pd.winners)sw=pd.winners}
@@ -835,15 +844,13 @@ async function checkVersion(){
 
 async function init(){
   await loadSeasonData();
-  var chip=document.getElementById('seasonChip');
-  if(chip){var cfg=_seasonData&&_seasonData.nextSeason;chip.textContent=cfg?(cfg.name+' '+(cfg.plannedStartLabel||cfg.plannedStart||'')+' 开赛 · 目标 '+cfg.target+' 分'):''}
   var sel=document.getElementById('currentUser');sel.innerHTML='<option value="">切换成员</option>'+PERSONS.map(function(p){return'<option value="'+p+'">'+p+'</option>'}).join('');
   var saved=localStorage.getItem('wuren_me');
   if(saved&&PERSONS.indexOf(saved)>-1){
     sel.value=saved;
   }
   document.getElementById('checkinDate').value=fd(new Date());
-  document.getElementById('verNum').textContent='19';
+  document.getElementById('verNum').textContent='20';
   // Render immediately with local data, then sync
   renderAll();
   await syncNow(true);
@@ -856,7 +863,7 @@ async function init(){
     setTimeout(function(){renderCheckin();},100);
     setTimeout(function(){renderCheckin();},400);
   }
-  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=19').catch(function(){})}
+  if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js?v=20').catch(function(){})}
 }
 init();
 document.addEventListener('visibilitychange',function(){if(!document.hidden&&!window._tmp)syncNow(false)});
