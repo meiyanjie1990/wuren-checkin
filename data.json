@@ -421,6 +421,16 @@
         "师旌议"
       ],
       "revealed": true
+    },
+    "2026-09-13": {
+      "weekStart": "2026-09-14",
+      "weekEnd": "2026-09-20",
+      "preds": {
+        "单兰迪": 60
+      },
+      "actual": null,
+      "winners": [],
+      "revealed": false
     }
   },
   "comments": {
