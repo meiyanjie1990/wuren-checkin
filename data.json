@@ -404,9 +404,11 @@
         "梅妍洁": 55,
         "石维婧": 66
       },
-      "actual": null,
-      "winners": [],
-      "revealed": false
+      "actual": 56,
+      "winners": [
+        "梅妍洁"
+      ],
+      "revealed": true
     }
   },
   "comments": {
