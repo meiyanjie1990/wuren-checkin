@@ -605,11 +605,21 @@
         "王珂": 56,
         "石维婧": 62
       },
-      "actual": 40.0,
+      "actual": 40,
       "winners": [
         "梅妍洁"
       ],
       "revealed": true
+    },
+    "2026-09-27": {
+      "weekStart": "2026-09-28",
+      "weekEnd": "2026-10-04",
+      "preds": {
+        "梅妍洁": 55
+      },
+      "actual": null,
+      "winners": [],
+      "revealed": false
     }
   },
   "comments": {
