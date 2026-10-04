@@ -806,6 +806,16 @@
         "单兰迪"
       ],
       "revealed": true
+    },
+    "2026-10-04": {
+      "weekStart": "2026-10-05",
+      "weekEnd": "2026-10-11",
+      "preds": {
+        "王珂": 45
+      },
+      "actual": null,
+      "winners": [],
+      "revealed": false
     }
   },
   "comments": {
