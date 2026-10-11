@@ -996,6 +996,16 @@
         "师旌议"
       ],
       "revealed": true
+    },
+    "2026-10-11": {
+      "weekStart": "2026-10-12",
+      "weekEnd": "2026-10-18",
+      "preds": {
+        "梅妍洁": 40
+      },
+      "actual": null,
+      "winners": [],
+      "revealed": false
     }
   },
   "comments": {
