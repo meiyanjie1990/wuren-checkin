@@ -1196,6 +1196,16 @@
         "梅妍洁"
       ],
       "revealed": true
+    },
+    "2026-10-18": {
+      "weekStart": "2026-10-19",
+      "weekEnd": "2026-10-25",
+      "preds": {
+        "王珂": 38
+      },
+      "actual": null,
+      "winners": [],
+      "revealed": false
     }
   },
   "comments": {
