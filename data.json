@@ -1191,9 +1191,11 @@
         "师旌议": 54,
         "石维婧": 48
       },
-      "actual": null,
-      "winners": [],
-      "revealed": false
+      "actual": 31.5,
+      "winners": [
+        "梅妍洁"
+      ],
+      "revealed": true
     }
   },
   "comments": {
