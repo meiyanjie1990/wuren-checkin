@@ -1387,9 +1387,11 @@
         "石维婧": 52,
         "单兰迪": 48
       },
-      "actual": null,
-      "winners": [],
-      "revealed": false
+      "actual": 44.5,
+      "winners": [
+        "单兰迪"
+      ],
+      "revealed": true
     },
     "2026-10-25": {
       "weekStart": "2026-10-26",
