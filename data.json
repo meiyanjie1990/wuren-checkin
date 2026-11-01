@@ -1589,9 +1589,11 @@
         "单兰迪": 48,
         "石维婧": 52
       },
-      "actual": null,
-      "winners": [],
-      "revealed": false
+      "actual": 50.5,
+      "winners": [
+        "石维婧"
+      ],
+      "revealed": true
     }
   },
   "comments": {
