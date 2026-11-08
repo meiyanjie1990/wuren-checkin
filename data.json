@@ -1760,9 +1760,11 @@
         "师旌议": 56,
         "石维婧": 50
       },
-      "actual": null,
-      "winners": [],
-      "revealed": false
+      "actual": 41.5,
+      "winners": [
+        "石维婧"
+      ],
+      "revealed": true
     },
     "2026-11-08": {
       "weekStart": "2026-11-09",
