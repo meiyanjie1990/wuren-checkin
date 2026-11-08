@@ -1763,6 +1763,16 @@
       "actual": null,
       "winners": [],
       "revealed": false
+    },
+    "2026-11-08": {
+      "weekStart": "2026-11-09",
+      "weekEnd": "2026-11-15",
+      "preds": {
+        "单兰迪": 50
+      },
+      "actual": null,
+      "winners": [],
+      "revealed": false
     }
   },
   "comments": {
